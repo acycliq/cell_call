@@ -349,6 +349,55 @@
     <input type="hidden" id="yyValue" />
 </form>
 
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title">Transcriptomics viewer</h2>
+            </div>
+            <div class="modal-body">
+                <h2>Lorem ipsum dolor sit amet</h2>
+
+                <h3>Consectetur adipiscing elit</h3>
+
+                <p><b>Q: Donec quis justo turpis?</b><br>
+                    A: Nulla suscipit eget felis non accumsan. Pellentesque nulla nunc, ultrices posuere imperdiet non, congue ut tellus.</p>
+
+                <p style="margin-bottom: 0;"><b>Q: Integer eros nulla, luctus vel purus ut, dignissim aliquet purus.?</b><br>
+                    A:  Ut rutrum et ligula at venenatis:</p>
+                <ul>
+                    <li><b>Consequat lorem:</b>  Etiam malesuada nibh nibh.</li>
+                    <li><b>Aenean ac est:</b>  Vivamus luctus ac velit id lobortis. Sed ornare magna lectus, eget tempor nibh pretium in. Integer posuere ex sem, et eleifend lorem eleifend vitae.</li>
+                    <li><b>Morbi fermentum:</b>Pellentesque mollis ligula eget tempor mollis. Nam aliquam tempor cursus. Pellentesque velit quam, tincidunt a justo eget, maximus maximus nulla.</li>
+                </ul>
+
+                <p><b>Q: Aliquam neque odio, aliquet nec purus in, tincidunt commodo ipsum.?</b><br>
+                    A: Donec nunc orci, faucibus id metus non, cursus condimentum justo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam bibendum vehicula turpis id bibendum. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+
+                <h3>De finibus</h3>
+                <p><b>Q: Nec tempor purus porttitor sed?</b><br>
+                    A:  Sed iaculis auctor nisi, ornare suscipit ipsum pulvinar non. Mauris fringilla tellus ut enim condimentum, vel blandit lacus mattis. Nullam mattis dui quis metus faucibus, non vulputate dolor facilisis. Mauris ornare eros diam, ac rhoncus lectus eleifend non. Ut sollicitudin elementum dolor vel mollis.</p>
+
+                <h3>Morbi venenatis</h3>
+                <p><b>Q: Neque consequat tempor?</b><br>
+                    A: Nam porta efficitur maximus. Vestibulum venenatis magna ac molestie posuere. Phasellus suscipit egestas ipsum, eu tincidunt erat euismod eu:
+                    <a href="http://www.google.com" target="_blank">"Leo ac rutrum convallis"
+                    </a> (Fermentum).
+                </p>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="container-fluid">
@@ -424,7 +473,7 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">About</a></li>
+                    <li><a data-target="#myModal" data-toggle="modal" href="#myModal">About</a></li>
                     <li><a href="#">Contact</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
