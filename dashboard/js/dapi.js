@@ -596,6 +596,7 @@ function dapiChart(cellData, geneData, config) {
             layer.on(
                 {
                     'mouseover': VoronoiMouseover,
+                    // 'mouseout': VoronoiMouseout,
                     'click': clickHandler,
                     // 'add': function(e){console.log('add pressed')},
                     // 'remove': function(e){console.log('remove pressed')},
@@ -608,11 +609,8 @@ function dapiChart(cellData, geneData, config) {
     function clickHandler(e) {
         console.log('Voronoi was clicked');
         map.fitBounds(e.target.getBounds());
-        var layer = e.target;
+        updateDashboard(e.target.feature.properties)
 
-        //make sure zValue is empty
-        document.getElementById("zValue").value = ''
-        dispachClick(layer)
     }
 
 
@@ -620,7 +618,7 @@ function dapiChart(cellData, geneData, config) {
 
     function VoronoiMouseover(e) {
         voronoiHighlight(e);
-        dapiConfig.info.update(e.target.feature.properties)
+        dapiConfig.info.update(e.target.feature.properties);
     }
 
     function voronoiHighlight(e) {
@@ -632,6 +630,25 @@ function dapiChart(cellData, geneData, config) {
             console.log("moved into a new voronoi");
             styleVoronoiMarkers(point);
             previousVoronoiCell = idx;
+
+            // Look up and interact with sectin chart
+            var cn = e.target.feature.properties.Cell_Num
+            var xVal = d3.select('#Cell_Num_' + cn).attr('cx')
+            var yVal = d3.select('#Cell_Num_' + cn).attr('cy')
+            var rSize =  d3.select('#Cell_Num_' + cn).attr('r')
+
+            var width = 35*1.6;
+            var height = 35;
+            d3.select('.highlight-rect').attr("x", xVal-width/2)
+                .attr("y", yVal-height/2)
+                .attr("width", width)
+                .attr("height",height)
+                .attr('fill', 'orange')
+                .attr('fill-opacity', 0.5)
+                .attr('stroke', 'red')
+                // .attr('stroke-dasharray', '10,5')
+                // .attr('stroke-linecap', 'butt')
+                .attr('stroke-width', '3')
         }
         else {
             console.log("moving within the same voronoi, dont lookup")
@@ -648,14 +665,18 @@ function dapiChart(cellData, geneData, config) {
         ;
         var p = point.geometry.coordinates
         voronoiMarker = L.circleMarker([p[1], p[0]], {
-            radius: 8,
-            fillColor: "#FFCE00",
+            radius: 15,
+            fillColor: "orange",
             color: "red",
             weight: 1,
             opacity: 1,
             fillOpacity: 0.5
         }).addTo(map);
 
+    }
+
+    function VoronoiMouseout(e){
+        d3.select('.highlight-rect').style('opacity', 0)
     }
 
 

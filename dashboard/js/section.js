@@ -261,7 +261,7 @@ function sectionChart(data) {
         .enter()
         .append('circle')
         .attr('class', 'dotOnScatter')
-        .attr('id', d => d.managedData.IdentifiedType)
+        .attr('id', d => 'Cell_Num_' + d.Cell_Num)
         .attr('r', d => Math.sqrt(d.managedData.GeneCountTotal))
         .attr('cx', d => sectionFeatures.scale.x(d.x))
         .attr('cy', d => sectionFeatures.scale.y(d.y))
@@ -280,6 +280,11 @@ function sectionChart(data) {
         .attr('r', sectionFeatures.pointRadius * 2) // increase the size if highlighted
         //.style('fill', '#FFCE00')
         .style('display', 'none');
+
+    // add a rect for indicating the highlighted point when you mouseover on the dapi chart
+    dotsGroup.append('rect')
+        .attr('class', 'highlight-rect')
+
 
     // add the overlay on top of everything to take the mouse events
     dotsGroup.append('rect')
