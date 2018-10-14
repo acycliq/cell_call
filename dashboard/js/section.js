@@ -150,7 +150,7 @@ function aggregator(data) {
                 Prob: d3.sum(leaves, function (d) {
                     return d.Prob;
                 }), //sum all the values with the same IdentifiedType
-                color: leaves[0].color                             //Get the first color code. All codes with the same IdentifiedType are the same anyway
+                color: leaves[0].color //Get the first color code. All codes with the same IdentifiedType are the same anyway
             }
         }).entries(data)
         .map(function (d) {
@@ -170,7 +170,7 @@ function dataManager(sectionFeatures, data) {
     for (var i = 0; i < data.length; ++i) {
         var temp = [];
         for (var j = 0; j < data[i].ClassName.length; ++j) {
-            console.log(data[i].ClassName[j])
+            // console.log(data[i].ClassName[j])
             temp.push({
                 IdentifiedType: sectionFeatures.colorMap.get(data[i].ClassName[j]).IdentifiedType,
                 color: sectionFeatures.colorMap.get(data[i].ClassName[j]).color,
