@@ -121,8 +121,8 @@ function barchart(data) {
             // could have been a one-liner at the calling function. Not necessary to have
             // a full function for this. If however it needed to be something more
             // complicated then this is the place to write the logic
-            console.log("getting color for "+ d.labels)
-            console.log("found it! " + colorMap.get(d.labels).color)
+            // console.log("getting color for "+ d.labels)
+            // console.log("found it! " + colorMap.get(d.labels).color)
             return colorMap.get(d.labels).color;
         }
 
