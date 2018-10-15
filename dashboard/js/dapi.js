@@ -96,6 +96,19 @@ function dapi(config) {
         minZoom: minZoom,
         maxZoom: maxZoom,
     }).setView([img[1] / 2, img[0] / 5], 5);
+    //
+    // map.on('mouseover', function() {console.log("mouse over map");});
+    // //remove the rect from the section chart when you leave the dapi chart
+    // map.on('mouseout', hideRect);
+    // function hideRect(e){
+    //     console.log('Exiting map. Hide rect on section chart')
+    //     d3.select('.highlight-rect').attr("x",0)
+    //         .attr("y", 0)
+    //         .attr("width", 0)
+    //         .attr("height",0)
+    //         .attr('opacity', 0)
+    // }
+
 
     var urlStr = config.tiles
     //var urlStr = "./dashboard/data/img/65536px/{z}/{x}/{y}.png"
@@ -631,7 +644,7 @@ function dapiChart(cellData, geneData, config) {
             styleVoronoiMarkers(point);
             previousVoronoiCell = idx;
 
-            // Look up and interact with sectin chart
+            // Look up and interact with section chart
             var cn = e.target.feature.properties.Cell_Num
             var xVal = d3.select('#Cell_Num_' + cn).attr('cx')
             var yVal = d3.select('#Cell_Num_' + cn).attr('cy')
