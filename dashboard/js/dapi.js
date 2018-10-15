@@ -215,6 +215,33 @@ function dapi(config) {
     }
 
 
+    function makePolygonFeatures(data) {
+        var out = {
+            type: "FeatureCollection",
+            features: []
+        };
+        for (var i = 0; i < data.length; ++i) {
+            var g = {
+                "type": "Polygon",
+                "coordinates": [data[i]]
+            };
+
+            //create feature properties
+            var p = {
+                "id": i, //just a basic one, something like a placeholder
+            };
+
+            //create features with proper geojson structure
+            out.features.push({
+                "geometry": g,
+                "type": "Feature",
+                "properties": p
+            });
+        }
+        return out;
+    }
+
+
     // control that shows state info on hover
     var info = L.control({
         position: 'bottomleft'
@@ -384,21 +411,8 @@ function dapi(config) {
         layer.on({
             mouseover: highlightDot,
             mouseout: resetDotHighlight,
-            click: clickDot,
+            // click: clickDot,
         });
-        var genePopup = '<table style="width:30px"><tbody><tr><td><div>' + feature.properties.gene + '</div></td></tr></tbody></table>'
-
-        var cellPopup = donutPopup
-
-        if (feature.properties.type === 'gene') {
-            popup = genePopup;
-        }
-        if (feature.properties.type === 'cell') {
-            // popup = cellPopup;
-            popup = genePopup;
-        }
-
-        layer.bindPopup(popup);
     }
 
 
@@ -448,6 +462,7 @@ function dapi(config) {
     dapiData.getRadius = getRadius;
     dapiData.map = map;
     dapiData.makeCellFeatures = makeCellFeatures;
+    dapiData.makePolygonFeatures = makePolygonFeatures;
     dapiData.make_dots = make_dots;
     dapiData.info = info;
     dapiData.getRadius = getRadius;
@@ -463,124 +478,111 @@ function dapi(config) {
 }
 
 
-
-
-function dapiChart(cellData, geneData, config){
+function dapiChart(cellData, geneData, config) {
     console.log('Doing Dapi plot')
 
 
-        var dapiConfig = dapi(config)
-        var map = dapiConfig.map;
+    var dapiConfig = dapi(config)
+    var map = dapiConfig.map;
 
+    // var genes = d3.map(data, function (d) {return d.Gene;}).keys();
+    var myDots = dapiConfig.make_dots(geneData);
 
+    // Define an array to keep layers
+    var dotlayer = [];
 
-        // var genes = d3.map(data, function (d) {return d.Gene;}).keys();
-        
-        var myDots = dapiConfig.make_dots(geneData);
-
-        // Define an array to keep layers
-        var dotlayer = [];
-
-        //create marker layer and display it on the map
-        for (var i = 0; i < myDots.length; i += 1) {
-            dotlayer[i] = L.geoJson(myDots[i], {
-                pointToLayer: function (feature, latlng) {
-                    //var p = xy(project([latlng.lng, latlng.lat], img, grid));
-                    //return L.circleMarker(p, style(feature));
-                    // return new MarkerStar(p, style(feature));
-
-                    return new svgGlyph(latlng, dapiConfig.style(feature, 'gene')).bindTooltip(feature.properties.gene, {className: 'myCSSClass'});
-                },
-                onEachFeature: dapiConfig.onEachDot
-            });
-        }
-
-
-        // Keep these layers on a single layer group and call this to add them to the map
-        var lg = new L.LayerGroup();
-        function addLayers(){
-            $('#pleasewait').show();
-            setTimeout(function(){
-                $('#pleasewait').hide();
-
-                for (var i = 0; i < myDots.length; i += 1) {
-                    lg.addLayer(dotlayer[i]);
-                };
-                lg.addTo(map);
-
-            }, 500);
-        }
-
-        // Call this to clear chart from the layers grouped together on the layer group
-        function removeLayers(){
-            $('#pleasewait').show();
-            setTimeout(function(){
-                $('#pleasewait').hide();
-                lg.clearLayers();
-            }, 500);
-//            $('#pleasewait').hide();
-        }
-
-        //add now the grouped layers to the map
-        addLayers()
-
-
-        //Now add the info control  to map
-        dapiConfig.info.addTo(map);
-
-        // Plot now the cells
-        var cellDots = dapiConfig.makeCellFeatures(cellData);
-        var cellFeatures = cellDots.features;
-        var fc = turf.featureCollection(cellFeatures)
-        var cellLayer = L.geoJSON(fc, {
-            pointToLayer: function (feature, latlng){
-                return L.circleMarker(latlng, dapiConfig.style(feature, 'cell'));
+    //create marker layer and display it on the map
+    for (var i = 0; i < myDots.length; i += 1) {
+        dotlayer[i] = L.geoJson(myDots[i], {
+            pointToLayer: function (feature, latlng) {
+                return new svgGlyph(latlng, dapiConfig.style(feature, 'gene')).bindTooltip(feature.properties.gene, {className: 'myCSSClass'});
             },
             onEachFeature: dapiConfig.onEachDot
-        }).addTo(map);
+        });
+    }
 
 
-        //var cl = L.control.layers(null, {}).addTo(map);
+    // Keep these layers on a single layer group and call this to add them to the map
+    var lg = new L.LayerGroup();
 
+    function addLayers() {
+        $('#pleasewait').show();
+        setTimeout(function () {
+            $('#pleasewait').hide();
 
-        // // Lets remove that for now, will come back later
-        // var cl = L.control.layers(null, {}).addTo(map);
-        // for (j = 0; j < dotlayer.length; j += 1) {
-        //     var name = "Group " + j + "0-" + j + "9";
-        //     cl.addOverlay(dotlayer[j], name);
-        // }
-        // cl.addOverlay(cellLayer, "Cells");
-        // cl.addOverlay(voronoiLayer, "Voronoi Polygons");
-
-
-
-        // Voronoi
-        var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, dapiConfig.img[0], dapiConfig.img[1]]});
-
-        // //  **** Code for use in future revisions. Alternative way to calc voronois ****
-        // var myDelaunayPoints = []
-        // for(i=0; i<cellFeatures.length; ++i){
-        //     myDelaunayPoints[i] = cellFeatures[i].geometry.coordinates
-        // }
-        // var delaunay = d3.Delaunay.from(myDelaunayPoints);
-        // var voronoi = delaunay.voronoi([0, 0, dapiConfig.img[0], dapiConfig.img[1]]);
-        // var vorPolygon = voronoi.cellPolygon(0)
-        // // *** *** *** *** *** *** *** *** *** *** *** ***
-
-        //push the features of the cells to polygons
-        for (i=0; i < cellFeatures.length; ++i){
-            voronoiPolygons.features[i].properties = fc.features[i].properties;
-            voronoiPolygons.features[i].properties.generator = fc.features[i].geometry.coordinates;
-        }
-
-        // specify popup options
-        var customOptions =
-            {
-               'className' : 'popupCustom'
+            for (var i = 0; i < myDots.length; i += 1) {
+                lg.addLayer(dotlayer[i]);
             }
+            ;
+            lg.addTo(map);
 
-        var cm ;
-        var voronoiLayer = L.geoJSON(voronoiPolygons, {style: function(feature) {
+        }, 500);
+    }
+
+    // Call this to clear chart from the layers grouped together on the layer group
+    function removeLayers() {
+        $('#pleasewait').show();
+        setTimeout(function () {
+            $('#pleasewait').hide();
+            lg.clearLayers();
+        }, 500);
+//            $('#pleasewait').hide();
+    }
+
+    //add now the grouped layers to the map
+    addLayers()
+
+
+    //Now add the info control  to map
+    dapiConfig.info.addTo(map);
+
+    // Plot now the cells
+    var cellDots = dapiConfig.makeCellFeatures(cellData);
+    var cellFeatures = cellDots.features;
+    // var fc = turf.featureCollection(cellFeatures)
+    // var cellLayer = L.geoJSON(fc, {
+    //     pointToLayer: function (feature, latlng){
+    //         return L.circleMarker(latlng, dapiConfig.style(feature, 'cell'));
+    //     },
+    //     //onEachFeature: dapiConfig.onEachDot
+    // }).addTo(map);
+
+
+    //var cl = L.control.layers(null, {}).addTo(map);
+
+
+    // // Lets remove that for now, will come back later
+    // var cl = L.control.layers(null, {}).addTo(map);
+    // for (j = 0; j < dotlayer.length; j += 1) {
+    //     var name = "Group " + j + "0-" + j + "9";
+    //     cl.addOverlay(dotlayer[j], name);
+    // }
+    // cl.addOverlay(cellLayer, "Cells");
+    // cl.addOverlay(voronoiLayer, "Voronoi Polygons");
+
+
+    // Voronoi
+    // var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, dapiConfig.img[0], dapiConfig.img[1]]});
+
+    // Alternative way to calc voronois
+    var myDelaunayPoints = []
+    for (i = 0; i < cellFeatures.length; ++i) {
+        myDelaunayPoints[i] = cellFeatures[i].geometry.coordinates
+    }
+    var delaunay = d3.Delaunay.from(myDelaunayPoints);
+    var voronoi = delaunay.voronoi([0, 0, dapiConfig.img[0], dapiConfig.img[1]]);
+    var voronoiArray = Array.from(voronoi.cellPolygons())
+    var voronoiPolygons = dapiConfig.makePolygonFeatures(voronoiArray)
+    // // *** *** *** *** *** *** *** *** *** *** *** ***
+
+    // //push the features of the cells to polygons
+    for (i = 0; i < cellFeatures.length; ++i) {
+        voronoiPolygons.features[i].properties = cellDots.features[i].properties;
+        voronoiPolygons.features[i].properties.generator = cellDots.features[i].geometry.coordinates;
+    }
+
+    var voronoiLayer = L.geoJSON(voronoiPolygons, {
+        style: function (feature) {
             return {
                 weight: 0.0, // Voronoi not visible, useful only for navigation purposes
                 color: 'tomato',
@@ -590,252 +592,237 @@ function dapiChart(cellData, geneData, config){
                 renderer: dapiConfig.myRenderer,
             };
         },
-            onEachFeature: function(feature, layer) {
+        onEachFeature: function (feature, layer) {
             layer.on(
                 {
-                    // 'mouseover': function(e){e.target.setStyle({weight:0.0, color: 'red'}); mouseoverHandler(e); dapiConfig.info.update(e.target.feature.properties);},
-                    'mouseover': VorMouseover,
-                    // 'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup(); dapiConfig.info.update(); map.removeLayer(cm)},
-                    // 'mouseover': function(e){
-                    //     console.log('Voronoi clicked')
-                    //     //map.fitBounds(e.target.getBounds());
-                    //     console.log("opening popup")
-                    //     var voronoiGenerator = e.target.feature.properties.generator;
-                    //     var targetPoint = L.latLng([voronoiGenerator[1], voronoiGenerator[0]])
-                    //     this.openPopup(targetPoint);
-                    //     },
+                    'mouseover': VoronoiMouseover,
+                    // 'mouseout': VoronoiMouseout,
                     'click': clickHandler,
-                    'add': function(e){console.log('add pressed')},
-                    'remove': function(e){console.log('remove pressed')},
+                    // 'add': function(e){console.log('add pressed')},
+                    // 'remove': function(e){console.log('remove pressed')},
                 }
             );//close bracket
+        }
+    }).addTo(map);
 
-                // thats one way to bind a popup. This however will make the popup show on mouseclicks.
-                // If this is not desired then do it the way described as few lines below
-                // layer.bindPopup(donutPopup, customOptions);
-            }
 
+    function clickHandler(e) {
+        console.log('Voronoi was clicked');
+        map.fitBounds(e.target.getBounds());
+        updateDashboard(e.target.feature.properties)
+
+    }
+
+
+    var previousVoronoiCell = [];
+
+    function VoronoiMouseover(e) {
+        voronoiHighlight(e);
+        dapiConfig.info.update(e.target.feature.properties);
+    }
+
+    function voronoiHighlight(e) {
+        console.log("Current position: x: " + e.latlng.lng + ", y: " + e.latlng.lat);
+        var idx = delaunay.find(e.latlng.lng, e.latlng.lat);
+        var point = cellFeatures[idx];
+
+        if (previousVoronoiCell != idx) {
+            console.log("moved into a new voronoi");
+            styleVoronoiMarkers(point);
+            previousVoronoiCell = idx;
+
+            // Look up and interact with sectin chart
+            var cn = e.target.feature.properties.Cell_Num
+            var xVal = d3.select('#Cell_Num_' + cn).attr('cx')
+            var yVal = d3.select('#Cell_Num_' + cn).attr('cy')
+            var rSize =  d3.select('#Cell_Num_' + cn).attr('r')
+
+            var width = 35*1.6;
+            var height = 35;
+            d3.select('.highlight-rect').attr("x", xVal-width/2)
+                .attr("y", yVal-height/2)
+                .attr("width", width)
+                .attr("height",height)
+                .attr('fill', 'orange')
+                .attr('fill-opacity', 0.5)
+                .attr('stroke', 'red')
+                // .attr('stroke-dasharray', '10,5')
+                // .attr('stroke-linecap', 'butt')
+                .attr('stroke-width', '3')
+        }
+        else {
+            console.log("moving within the same voronoi, dont lookup")
+        }
+    };
+
+    var voronoiMarker
+    var styleVoronoiMarkers = function (point) {
+        var myNum = point.properties.Cell_Num;
+        if (voronoiMarker) {
+            map.removeLayer(voronoiMarker)
+            console.log('removed previous Voronoi marker')
+        }
+        ;
+        var p = point.geometry.coordinates
+        voronoiMarker = L.circleMarker([p[1], p[0]], {
+            radius: 15,
+            fillColor: "orange",
+            color: "red",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.5
         }).addTo(map);
 
-        function VorMouseover(e){
-            e.target.setStyle({weight:1.0, color: 'red'});
-            var key = dapiConfig.t.untransform(L.point([e.latlng.lng, e.latlng.lat]))
-            // var id = delaunay.find(key.x, key.y)
-            // var point = myDelaunayPoints[id]
+    }
 
-            var coord = e.latlng;
-            var lat = coord.lat;
-            var lng = coord.lng;
-            var targetPoint = turf.point([lng, lat]);
-            var nearest = turf.nearestPoint(targetPoint, fc);
-            nearest.properties['marker-color'] = '#F00';
+    function VoronoiMouseout(e){
+        d3.select('.highlight-rect').style('opacity', 0)
+    }
 
 
-        }
-
-        // Bind popups
-        var cellCounter;
-        var popup = L.popup(customOptions);
-        function mouseoverHandler(e){
-            //reset the style first
-            e.target.setStyle();
-            handlerHelper(e)
-        }
-
-        function clickHandler(e){
-            map.removeLayer(cm)
-            clickVoronoi(e)
-            handlerHelper(e);
-        }
-
-        function clickVoronoi(e){
-            console.log('Voronoi was clicked');
-            map.fitBounds(e.target.getBounds());
-            var layer = e.target;
-            var voronoiStyle = {
-                fillColor: "#FFCE00",
-                color: "#FFCE00",
-                weight: 5,
-                opacity: 1,
-                fillOpacity: 0.9
-            }
-            //layer.setStyle(voronoiStyle)
-
-            //make sure zValue is empty
-            document.getElementById("zValue").value = ''
-            dispachClick(layer)
-
-        }
-
-        function handlerHelper(e){
-            var content = donutPopup(e.target);
-            var voronoiGenerator = e.target.feature.properties.generator;
-            var targetPoint = L.latLng([voronoiGenerator[1], voronoiGenerator[0]]);
-            popup.setContent(content);
-            popup.setLatLng(targetPoint);
-
-            cm = L.circleMarker(targetPoint, {
-                radius: 8,
-                fillColor: "#FFCE00",
-                color: "red",
-                weight: 1,
-                opacity: 1,
-                fillOpacity: 0.9
-            }).addTo(map);
-            //map.openPopup(popup);
-        }
-
-
-
-
-
-
-        
-
-        // Toggle button to turn layers on and off
-        var customControl =  L.Control.extend({
-          options: {
+    // Toggle button to turn layers on and off
+    var customControl = L.Control.extend({
+        options: {
             position: 'topright'
-          },
+        },
 
-          onAdd: function (map) {
+        onAdd: function (map) {
             var container = L.DomUtil.create('input');
-            container.type="button";
-            container.title="Toggle genes on/off";
+            container.type = "button";
+            container.title = "Toggle genes on/off";
             container.value = "Hide genes";
 
-            container.style.backgroundColor = 'white';     
+            container.style.backgroundColor = 'white';
             container.style.backgroundSize = "80px 30px";
             container.style.width = '80px';
             container.style.height = '30px';
-              
+
 
             function toggle(button) {
-                if(button.value=="Hide genes") {
-                    button.value="Show genes"
-                    button.innerHTML="Show genes"
+                if (button.value == "Hide genes") {
+                    button.value = "Show genes"
+                    button.innerHTML = "Show genes"
                     removeLayers();
-                } else if(button.value=="Show genes") {
-                    button.value="Hide genes"
-                    button.innerHTML="Hide genes"
+                } else if (button.value == "Show genes") {
+                    button.value = "Hide genes"
+                    button.innerHTML = "Hide genes"
                     addLayers();
                 }
             }
 
-            container.onmouseover = function(){
-              container.style.backgroundColor = 'pink'; 
+            container.onmouseover = function () {
+                container.style.backgroundColor = 'pink';
             }
-            container.onmouseout = function(){
-              container.style.backgroundColor = 'white'; 
+            container.onmouseout = function () {
+                container.style.backgroundColor = 'white';
             }
 
-            container.onclick = function(){
+            container.onclick = function () {
                 toggle(this);
-              console.log('buttonClicked');
+                console.log('buttonClicked');
             }
 
 
             return container;
-          }
-        });
-        //map.addControl(new customControl());
-        
-        
-        // toggle button (again)
-        // Toggle button to turn layers on and off
-        // you may also want to try this one: http://www.bootstraptoggle.com/
-        var switchControl = L.Control.extend({
-          options: {
+        }
+    });
+    //map.addControl(new customControl());
+
+
+    // toggle button (again)
+    // Toggle button to turn layers on and off
+    // you may also want to try this one: http://www.bootstraptoggle.com/
+    var switchControl = L.Control.extend({
+        options: {
             position: 'topright'
-          },
+        },
 
-          onAdd: function(map) {
-              var container = L.DomUtil.create('div');
-              container.setAttribute('rel', 'tooltip');
-              container.setAttribute('data-placement', 'bottom');
-              container.title = "Show genes?";
-              //container.style = "width: 100px";
-              
-              // Use a child input.
-              var input = L.DomUtil.create('input');
-              input.type = "checkbox";
-              input.title = "Some title";
-              input.value = "On";
-              // Insert the input as child of container.
-              container.appendChild(input);
+        onAdd: function (map) {
+            var container = L.DomUtil.create('div');
+            container.setAttribute('rel', 'tooltip');
+            container.setAttribute('data-placement', 'bottom');
+            container.title = "Show genes?";
+            //container.style = "width: 100px";
+
+            // Use a child input.
+            var input = L.DomUtil.create('input');
+            input.type = "checkbox";
+            input.title = "Some title";
+            input.value = "On";
+            // Insert the input as child of container.
+            container.appendChild(input);
 
 
-              function toggle(event) {
-                if(event.target.checked === false) {
+            function toggle(event) {
+                if (event.target.checked === false) {
 //                    button.value="Show genes"
 //                    button.innerHTML="Show genes"
                     removeLayers();
-                } else if(event.target.checked === true) {
+                } else if (event.target.checked === true) {
 //                    button.value="Hide genes"
 //                    button.innerHTML="Hide genes"
                     addLayers();
                 }
             }
-              
+
             jQuery(input).bootstrapSwitch({
                 size: 'mini',
                 state: true,
                 onText: 'Yes',
                 offText: 'No',
-              // http://bootstrapswitch.site/options.html
-              onSwitchChange: function(event) {
-                console.log('buttonClicked', event.target.checked);
-                  toggle(event);
-              }
+                // http://bootstrapswitch.site/options.html
+                onSwitchChange: function (event) {
+                    console.log('buttonClicked', event.target.checked);
+                    toggle(event);
+                }
             });
 
             return container;
-          }
-        });
-        map.addControl(new switchControl());
-        
-
-        // make placeholder for the spinner gif
-        function addControlPlaceholders(map) {
-            var corners = map._controlCorners,
-                l = 'leaflet-',
-                container = map._controlContainer;
-
-            function createCorner(vSide, hSide) {
-                var className = l + vSide + ' ' + l + hSide;
-                corners[vSide + hSide] = L.DomUtil.create('div', className, container);
-            }
-
-            createCorner('verticalcenter', 'left');
-            createCorner('verticalcenter', 'right');
-            createCorner('verticalcenter', 'horizontalcenter');
-
         }
-        addControlPlaceholders(map);
+    });
+    map.addControl(new switchControl());
 
 
-        // Do the spinner control
-        var spinnerControl = L.Control.extend({
-           options:{position:'verticalcenterhorizontalcenter'},
-            
-            onAdd: function(map){
-                
-                var container = L.DomUtil.create('div');
-                container.id = "pleasewait";
-                container.style = "display: none";
-                
-                var img = L.DomUtil.create('img');
-                img.src="./dashboard/data/img/spinner.gif";
-                
-                container.appendChild(img);
-                
-                return container;
-            }
-        });
-        map.addControl(new spinnerControl());
+    // make placeholder for the spinner gif
+    function addControlPlaceholders(map) {
+        var corners = map._controlCorners,
+            l = 'leaflet-',
+            container = map._controlContainer;
 
+        function createCorner(vSide, hSide) {
+            var className = l + vSide + ' ' + l + hSide;
+            corners[vSide + hSide] = L.DomUtil.create('div', className, container);
+        }
 
-
+        createCorner('verticalcenter', 'left');
+        createCorner('verticalcenter', 'right');
+        createCorner('verticalcenter', 'horizontalcenter');
 
     }
+
+    addControlPlaceholders(map);
+
+
+    // Do the spinner control
+    var spinnerControl = L.Control.extend({
+        options: {position: 'verticalcenterhorizontalcenter'},
+
+        onAdd: function (map) {
+
+            var container = L.DomUtil.create('div');
+            container.id = "pleasewait";
+            container.style = "display: none";
+
+            var img = L.DomUtil.create('img');
+            img.src = "./dashboard/data/img/spinner.gif";
+
+            container.appendChild(img);
+
+            return container;
+        }
+    });
+    map.addControl(new spinnerControl());
+
+
+}
 

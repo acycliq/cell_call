@@ -150,7 +150,7 @@ function aggregator(data) {
                 Prob: d3.sum(leaves, function (d) {
                     return d.Prob;
                 }), //sum all the values with the same IdentifiedType
-                color: leaves[0].color                             //Get the first color code. All codes with the same IdentifiedType are the same anyway
+                color: leaves[0].color //Get the first color code. All codes with the same IdentifiedType are the same anyway
             }
         }).entries(data)
         .map(function (d) {
@@ -170,7 +170,7 @@ function dataManager(sectionFeatures, data) {
     for (var i = 0; i < data.length; ++i) {
         var temp = [];
         for (var j = 0; j < data[i].ClassName.length; ++j) {
-            console.log(data[i].ClassName[j])
+            // console.log(data[i].ClassName[j])
             temp.push({
                 IdentifiedType: sectionFeatures.colorMap.get(data[i].ClassName[j]).IdentifiedType,
                 color: sectionFeatures.colorMap.get(data[i].ClassName[j]).color,
@@ -261,7 +261,7 @@ function sectionChart(data) {
         .enter()
         .append('circle')
         .attr('class', 'dotOnScatter')
-        .attr('id', d => d.managedData.IdentifiedType)
+        .attr('id', d => 'Cell_Num_' + d.Cell_Num)
         .attr('r', d => Math.sqrt(d.managedData.GeneCountTotal))
         .attr('cx', d => sectionFeatures.scale.x(d.x))
         .attr('cy', d => sectionFeatures.scale.y(d.y))
@@ -280,6 +280,11 @@ function sectionChart(data) {
         .attr('r', sectionFeatures.pointRadius * 2) // increase the size if highlighted
         //.style('fill', '#FFCE00')
         .style('display', 'none');
+
+    // add a rect for indicating the highlighted point when you mouseover on the dapi chart
+    dotsGroup.append('rect')
+        .attr('class', 'highlight-rect')
+
 
     // add the overlay on top of everything to take the mouse events
     dotsGroup.append('rect')
