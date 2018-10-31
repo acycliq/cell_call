@@ -3,9 +3,9 @@ import numpy_groupies as npg
 import pandas as pd
 import os
 import scipy
-import src.utils as utils
-from src.iss import Iss
-from src.geneset import GeneSet
+import utils as utils
+from iss import Iss
+from geneset import GeneSet
 from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
 import logging
