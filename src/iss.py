@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
-import src.utils as utils
+import utils as utils
 from skimage.measure import regionprops
 import logging
 
