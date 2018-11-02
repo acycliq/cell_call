@@ -132,9 +132,9 @@ class Call_cells:
         exclude_genes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
         all_gene_names = self.iss.GeneNames[self.iss.SpotCodeNo-1] # -1 is needed because Matlab is 1-based
         cond_1 = ~np.isin(all_gene_names, exclude_genes)
-        start_time = time()
-        cond_2 = utils.inpolygon(self.iss.SpotGlobalYX[:, 0], self.iss.SpotGlobalYX[:, 1], self.iss.CellCallRegionYX[:, 0], self.iss.CellCallRegionYX[:, 1])
-        print('Shapely Elapsed time: ' + str(time() - start_time))
+        # start_time = time()
+        # cond_2 = utils.inpolygon(self.iss.SpotGlobalYX[:, 0], self.iss.SpotGlobalYX[:, 1], self.iss.CellCallRegionYX[:, 0], self.iss.CellCallRegionYX[:, 1])
+        # print('Shapely Elapsed time: ' + str(time() - start_time))
 
         start_time = time()
         cond_2 = utils.inpolygon2(self.iss.SpotGlobalYX[:, 0], self.iss.SpotGlobalYX[:, 1], self.iss.CellCallRegionYX[:, 0], self.iss.CellCallRegionYX[:, 1])

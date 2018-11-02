@@ -27,8 +27,15 @@ class Iss:
             setattr(self, key, dictionary[key])
 
     def _load_cellMapFile(self):
-        mat = utils.loadmat(self.CellMapFile)
-        self.cell_map = mat["CellMap"]
+        try:
+            mat = utils.loadmat(self.CellMapFile)
+            self.cell_map = mat["CellMap"]
+        except TypeError:
+            matStr = "..\data\CellMap.mat"
+            logger.info("reading CellMap from %s", matStr)
+            mat = utils.loadmat(matStr)
+            self.cell_map = mat["CellMap"]
+
 
 
 
