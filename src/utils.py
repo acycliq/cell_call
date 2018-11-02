@@ -72,7 +72,7 @@ def _todict(matobj):
     return dict
 
 
-def inpolygon(xq, yq, xv, yv):
+def inpolygon_deprecated (xq, yq, xv, yv):
     '''
     :param xq:
     :param yq:
@@ -96,28 +96,16 @@ def inpolygon(xq, yq, xv, yv):
     return out
 
 
-def inpolygon2(xq, yq, xv, yv):
+def inpolygon(pts, poly):
     '''
-    :param xq:
-    :param yq:
-    :param xv:
-    :param yv:
-    :return:
+    A lot faster than the previous version but it is not clear what happens when a point is on the polygon.
+    I doesnt seem to be an issue here but in general it might matter
     '''
-
-    # create the polygon
-    poly = np.column_stack([xv, yv])
-
-    # create a list of Points
-    pts = np.column_stack([xq, yq])
 
     # check if point is inside or on the edge
     path = mpltPath.Path(poly)
     out = path.contains_points(pts)
-    # isInside = [pt.within(poly) for pt in pts]
-    # isOn = [pt.touches(poly) for pt in pts]
 
-    # out = np.array(isInside) | np.array(isOn)
     return out
 
 
