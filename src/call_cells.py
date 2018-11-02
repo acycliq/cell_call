@@ -134,7 +134,7 @@ class Call_cells:
         cond_1 = ~np.isin(all_gene_names, exclude_genes)
         start_time = time()
         cond_2 = utils.inpolygon(self.iss.SpotGlobalYX, self.iss.CellCallRegionYX)
-        print('Shapely Elapsed time: ' + str(time() - start_time))
+        print('Elapsed time: ' + str(time() - start_time))
 
         cond_3 = self._quality_threshold()
 
