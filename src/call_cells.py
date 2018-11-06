@@ -168,7 +168,7 @@ class Call_cells:
 
         return qual_ok
 
-    @utils.cached('cell_info_cache.pickle')
+    # @utils.cached('cell_info_cache.pickle')
     def _cell_info(self):
         '''
         Read image and calc some statistics
@@ -177,7 +177,16 @@ class Call_cells:
         y0 = self.iss.CellCallRegionYX[:, 0].min()
         x0 = self.iss.CellCallRegionYX[:, 1].min()
 
-        mat = utils.loadmat(self.iss.CellMapFile)
+        # mat = utils.loadmat(self.iss.CellMapFile)
+        try:
+            mat = utils.loadmat(self.CellMapFile)
+            self.cell_map = mat["CellMap"]
+        except AttributeError:
+            matStr = "..\data\CellMap.mat"
+            logger.info("reading CellMap from %s", matStr)
+            mat = utils.loadmat(matStr)
+            self.cell_map = mat["CellMap"]
+
         rp = regionprops(mat["CellMap"])
         CellYX = np.array([x.centroid for x in rp]) + np.array([y0, x0])
 
@@ -196,7 +205,7 @@ class Call_cells:
         out["RelCellRadius"] = RelCellRadius
         return out
 
-    @utils.cached('ini_cache.pickle')
+    # @utils.cached('ini_cache.pickle')
     def _initialise(self):
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.SpotGeneName, return_inverse=True, return_counts=True)
         ClassNames = np.append(pd.unique(self.gSet.Class), 'Zero')
