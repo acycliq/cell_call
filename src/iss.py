@@ -1,8 +1,5 @@
-import numpy as np
-import pandas as pd
 import os
-import utils as utils
-from skimage.measure import regionprops
+import utils
 import logging
 
 
@@ -16,15 +13,18 @@ logging.basicConfig(
 class Iss:
     def __init__(self):
         my_path = os.path.abspath(os.path.dirname(__file__))
-        self._populate(os.path.join(my_path, "../data/iss.mat"))
+        issPath = os.path.join(my_path, "../data/iss.mat")
+        self._populate(issPath)
         self._load_cellMapFile()
         print(self.cell_map)
 
-    def _populate(self, path_str):
-        mat = utils.loadmat(path_str)
+    def _populate(self, pathStr):
+        mat = utils.loadmat(pathStr)
         dictionary = mat["iss"]
+        logger.info("reading iss.mat from %s", pathStr)
         for key in mat["iss"]:
             setattr(self, key, dictionary[key])
+            logger.info("Attribute %s populated.", key)
 
     def _load_cellMapFile(self):
         try:
