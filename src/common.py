@@ -46,8 +46,8 @@ class Base(object):
         elif np.issubdtype(np.array(IDs).dtype, np.str_):
             mask = self.Class == IDs
             if np.issubdtype(np.array(mask).dtype, np.bool_):
-                print(self.GeneExp.shape)
-                print(mask.shape)
+                # print(self.GeneExp.shape)
+                # print(mask.shape)
                 dc.GeneExp_df = self.GeneExp_df.loc[:, mask]
             else:
                 dc.GeneExp_df = self.GeneExp_df[IDs]
