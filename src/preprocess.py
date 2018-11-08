@@ -92,53 +92,30 @@ def cell_info(iss):
     out = dict()
     out["cellYX"] = cellYX
     out["meanCellRadius"] = meanCellRadius
-    out["melCellRadius"] = relCellRadius
+    out["relCellRadius"] = relCellRadius
     return out
 
 
 # @utils.cached('ini_cache.pickle')
 def initialise(spots, cellinfo, iss, gSet):
+
+    # 1) Get Genenames etc
     [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(spots['spotGeneName'], return_inverse=True, return_counts=True)
+
+    # 2) Get the class name and add an extra class, labeled 'Zero'
     ClassNames = np.append(pd.unique(gSet.Class), 'Zero')
 
-    nG = GeneNames.shape[0]
-    nK = ClassNames.shape[0]
-    nC = cellinfo['cellYX'].shape[0] + 1
-    nS = spots['spotYX'].shape[0]
-    nN = iss.nNeighbors + 1
+    # 3) calc the prior
+    LogClassPrior = getLogClassPrior(ClassNames)
 
-    ClassPrior = np.append([.5 * np.ones(nK - 1) / nK], 0.5);
+    # 4) get the log-mean expression across all classes
+    lMeanClassExp, MeanClassExp = getClassExpression(GeneNames, ClassNames, iss, gSet)
 
-    MeanClassExp = np.zeros([nK, nG])
-    temp = gSet.GeneSubset(GeneNames).ScaleCell(0)
-    for k in range(nK - 1):
-        val = iss.Inefficiency * np.mean(temp.CellSubset(ClassNames[k]).GeneExp, 1);
-        MeanClassExp[k, :] = val
+    # 5) calc loglikelihood
+    D, Neighbors, SpotInCell = loglik(cellinfo, spots, iss)
 
-    lMeanClassExp = np.log(MeanClassExp + self.iss.SpotReg)
-    nbrs = NearestNeighbors(n_neighbors=nN, algorithm='ball_tree').fit(CellYX)
-    Dist, Neighbors = nbrs.kneighbors(SpotYX)
-    Neighbors[:, -1] = nC
-
-    D = -Dist ** 2 / (2 * self.MeanCellRadius ** 2) - np.log(2 * np.pi * self.MeanCellRadius ** 2)
-    D[:, -1] = np.log(self.iss.MisreadDensity)
-
-    y0 = self.iss.CellCallRegionYX[:, 0].min()
-    x0 = self.iss.CellCallRegionYX[:, 1].min()
-    logger.info("Rebasing SpotYX to match the one-based indexed Matlab object.")
-    spotyx = self.SpotYX - 1
-    idx = spotyx - [y0, x0]
-    SpotInCell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
-    logger.info("Rebasing Neighbors to match the one-based indexed Matlab object.")
-    sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
-    assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
-
-    D[SpotInCell > 0, 0] = D[SpotInCell > 0, 0] + self.iss.InsideCellBonus
-    LogClassPrior = np.log(ClassPrior)
-    nom = np.exp(-self.RelCellRadius ** 2 / 2) * (1 - np.exp(self.iss.InsideCellBonus)) + np.exp(
-        self.iss.InsideCellBonus)
-    denom = np.exp(-0.5) * (1 - np.exp(self.iss.InsideCellBonus)) + np.exp(self.iss.InsideCellBonus)
-    CellAreaFactor = nom / denom
+    # 6) calc the cell area factor
+    CellAreaFactor = getCellAreaFactor(cellinfo, iss)
 
     out = dict()
     out["GeneNames"] = GeneNames
@@ -153,3 +130,64 @@ def initialise(spots, cellinfo, iss, gSet):
     out["CellAreaFactor"] = CellAreaFactor
     out["SpotInCell"] = SpotInCell
     return out
+
+
+def getLogClassPrior(ClassNames):
+    print('in logClassPrior')
+    # uniform prior on Zero and non-zero classes
+    nK = ClassNames.shape[0]
+    classPrior = np.append([.5 * np.ones(nK - 1) / nK], 0.5)
+    logClassPrior = np.log(classPrior)
+    return logClassPrior
+
+
+def getClassExpression(GeneNames, ClassNames, iss, gSet):
+    print('in classExpression')
+    nG = GeneNames.shape[0]
+    nK = ClassNames.shape[0]
+    MeanClassExp = np.zeros([nK, nG])
+    temp = gSet.GeneSubset(GeneNames).ScaleCell(0)
+    for k in range(nK - 1):
+        val = iss.Inefficiency * np.mean(temp.CellSubset(ClassNames[k]).GeneExp, 1)
+        MeanClassExp[k, :] = val
+
+    logMeanClassExp = np.log(MeanClassExp + iss.SpotReg)
+
+    return logMeanClassExp, MeanClassExp
+
+
+def getCellAreaFactor(cellinfo, iss):
+    relCellRadius = cellinfo["relCellRadius"]
+    nom = np.exp(-relCellRadius ** 2 / 2) * (1 - np.exp(iss.InsideCellBonus)) + np.exp(iss.InsideCellBonus)
+    denom = np.exp(-0.5) * (1 - np.exp(iss.InsideCellBonus)) + np.exp(iss.InsideCellBonus)
+    cellAreaFactor = nom / denom
+
+    return cellAreaFactor
+
+
+def loglik(cellinfo, spots, iss):
+    cellYX = cellinfo['cellYX']
+    spotYX = spots['spotYX']
+    meanCellRadius = cellinfo["meanCellRadius"]
+    nC = cellYX.shape[0] + 1
+    nN = iss.nNeighbors + 1
+    nbrs = NearestNeighbors(n_neighbors=nN, algorithm='ball_tree').fit(cellYX)
+    Dist, Neighbors = nbrs.kneighbors(spotYX)
+    Neighbors[:, -1] = nC
+
+    D = -Dist ** 2 / (2 * meanCellRadius ** 2) - np.log(2 * np.pi * meanCellRadius ** 2)
+    D[:, -1] = np.log(iss.MisreadDensity)
+
+    y0 = iss.CellCallRegionYX[:, 0].min()
+    x0 = iss.CellCallRegionYX[:, 1].min()
+    logger.info("Rebasing SpotYX to match the one-based indexed Matlab object.")
+    spotyx = spotYX - 1
+    idx = spotyx - [y0, x0]
+    SpotInCell = utils.IndexArrayNan(iss.cell_map, idx.T)
+    logger.info("Rebasing Neighbors to match the one-based indexed Matlab object.")
+    sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
+    assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
+
+    D[SpotInCell > 0, 0] = D[SpotInCell > 0, 0] + iss.InsideCellBonus
+
+    return D, Neighbors, SpotInCell
