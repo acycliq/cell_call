@@ -171,19 +171,27 @@ def loglik(cellinfo, spots, iss):
     meanCellRadius = cellinfo["meanCellRadius"]
     nC = cellYX.shape[0] + 1
     nN = iss.nNeighbors + 1
+
+    # for each spot find the closest cell (in fact the top nN-closest cells...)
     nbrs = NearestNeighbors(n_neighbors=nN, algorithm='ball_tree').fit(cellYX)
     Dist, Neighbors = nbrs.kneighbors(spotYX)
+
+    # Assign the nN-closest neighbour to an out-of-bounds value. (I would use -1 here instead of nC, anyways...)
     Neighbors[:, -1] = nC
 
+    # Assume a bivariate normal and calc the likelihood
     D = -Dist ** 2 / (2 * meanCellRadius ** 2) - np.log(2 * np.pi * meanCellRadius ** 2)
+
+    # last column (nN-closest) keeps the misreads,
     D[:, -1] = np.log(iss.MisreadDensity)
+
 
     y0 = iss.CellCallRegionYX[:, 0].min()
     x0 = iss.CellCallRegionYX[:, 1].min()
     logger.info("Rebasing SpotYX to match the one-based indexed Matlab object.")
-    spotyx = spotYX - 1
+    spotyx = spotYX - 1 # I DO NOT THINK THIS IS NEEDED!! REMOVE IT!
     idx = spotyx - [y0, x0]
-    SpotInCell = utils.IndexArrayNan(iss.cell_map, idx.T)
+    SpotInCell = utils.IndexArrayNan(iss.cell_map, idx.T) # I DONT QUITE GET THAT. WHY NOT JUST CHECKING IF Dist<meanCellRadius INSTEAD?
     logger.info("Rebasing Neighbors to match the one-based indexed Matlab object.")
     sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
     assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
