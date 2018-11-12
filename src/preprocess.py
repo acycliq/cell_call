@@ -190,9 +190,12 @@ def loglik(cellinfo, spots, iss):
     x0 = iss.CellCallRegionYX[:, 1].min()
     logger.info("Rebasing SpotYX to match the one-based indexed Matlab object.")
     spotyx = spotYX - 1 # I DO NOT THINK THIS IS NEEDED!! REMOVE IT!
-    idx = spotyx - [y0, x0]
-    SpotInCell = utils.IndexArrayNan(iss.cell_map, idx.T) # I DONT QUITE GET THAT. WHY NOT JUST CHECKING IF Dist<meanCellRadius INSTEAD?
-    logger.info("Rebasing Neighbors to match the one-based indexed Matlab object.")
+    logger.info("Rebasing Neighbors to match the one-based indexed Matlab object. Not sure this is needed! REMOVE IT")
+
+    # Lookup cell_map and infer which spot belongs to which cell.
+    # This is kinda using the empirical....
+    idx = spotyx - [y0, x0] # First move the origin at (0, 0)
+    SpotInCell = utils.IndexArrayNan(iss.cell_map, idx.T) # Now get the allocation of spots to cells
     sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
     assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
