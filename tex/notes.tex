@@ -23,12 +23,12 @@
 
 \section{Notes}
 \subsection{Errata}
-Some side notes on the supplementary material
+Some side notes on the supplementary material:
 
+ \hspace*{-35pt}
 \begin{small}
 https://www.biorxiv.org/content/biorxiv/suppl/2018/10/01/431957.DC1/431957-1.pdf
 \end{small}
-
 I start page numbering from page 15 out of 30 of the above-mentioned document. Hence page 1 starts with the section `Materials and Methods', subesection `Gene selection'.
 
 
@@ -51,6 +51,11 @@ I start page numbering from page 15 out of 30 of the above-mentioned document. H
 		\text{p}({\bf x}, g, z, \zeta, \gamma, \eta) & =  \text{p}({\bf x}, g, z \given \zeta, \gamma, \eta) \, \text{p}(\zeta, \gamma, \eta) \nonumber\\
 							      & =\text{p}({\bf x}, g, z \given \zeta, \gamma, \eta) \, \text{p}(\zeta) \, \text{p}(\gamma) \, \text{p}(\eta) \nonumber
 	\end{align}
+     \item Page 10, bottom of the page, equation of the joint log-density: \[\sum_{g,c}\log Gamma(\gamma_{g,c} \given r, r) \text{ and} \sum_{g,c}\log Gamma(\eta_g \given r, r/\eta_0)\]
+Move conditioning symbol inside the parentheses, at the end, ie:
+ \[\sum_{g,c}\log Gamma(\gamma_{g,c}, r  \given r) \text{ and} \sum_{g,c}\log Gamma(\eta_g, r/\eta_0 \given r)\]
+
+     \item Page 11, equation (1), some point as above.
 
      \item Page 11,  lines 8 and 9 from the bottom: $N_{c,g}$ needs its subscripts swapped I think, ie it should be: $N_{g,c}$.  The latter is the notation used in the rest of the paper.
 
@@ -60,6 +65,6 @@ I start page numbering from page 15 out of 30 of the above-mentioned document. H
 
    \item Page 14. In the pseudocode, in the main loop, compute step number 4: Again, reference source is not found. 
 
-   \item General comment. I would explicitly add/state that $x$ denotes counts whereas ${\bf x}$ locations. Sometimes also, ${\bf x}$ and  $\textit{\textbf{x}}$ are used interchangeably (page 9 in log-probability density and page 10 in intensity function).
+   \item General comment. I would explicitly add/state that $x$ denotes counts whereas ${\bf x}$ locations. Sometimes also, (and I might sound excessively pedantic here...) ${\bf x}$ and  $\textit{\textbf{x}}$ are used interchangeably (page 9, log-density and page 10, intensity function).
 \end{itemize}
 \end{document}
