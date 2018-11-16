@@ -1,8 +1,10 @@
 from iss import Iss
 from geneset import GeneSet
-from preprocess import preprocess
+import preprocess
 import numpy as np
 import numpy_groupies as npg
+import common
+import systemData
 
 import logging
 
@@ -63,5 +65,16 @@ class algo:
 
 if __name__ == "__main__":
     algo = algo()
-    ini = preprocess(algo.iss, algo.gSet)
+
+    # make a cell object
+    cell = systemData.Cell(algo.iss)
+
+    # make a spots object
+    spots = systemData.Spots(algo.iss)
+
+    # calc the loglik and populate some of the object's properties
+    spots.loglik(cell, algo.iss)
+
+
+
     print("done")

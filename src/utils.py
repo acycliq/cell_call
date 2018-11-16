@@ -205,3 +205,25 @@ def bi(X, *args):
     out = X[np.unravel_index(inds, X.shape, order='F')]
 
     return out
+
+def qualityThreshold(iss):
+    qualOk = iss.SpotCombi & (iss.SpotScore > iss.CombiQualThresh) & (
+                iss.SpotIntensity > iss.CombiIntensityThresh);
+
+    anchorsOk = np.ones(qualOk.shape)
+    isGreater = iss.cAnchorIntensities > iss.DetectionThresh
+    tot = isGreater.sum(axis=1)
+    idx = tot > iss.CombiAnchorsReq
+
+    anchorsOk[np.array(iss.SpotCombi, dtype=bool)] = idx
+    qualOk = np.array(qualOk, dtype=bool) & np.array(anchorsOk, dtype=bool)
+    nCombiCodes = np.array([x != 'EXTRA' for x in iss.CharCodes]).sum()
+
+    for i in range(iss.ExtraCodes.shape[0]):
+        my_spots = iss.SpotCodeNo == nCombiCodes + (i + 1)
+        my_spots = np.array(my_spots, dtype=bool)
+        thres = iss.ExtraCodes[i, 3]
+        isAboveThres = iss.SpotIntensity[my_spots] > thres
+        qualOk[my_spots] = isAboveThres
+
+    return qualOk

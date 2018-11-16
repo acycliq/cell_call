@@ -17,6 +17,7 @@ def preprocess(iss, gSet):
     spots = filter_spots(iss)
     cellinfo = cell_info(iss)
     ini = initialise(spots, cellinfo, iss, gSet)
+    return ini
 
 
 # @utils.cached('filter_spots_cache.pickle')
@@ -116,6 +117,7 @@ def initialise(spots, cellinfo, iss, gSet):
 
     # 6) calc the cell area factor
     CellAreaFactor = getCellAreaFactor(cellinfo, iss)
+
 
     out = dict()
     out["GeneNames"] = GeneNames
