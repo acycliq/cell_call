@@ -75,6 +75,8 @@ if __name__ == "__main__":
     # calc the loglik and populate some of the object's properties
     spots.loglik(cell, algo.iss)
 
+    cell.geneCount(spots)
+
 
 
     print("done")

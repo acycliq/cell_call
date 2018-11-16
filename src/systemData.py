@@ -3,6 +3,7 @@ import numpy as np
 from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
 import utils
+import numpy_groupies as npg
 from time import time
 import logging
 
@@ -26,7 +27,9 @@ class Spots(object):
         self._D = None
         self._inCell = None
         self._YX = None
+        self._nS = None
         self._geneName = None
+        self._geneNo = None
         # 1) filter the spots
         self._filter_spots(iss)
 
@@ -35,8 +38,20 @@ class Spots(object):
         return self._YX
 
     @property
+    def nS(self):
+        return self._nS
+
+    @property
+    def nG(self):
+        return self._nG
+
+    @property
     def geneName(self):
         return self._geneName
+
+    @property
+    def geneNo(self):
+        return self._geneNo
 
     @property
     def inCell(self):
@@ -118,14 +133,20 @@ class Spots(object):
         spotYX = iss.SpotGlobalYX[includeSpot, :].round()
         spotGeneName = allGeneNames[includeSpot]
 
+        [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(spotGeneName, return_inverse=True, return_counts=True)
+
         self._YX = spotYX
-        self._geneName = spotGeneName
+        self._geneName = GeneNames
+        self._geneNo = SpotGeneNo
+        self._nS = spotYX.shape[0]
+        self._nG = GeneNames.shape[0]
 
 
 class Cell(object):
     def __init__(self, iss):
         # creates a cell object
         self._YX = None
+        self._nC = None
         self._meanRadius = None
         self._relativeRadius = None
         self._classProb = None
@@ -134,6 +155,10 @@ class Cell(object):
     @property
     def YX(self):
         return self._YX
+
+    @property
+    def nC(self):
+        return self._nC
 
     @property
     def meanRadius(self):
@@ -177,5 +202,20 @@ class Cell(object):
         cellYX = cellYX + 1
 
         self._YX = cellYX
+        self._nC = cellYX.shape[0]
         self._meanRadius = meanCellRadius
         self._relativeRadius = relCellRadius
+
+    def geneCount(self, spot):
+        CellGeneCount = np.zeros([self.nC, spot.nG])
+        neighbors = spot.neighbors['id']
+        prob = spot.neighbors['prob']
+        nN = neighbors.shape[1]
+        for n in range(nN - 1):
+            c = neighbors[:, n]
+            group_idx = np.vstack((c[None, :], spot.geneNo[None, :]))
+            a = prob[:, n]
+            accumarray = npg.aggregate(group_idx, a, func="sum", size=(self.nC, spot.nG))
+            CellGeneCount = CellGeneCount + accumarray
+
+
