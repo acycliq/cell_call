@@ -75,8 +75,13 @@ if __name__ == "__main__":
     # calc the loglik and populate some of the object's properties
     spots.loglik(cell, algo.iss)
 
-    # for each cell calc the gene count
-    cell.geneCount(spots)
+    # make now a genes object
+    genes = spots.getGenes()
+
+    cell.geneCounts(spots, genes)
+
+    myKlass = systemData.Klass(algo.iss, algo.gSet, genes)
+
 
 
 

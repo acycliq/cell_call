@@ -1,5 +1,6 @@
 
 import numpy as np
+import pandas as pd
 from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
 import utils
@@ -183,5 +184,27 @@ class Genes(object):
         self.names = None
         self.spotNo = None
         self.totalSpots = None
-        self.nG = None
+
+
+class Klass(object):
+    def __init__(self, iss, gSet, genes):
+        self.expression = None
+        self.logExpression = None
+        self.nK = None
+        self.name = None
+        self._populate(iss, gSet, genes)
+
+    def _populate(self, iss, gSet, genes):
+        self.name = np.append(pd.unique(gSet.Class), 'Zero')
+        self.nK = self.name.shape[0]
+
+        MeanClassExp = np.zeros([self.nK, genes.nG])
+        temp = gSet.GeneSubset(genes.names).ScaleCell(0)
+        for k in range(self.nK - 1):
+            val = iss.Inefficiency * np.mean(temp.CellSubset(self.name[k]).GeneExp, 1);
+            MeanClassExp[k, :] = val
+        self.expression = MeanClassExp
+        self.logExpression = np.log(MeanClassExp + iss.SpotReg)
+
+
 
