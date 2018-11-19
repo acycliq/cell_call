@@ -23,51 +23,15 @@ class Spots(object):
     '''
     def __init__(self, iss):
         # creates a spot object
-        self._neighbors = None  # neighbors is a dict (top3 plus last one which is a dummy)
-        self._D = None
-        self._inCell = None
-        self._YX = None
-        self._nS = None
-        self._geneName = None
-        self._geneNo = None
+        self.neighbors = None  # neighbors is a dict (top3 plus last one which is a dummy)
+        self.D = None
+        self.inCell = None
+        self.YX = None
+        self.nS = None
+        self.name = None
+        self.geneNo = None
         # 1) filter the spots
         self._filter_spots(iss)
-
-    @property
-    def YX(self):
-        return self._YX
-
-    @property
-    def nS(self):
-        return self._nS
-
-    @property
-    def nG(self):
-        return self._nG
-
-    @property
-    def geneName(self):
-        return self._geneName
-
-    @property
-    def geneNo(self):
-        return self._geneNo
-
-    @property
-    def inCell(self):
-        '''
-        :return: the cell id that the spot if lies within radius. Quite likely that the spot will
-        eventually belong to that cell BUT not necessarily.
-        '''
-        return self._inCell
-
-    @property
-    def neighbors(self):
-        return self._neighbors
-
-    @neighbors.setter
-    def neighbors(self, value):
-        self._neighbors = value
 
     def loglik(self, cellObj, iss):
         cellYX = cellObj.YX
@@ -115,9 +79,9 @@ class Spots(object):
         neighborsDict = dict()
         neighborsDict['id'] = Neighbors
         neighborsDict['prob'] = pSpotNeighb
-        self._D = D
-        self._neighbors = neighborsDict
-        self._inCell = SpotInCell
+        self.D = D
+        self.neighbors = neighborsDict
+        self.inCell = SpotInCell
 
     def _filter_spots(self, iss):
         excludeGenes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
@@ -133,48 +97,37 @@ class Spots(object):
         spotYX = iss.SpotGlobalYX[includeSpot, :].round()
         spotGeneName = allGeneNames[includeSpot]
 
-        [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(spotGeneName, return_inverse=True, return_counts=True)
+        # [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(spotGeneName, return_inverse=True, return_counts=True)
 
-        self._YX = spotYX
-        self._geneName = GeneNames
-        self._geneNo = SpotGeneNo
-        self._nS = spotYX.shape[0]
-        self._nG = GeneNames.shape[0]
+        self.YX = spotYX
+        self.nS = spotYX.shape[0]
+        self.name = spotGeneName
+        # self._name = GeneNames
+        # self._geneNo = SpotGeneNo
+        # self._nG = GeneNames.shape[0]
+
+    def getGenes(self):
+        #make a gene object
+        g = Genes()
+        #populate it
+        [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.name, return_inverse=True, return_counts=True)
+        g.names = GeneNames
+        g.spotNo = SpotGeneNo
+        g.totalSpots = TotGeneSpots
+        g.nG = GeneNames.shape[0]
+        return g
 
 
 class Cell(object):
     def __init__(self, iss):
         # creates a cell object
-        self._YX = None
-        self._nC = None
-        self._meanRadius = None
-        self._relativeRadius = None
-        self._classProb = None
+        self.YX = None
+        self.nC = None
+        self.meanRadius = None
+        self.relativeRadius = None
+        self.areaFactor = None
+        self.classProb = None
         self._cell_info(iss)
-
-    @property
-    def YX(self):
-        return self._YX
-
-    @property
-    def nC(self):
-        return self._nC
-
-    @property
-    def meanRadius(self):
-        return self._meanRadius
-
-    @property
-    def relativeRadius(self):
-        return self._relativeRadius
-
-    @property
-    def classProb(self):
-        return self._classProb
-
-    @classProb.setter
-    def classProb(self, value):
-        self._classProb = value
 
     def _cell_info(self, iss):
         '''
@@ -201,21 +154,34 @@ class Cell(object):
         logger.info("Rebasing CellYX to match the one-based indexed Matlab object. ")
         cellYX = cellYX + 1
 
-        self._YX = cellYX
-        self._nC = cellYX.shape[0]
-        self._meanRadius = meanCellRadius
-        self._relativeRadius = relCellRadius
+        self.YX = cellYX
+        self.nC = cellYX.shape[0]
+        self.meanRadius = meanCellRadius
+        self.relativeRadius = relCellRadius
 
-    def geneCount(self, spot):
-        CellGeneCount = np.zeros([self.nC, spot.nG])
-        neighbors = spot.neighbors['id']
-        prob = spot.neighbors['prob']
-        nN = neighbors.shape[1]
+        nom = np.exp(-self.relativeRadius ** 2 / 2) * (1 - np.exp(iss.InsideCellBonus)) + np.exp(iss.InsideCellBonus)
+        denom = np.exp(-0.5) * (1 - np.exp(iss.InsideCellBonus)) + np.exp(iss.InsideCellBonus)
+        CellAreaFactor = nom / denom
+        self.areaFactor = CellAreaFactor
+
+    def geneCounts(self, spots, genes):
+        nC = self.nC
+        nG = genes.nG
+        nN = spots.neighbors["id"].shape[1]
+        CellGeneCount = np.zeros([nC, nG]);
         for n in range(nN - 1):
-            c = neighbors[:, n]
-            group_idx = np.vstack((c[None, :], spot.geneNo[None, :]))
-            a = prob[:, n]
-            accumarray = npg.aggregate(group_idx, a, func="sum", size=(self.nC, spot.nG))
+            c = spots.neighbors["id"][:, n]
+            group_idx = np.vstack((c[None, :], genes.spotNo[None, :]))
+            a = spots.neighbors["prob"][:, n]
+            accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
+        return CellGeneCount
 
+
+class Genes(object):
+    def __init__(self):
+        self.names = None
+        self.spotNo = None
+        self.totalSpots = None
+        self.nG = None
 
