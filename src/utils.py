@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 import scipy.io as spio
 import os
 import pickle
@@ -227,3 +228,12 @@ def qualityThreshold(iss):
         qualOk[my_spots] = isAboveThres
 
     return qualOk
+
+
+def expectedGamma(r, b):
+    return r/b
+
+
+def expectedLogGamma(r, b):
+    return scipy.special.psi(r) - np.log(b)
+
