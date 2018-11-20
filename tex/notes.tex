@@ -67,5 +67,16 @@ Move conditioning symbol inside the parentheses, at the end, ie:
    \item Page 14. In the pseudocode, in the main loop, compute step number 4: Again, reference source is not found. 
 
    \item General comment. I would explicitly add/state that $x$ denotes counts whereas ${\bf x}$ locations. Sometimes also, (and I might sound excessively pedantic here...) ${\bf x}$ and  $\textit{\textbf{x}}$ are used interchangeably (page 9, log-density and page 10, intensity function).
+
+   \item I might be wrong but I am a bit a bit puzzled about the expected gamma expression in the Matlab code. For example line 135 of \texttt{call\_cell.m}, shouldnt the nominator and denominator be the other way round? See  figure \ref{fig:eSpotGamma}
+
+\begin{figure}[!ht]
+  \includegraphics[width=\linewidth]{eSpotGamma.jpg}
+  \caption{Code snip.}
+  \label{fig:eSpotGamma}
+\end{figure}
+
+
+
 \end{itemize}
 \end{document}
