@@ -2,8 +2,7 @@ from iss import Iss
 from geneset import GeneSet
 import preprocess
 import numpy as np
-import numpy_groupies as npg
-import common
+import utils
 import systemData
 
 import logging
@@ -15,6 +14,13 @@ logging.basicConfig(
     format="%(asctime)s:%(levelname)s:%(message)s"
     )
 
+
+# def expectedGamma(r, b):
+#     return r/b
+#
+#
+# def expectedLogGamma(r, b):
+#     return scipy.special.psi(r) - np.log(b)
 
 
 class algo:
@@ -35,10 +41,12 @@ class algo:
     def gSet(self):
         return self._gSet
 
-    def callCells(self):
+    def callCells(self, spots, cells, genes, klasses):
         '''
         Assign cells to classes
         '''
+        eg, elg = self.calcGamma(spots, cells, genes, klasses)
+
         print('in algo:callCells')
 
     def callSpots(self):
@@ -47,18 +55,14 @@ class algo:
         '''
         print('in algo:callSpots')
 
-    def calcRNAcounts(ini):
-        '''
-        Calc expected RNA counts
-        '''
-        print('in algo:calcRNAcounts')
-        CellGeneCount = np.zeros([nC, nG]);
-        for n in range(nN - 1):
-            c = ini.Neighbors[:, n]
-            group_idx = np.vstack((c[None, :], ini.SpotGeneNo[None, :]))
-            a = pSpotNeighb[:, n]
-            accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
-            CellGeneCount = CellGeneCount + accumarray
+    def calcGamma(self, spots, cells, genes, klasses):
+        scaledMean = np.transpose(np.dstack([klasses.expression.T] * len(cells.areaFactor)) * cells.areaFactor, (2, 1, 0))
+        cellGeneCount = cells.geneCount(spots, genes)
+        rho = self.iss.rSpot + np.reshape(cellGeneCount, (cells.nC, 1, genes.nG), order='F')
+        beta = self.iss.rSpot + scaledMean
+        eg = utils.expectedGamma(rho, beta)
+        elg = utils.expectedLogGamma(rho, beta)
+        return eg, elg
 
 
 
@@ -67,22 +71,22 @@ if __name__ == "__main__":
     algo = algo()
 
     # make a cell object
-    cell = systemData.Cell(algo.iss)
+    cells = systemData.Cell(algo.iss)
 
     # make a spots object
-    spots = systemData.Spots(algo.iss)
+    spots = systemData.Spot(algo.iss)
 
     # calc the loglik and populate some of the object's properties
-    spots.loglik(cell, algo.iss)
+    spots.loglik(cells, algo.iss)
 
     # make now a genes object
     genes = spots.getGenes()
 
-    cell.geneCounts(spots, genes)
+    cells.geneCount(spots, genes)
 
-    myKlass = systemData.Klass(algo.iss, algo.gSet, genes)
+    klasses = systemData.Klass(algo.iss, algo.gSet, genes)
 
-
+    algo.callCells(spots, cells, genes, klasses)
 
 
     print("done")
