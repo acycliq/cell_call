@@ -16,7 +16,7 @@ logging.basicConfig(
     )
 
 
-class Spots(object):
+class Spot(object):
     '''
     keeps the spots neighbors and the spot containing cell
     neighbors is a dict. Key is the neighbor cell id and val is the probability
@@ -109,7 +109,7 @@ class Spots(object):
 
     def getGenes(self):
         #make a gene object
-        g = Genes()
+        g = Gene()
         #populate it
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.name, return_inverse=True, return_counts=True)
         g.names = GeneNames
@@ -156,7 +156,7 @@ class Cell(object):
         cellYX = cellYX + 1
 
         self.YX = cellYX
-        self.nC = cellYX.shape[0]
+        self.nC = cellYX.shape[0] + 1
         self.meanRadius = meanCellRadius
         self.relativeRadius = relCellRadius
 
@@ -165,7 +165,7 @@ class Cell(object):
         CellAreaFactor = nom / denom
         self.areaFactor = CellAreaFactor
 
-    def geneCounts(self, spots, genes):
+    def geneCount(self, spots, genes):
         nC = self.nC
         nG = genes.nG
         nN = spots.neighbors["id"].shape[1]
@@ -179,11 +179,25 @@ class Cell(object):
         return CellGeneCount
 
 
-class Genes(object):
+class Gene(object):
     def __init__(self):
         self.names = None
         self.spotNo = None
         self.totalSpots = None
+        self.nG = None
+        self.totalBackground = None
+        self.totalZero = None
+        self._gamma = np.ones(self.nG)
+
+    def updateGamma(self, cells, spots, klasses):
+        nK = klasses.nK
+        temp = spots.gamma * cells.classProb[..., None] * cells.areaFactor[..., None, None]
+        ClassTotPredicted = np.squeeze(np.sum(temp, axis=0)) * (klasses.expression + self.iss.SpotReg)
+        TotPredicted = np.sum(ClassTotPredicted[np.arange(0, nK - 1), :], axis=0)
+        nom = self.iss.rGene + self.totalSpots - self.totalBackground - self.totalZero
+        denom = self.iss.rGene + TotPredicted
+        eGeneGamma = nom / denom
+
 
 
 class Klass(object):
@@ -201,7 +215,7 @@ class Klass(object):
         MeanClassExp = np.zeros([self.nK, genes.nG])
         temp = gSet.GeneSubset(genes.names).ScaleCell(0)
         for k in range(self.nK - 1):
-            val = iss.Inefficiency * np.mean(temp.CellSubset(self.name[k]).GeneExp, 1);
+            val = iss.Inefficiency * np.mean(temp.CellSubset(self.name[k]).GeneExp, 1)
             MeanClassExp[k, :] = val
         self.expression = MeanClassExp
         self.logExpression = np.log(MeanClassExp + iss.SpotReg)
