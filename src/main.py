@@ -58,10 +58,27 @@ class algo:
 
         print('in algo:callCells')
 
-    def callSpots(self):
+    def callSpots(self, spots, cells, genes, klasses, pCellClass):
         '''
         Assign spots to the neighbouring cells
         '''
+        nS = spots.nS
+        nN = spots.neighbors["id"].shape[1]
+        nK = klasses.nK
+        aSpotCell = np.zeros([nS, nN])
+        for n in range(nN - 1):
+            c = spots.Neighbors[:, n]
+            term_1 = np.sum(pCellClass[c, :] * self.lMeanClassExp[:, self.SpotGeneNo].T, axis=1)
+            temp = utils.bi(spots.expectedLogGamma, c[:, None], np.arange(0, nK), self.SpotGeneNo[:, None])
+            term_2 = np.sum(pCellClass[c, :] * temp, axis=1)
+            aSpotCell[:, n] = term_1 + term_2
+        wSpotCell = aSpotCell + spots.D
+
+        pSpotNeighb = utils.LogLtoP(wSpotCell)
+        MeanProbChanged = np.max(np.abs(pSpotNeighb - pSpotNeighbOld))
+        # logger.info('Iteration %d, mean prob change %f' % (i, MeanProbChanged))
+        Converged = (MeanProbChanged < self.iss.CellCallTolerance)
+        pSpotNeighbOld = pSpotNeighb
         print('in algo:callSpots')
 
     # def calcGamma(self, spots, cells, genes, klasses):
