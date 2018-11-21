@@ -7,6 +7,7 @@
 \usepackage{subfigure}  % use for side-by-side figures
 \usepackage{hyperref}   % use for hypertext links, including those to external documents and URLs
 \usepackage{bbm}
+\usepackage{hyperref}
 \usepackage{booktabs}
 
 \newcommand\givenbase[1][]{\:#1\lvert\:}
@@ -27,8 +28,10 @@ Some side notes on the supplementary material:
 
  \hspace*{-35pt}
 \begin{small}
-https://www.biorxiv.org/content/biorxiv/suppl/2018/10/01/431957.DC1/431957-1.pdf
+\href{https://www.biorxiv.org/content/biorxiv/suppl/2018/10/01/431957.DC1/431957-1.pdf}{
+https://www.biorxiv.org/content/biorxiv/suppl/2018/10/01/431957.DC1/431957-1.pdf}
 \end{small}
+
 I start page numbering from page 15 out of 30 of the above-mentioned document. Hence page 1 starts with the section `Materials and Methods', subesection `Gene selection'.
 
 
@@ -66,17 +69,17 @@ Move conditioning symbol inside the parentheses, at the end, ie:
 
    \item Page 14. In the pseudocode, in the main loop, compute step number 4: Again, reference source is not found. 
 
-   \item General comment. I would explicitly add/state that $x$ denotes counts whereas ${\bf x}$ locations. Sometimes also, (and I might sound excessively pedantic here...) ${\bf x}$ and  $\textit{\textbf{x}}$ are used interchangeably (page 9, log-density and page 10, intensity function).
+   \item General comment. I would explicitly add/state/stress that $x$ denotes counts whereas ${\bf x}$ locations. Sometimes also, (and I might sound excessively pedantic here...) ${\bf x}$ and  $\textit{\textbf{x}}$ are used interchangeably (page 9, log-density and page 10, intensity function).
 
-   \item I might be wrong but I am a bit puzzled about the expected gamma expression in the Matlab code. For example line 135 of \texttt{call\_cell.m}, shouldnt the nominator and denominator be the other way round? See  figure \ref{fig:eSpotGamma}
-
-\begin{figure}[!ht]
-  \includegraphics[width=\linewidth]{eSpotGamma.jpg}
-  \caption{Code snip.}
-  \label{fig:eSpotGamma}
-\end{figure}
-
-
+%   \item I might be wrong but I am a bit puzzled about the expected gamma expression in the Matlab code. For example line 135 of \texttt{call\_cell.m}, shouldnt the nominator and denominator be the other way round? See  figure \ref{fig:eSpotGamma}
+%
+%\begin{figure}[!ht]
+%  \includegraphics[width=\linewidth]{eSpotGamma.jpg}
+%  \caption{Code snip.}
+%  \label{fig:eSpotGamma}
+%\end{figure}
 
 \end{itemize}
+Thanks!
+
 \end{document}
