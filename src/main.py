@@ -45,7 +45,16 @@ class algo:
         '''
         Assign cells to classes
         '''
-        eg, elg = self.calcGamma(spots, cells, genes, klasses)
+        spots.calcGamma(self.iss, cells, genes, klasses)
+
+        nK = klasses.nK
+        nG = genes.nG
+        nC = cells.nC
+        ScaledExp = np.reshape(klasses.expression, (1, nK, nG)) * np.reshape(genes.expectedGamma, (1, 1, nG)) * cells.areaFactor[..., None, None] + self.iss.SpotReg
+        pNegBin = ScaledExp / (self.iss.rSpot + ScaledExp)
+        CellGeneCount = cells.geneCount(spots.neighbors, genes)
+        wCellClass = np.sum(np.reshape(CellGeneCount, (nC, 1, nG)) * np.log(pNegBin) + self.iss.rSpot * np.log(1 - pNegBin), axis=2) + klasses.logPrior
+        pCellClass = utils.LogLtoP(wCellClass)
 
         print('in algo:callCells')
 
@@ -55,14 +64,14 @@ class algo:
         '''
         print('in algo:callSpots')
 
-    def calcGamma(self, spots, cells, genes, klasses):
-        scaledMean = np.transpose(np.dstack([klasses.expression.T] * len(cells.areaFactor)) * cells.areaFactor, (2, 1, 0))
-        cellGeneCount = cells.geneCount(spots, genes)
-        rho = self.iss.rSpot + np.reshape(cellGeneCount, (cells.nC, 1, genes.nG), order='F')
-        beta = self.iss.rSpot + scaledMean
-        eg = utils.expectedGamma(rho, beta)
-        elg = utils.expectedLogGamma(rho, beta)
-        return eg, elg
+    # def calcGamma(self, spots, cells, genes, klasses):
+    #     scaledMean = np.transpose(np.dstack([klasses.expression.T] * len(cells.areaFactor)) * cells.areaFactor, (2, 1, 0))
+    #     cellGeneCount = cells.geneCount(spots.neighbors, genes)
+    #     rho = self.iss.rSpot + np.reshape(cellGeneCount, (cells.nC, 1, genes.nG), order='F')
+    #     beta = self.iss.rSpot + scaledMean
+    #     eg = utils.expectedGamma(rho, beta)
+    #     elg = utils.expectedLogGamma(rho, beta)
+    #     return eg, elg
 
 
 
@@ -82,7 +91,7 @@ if __name__ == "__main__":
     # make now a genes object
     genes = spots.getGenes()
 
-    cells.geneCount(spots, genes)
+    cells.geneCount(spots.neighbors, genes)
 
     klasses = systemData.Klass(algo.iss, algo.gSet, genes)
 

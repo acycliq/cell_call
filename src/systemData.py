@@ -31,6 +31,8 @@ class Spot(object):
         self.nS = None
         self.name = None
         self.geneNo = None
+        self.expectedGamma = None
+        self.expectedLogGamma = None
         # 1) filter the spots
         self._filter_spots(iss)
 
@@ -116,8 +118,16 @@ class Spot(object):
         g.spotNo = SpotGeneNo
         g.totalSpots = TotGeneSpots
         g.nG = GeneNames.shape[0]
+        g.expectedGamma = np.ones(g.nG)
         return g
 
+    def calcGamma(self, iss, cells, genes, klasses):
+        scaledMean = np.transpose(np.dstack([klasses.expression.T] * len(cells.areaFactor)) * cells.areaFactor, (2, 1, 0))
+        cellGeneCount = cells.geneCount(self.neighbors, genes)
+        rho = iss.rSpot + np.reshape(cellGeneCount, (cells.nC, 1, genes.nG), order='F')
+        beta = iss.rSpot + scaledMean
+        self.expectedGamma = utils.gammaExpectation(rho, beta)
+        self.expectedLogGamma = utils.logGammaExpectation(rho, beta)
 
 class Cell(object):
     def __init__(self, iss):
@@ -165,15 +175,15 @@ class Cell(object):
         CellAreaFactor = nom / denom
         self.areaFactor = CellAreaFactor
 
-    def geneCount(self, spots, genes):
+    def geneCount(self, spotsNeighbors, genes):
         nC = self.nC
         nG = genes.nG
-        nN = spots.neighbors["id"].shape[1]
+        nN = spotsNeighbors["id"].shape[1]
         CellGeneCount = np.zeros([nC, nG]);
         for n in range(nN - 1):
-            c = spots.neighbors["id"][:, n]
+            c = spotsNeighbors["id"][:, n]
             group_idx = np.vstack((c[None, :], genes.spotNo[None, :]))
-            a = spots.neighbors["prob"][:, n]
+            a = spotsNeighbors["prob"][:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
         return CellGeneCount
@@ -187,16 +197,16 @@ class Gene(object):
         self.nG = None
         self.totalBackground = None
         self.totalZero = None
-        self._gamma = np.ones(self.nG)
+        self.expectedGamma = None
 
-    def updateGamma(self, cells, spots, klasses):
+    def updateGamma(self, cells, spots, klasses, iss):
         nK = klasses.nK
         temp = spots.gamma * cells.classProb[..., None] * cells.areaFactor[..., None, None]
         ClassTotPredicted = np.squeeze(np.sum(temp, axis=0)) * (klasses.expression + self.iss.SpotReg)
         TotPredicted = np.sum(ClassTotPredicted[np.arange(0, nK - 1), :], axis=0)
-        nom = self.iss.rGene + self.totalSpots - self.totalBackground - self.totalZero
-        denom = self.iss.rGene + TotPredicted
-        eGeneGamma = nom / denom
+        nom = iss.rGene + self.totalSpots - self.totalBackground - self.totalZero
+        denom = iss.rGene + TotPredicted
+        self.expectedGamma = nom / denom
 
 
 
@@ -206,6 +216,7 @@ class Klass(object):
         self.logExpression = None
         self.nK = None
         self.name = None
+        self.prior = None
         self._populate(iss, gSet, genes)
 
     def _populate(self, iss, gSet, genes):
@@ -219,6 +230,7 @@ class Klass(object):
             MeanClassExp[k, :] = val
         self.expression = MeanClassExp
         self.logExpression = np.log(MeanClassExp + iss.SpotReg)
-
+        self.prior = np.append([.5 * np.ones(self.nK - 1) / self.nK], 0.5)
+        self.logPrior = np.log(self.prior)
 
 

@@ -230,10 +230,21 @@ def qualityThreshold(iss):
     return qualOk
 
 
-def expectedGamma(r, b):
+def gammaExpectation(r, b):
+    '''
+    :param r:
+    :param b:
+    :return: Expectetation of a rv X following a Gamma(r,b) distribution with pdf
+    f(x;\alpha ,\beta )= \frac{\beta^r}{\Gamma(r)} x^{r-1}e^{-\beta x}
+    '''
     return r/b
 
 
-def expectedLogGamma(r, b):
+def logGammaExpectation(r, b):
+    '''
+    :param r:
+    :param b:
+    :return: Expectetation of a rv log(X) where X follows a Gamma(r,b) distribution
+    '''
     return scipy.special.psi(r) - np.log(b)
 
