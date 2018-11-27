@@ -50,11 +50,12 @@ class algo:
         nK = klasses.nK
         nG = genes.nG
         nC = cells.nC
-        ScaledExp = np.reshape(klasses.expression, (1, nK, nG)) * np.reshape(genes.expectedGamma, (1, 1, nG)) * cells.areaFactor[..., None, None] + self.iss.SpotReg
+        ScaledExp = genes.expression * genes.expectedGamma[None, :, None] * cells.areaFactor[:, None, None] + self.iss.SpotReg
         pNegBin = ScaledExp / (self.iss.rSpot + ScaledExp)
         CellGeneCount = cells.geneCount(spots.neighbors, genes)
-        wCellClass = np.sum(np.reshape(CellGeneCount, (nC, 1, nG)) * np.log(pNegBin) + self.iss.rSpot * np.log(1 - pNegBin), axis=2) + klasses.logPrior
+        wCellClass = np.sum(CellGeneCount[:,:,None] * np.log(pNegBin) + self.iss.rSpot*np.log(1-pNegBin), axis=1) + klasses.logPrior
         pCellClass = utils.LogLtoP(wCellClass)
+        pCellClass2 = utils.softmax(wCellClass)
 
         print('in algo:callCells')
 
@@ -110,9 +111,15 @@ if __name__ == "__main__":
 
     cells.geneCount(spots.neighbors, genes)
 
-    klasses = systemData.Klass(algo.iss, algo.gSet, genes)
+    klasses = systemData.Klass(algo.gSet)
+
+    #now you can set expressions and logexpressions (as the mean expession over klass)
+    genes.setKlassExpressions(klasses, algo.iss, algo.gSet)
 
     algo.callCells(spots, cells, genes, klasses)
+
+    cells.klassAssignment(spots, genes, klasses, algo.iss)
+
 
 
     print("done")

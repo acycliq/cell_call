@@ -192,6 +192,19 @@ def LogLtoP(L):
     p = eL / np.sum(eL, axis=1)[:, None]
     return p
 
+def softmax0(x):
+    """Compute softmax values for each sets of scores in x."""
+    return np.exp(x) / np.sum(np.exp(x), axis=0)
+
+def softmax(x):
+    '''
+    https://stackoverflow.com/questions/34968722/how-to-implement-the-softmax-function-in-python
+    :param x:
+    :return:
+    '''
+    """Compute softmax values for each sets of scores in x."""
+    return np.exp(x) / np.sum(np.exp(x), axis=1)[:, None]
+
 
 def bi(X, *args):
     inds = []

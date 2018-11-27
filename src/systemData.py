@@ -122,12 +122,12 @@ class Spot(object):
         return g
 
     def calcGamma(self, iss, cells, genes, klasses):
-        scaledMean = np.transpose(np.dstack([klasses.expression.T] * len(cells.areaFactor)) * cells.areaFactor, (2, 1, 0))
+        scaledMean = genes.expression * cells.areaFactor[:, None, None]
         cellGeneCount = cells.geneCount(self.neighbors, genes)
-        rho = iss.rSpot + np.reshape(cellGeneCount, (cells.nC, 1, genes.nG), order='F')
+        rho = iss.rSpot + cellGeneCount
         beta = iss.rSpot + scaledMean
-        self.expectedGamma = utils.gammaExpectation(rho, beta)
-        self.expectedLogGamma = utils.logGammaExpectation(rho, beta)
+        self.expectedGamma = utils.gammaExpectation(rho[:,:,None], beta)
+        self.expectedLogGamma = utils.logGammaExpectation(rho[:,:,None], beta)
 
 class Cell(object):
     def __init__(self, iss):
@@ -188,6 +188,18 @@ class Cell(object):
             CellGeneCount = CellGeneCount + accumarray
         return CellGeneCount
 
+    def klassAssignment(self, spots, genes, klasses, iss):
+        spots.calcGamma(iss, self, genes, klasses)
+
+        ScaledExp = genes.expression * genes.expectedGamma[None, :, None]*self.areaFactor[:, None, None] + iss.SpotReg
+        pNegBin = ScaledExp / (iss.rSpot + ScaledExp)
+        CellGeneCount = self.geneCount(spots.neighbors, genes)
+        contr = negBinLoglik(CellGeneCount[:,:,None], iss.rSpot, pNegBin)
+        wCellClass = np.sum(contr, axis=1) + klasses.logPrior
+        pCellClass = utils.LogLtoP(wCellClass)
+
+        return pCellClass
+
 
 class Gene(object):
     def __init__(self):
@@ -198,6 +210,8 @@ class Gene(object):
         self.totalBackground = None
         self.totalZero = None
         self.expectedGamma = None
+        self.expression = None
+        self.logExpression = None
 
     def updateGamma(self, cells, spots, klasses, iss):
         nK = klasses.nK
@@ -208,29 +222,41 @@ class Gene(object):
         denom = iss.rGene + TotPredicted
         self.expectedGamma = nom / denom
 
+    def setKlassExpressions(self, klasses, iss, gSet):
+        MeanClassExp = np.zeros([self.nG, klasses.nK])
+        temp = gSet.GeneSubset(self.names).ScaleCell(0)
+        for k in range(klasses.nK - 1):
+            val = iss.Inefficiency * np.mean(temp.CellSubset(klasses.name[k]).GeneExp, 1)
+            MeanClassExp[:, k] = val[None, :]
+        # MeanClassExp = MeanClassExp, (1, self.nG, klasses.nK)
+        expression = MeanClassExp
+        logExpression = np.log(MeanClassExp + iss.SpotReg)
+        self.expression = np.reshape(expression, (1, self.nG, klasses.nK))
+        self.logExpression = np.reshape(logExpression, (1, self.nG, klasses.nK))
 
 
 class Klass(object):
-    def __init__(self, iss, gSet, genes):
-        self.expression = None
-        self.logExpression = None
+    def __init__(self, gSet):
         self.nK = None
         self.name = None
         self.prior = None
-        self._populate(iss, gSet, genes)
+        self.logPrior = None
+        self._populate(gSet)
 
-    def _populate(self, iss, gSet, genes):
+    def _populate(self, gSet):
         self.name = np.append(pd.unique(gSet.Class), 'Zero')
         self.nK = self.name.shape[0]
-
-        MeanClassExp = np.zeros([self.nK, genes.nG])
-        temp = gSet.GeneSubset(genes.names).ScaleCell(0)
-        for k in range(self.nK - 1):
-            val = iss.Inefficiency * np.mean(temp.CellSubset(self.name[k]).GeneExp, 1)
-            MeanClassExp[k, :] = val
-        self.expression = MeanClassExp
-        self.logExpression = np.log(MeanClassExp + iss.SpotReg)
         self.prior = np.append([.5 * np.ones(self.nK - 1) / self.nK], 0.5)
         self.logPrior = np.log(self.prior)
 
 
+def negBinLoglik(x, r, p):
+    '''
+    Negative Binomial loglikehood
+    :param x:
+    :param r:
+    :param p:
+    :return:
+    '''
+    out = x * np.log(p) + r * np.log(1-p)
+    return out
