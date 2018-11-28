@@ -129,6 +129,24 @@ class Spot(object):
         self.expectedGamma = utils.gammaExpectation(rho[:,:,None], beta)
         self.expectedLogGamma = utils.logGammaExpectation(rho[:,:,None], beta)
 
+    def cellAssignment(self, cells, genes, klasses):
+        nN = self.neighbors['id'].shape[1]
+        nS = self.nS
+        nK = klasses.nK
+        aSpotCell = np.zeros([nS, nN])
+        for n in range(nN - 1):
+            c = self.neighbors['id'][:, n]
+            logger.info('genes.spotNo should be something line spots.geneNo instead!!')
+            meanLogExpression = np.squeeze(genes.logExpression[:, genes.spotNo, :])
+            classProb = cells.classProb[c, :]
+            term_1 = np.sum(classProb * meanLogExpression, axis=1)
+            # temp = utils.bi(self.expectedLogGamma, c[:, None], genes.spotNo[:, None], np.arange(0, nK))
+            expectedLog = utils.bi2(self.expectedLogGamma, [nS, nK], c[:, None], genes.spotNo[:, None])
+            # term_2 = np.sum(cells.classProb[c, :] * temp, axis=1)
+            term_2 = np.sum(cells.classProb[c, :] * expectedLog, axis=1)
+            aSpotCell[:, n] = term_1 + term_2
+        wSpotCell = aSpotCell + self.D
+
 class Cell(object):
     def __init__(self, iss):
         # creates a cell object
@@ -196,8 +214,9 @@ class Cell(object):
         CellGeneCount = self.geneCount(spots.neighbors, genes)
         contr = negBinLoglik(CellGeneCount[:,:,None], iss.rSpot, pNegBin)
         wCellClass = np.sum(contr, axis=1) + klasses.logPrior
-        pCellClass = utils.LogLtoP(wCellClass)
+        pCellClass = utils.softmax(wCellClass)
 
+        self.classProb = pCellClass
         return pCellClass
 
 

@@ -215,10 +215,25 @@ def bi(X, *args):
     for i in range(len(args)):
         inds.append(ZeroIndexArray + args[i])
 
-    inds = np.ravel_multi_index(inds, X.shape, order='F')
-    out = X[np.unravel_index(inds, X.shape, order='F')]
+    flatIndex = np.ravel_multi_index(inds, X.shape, order='F')
+    idx = np.unravel_index(flatIndex, X.shape, order='F')
+    out = X[idx]
 
     return out
+
+def bi2(X, dims, *args):
+    nK = dims[1]
+    inds = []
+    if len(args) == 2:
+        args = (*args, np.arange(0, nK))
+
+    temp = np.zeros(dims).astype(int)
+    for i in range(len(args)):
+        inds.append(temp + args[i])
+
+    out = X[inds]
+    return out
+
 
 def qualityThreshold(iss):
     qualOk = iss.SpotCombi & (iss.SpotScore > iss.CombiQualThresh) & (
