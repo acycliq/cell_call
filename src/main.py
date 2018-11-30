@@ -109,7 +109,7 @@ if __name__ == "__main__":
     # make now a genes object
     genes = spots.getGenes()
 
-    cells.geneCount(spots.neighbors, genes)
+    cells.geneCount(spots, genes)
 
     klasses = systemData.Klass(algo.gSet)
 
@@ -121,6 +121,8 @@ if __name__ == "__main__":
     cells.klassAssignment(spots, genes, klasses, algo.iss)
 
     spots.cellAssignment(cells, genes, klasses)
+
+    genes.updateGamma(cells, spots, klasses, algo.iss)
 
 
 

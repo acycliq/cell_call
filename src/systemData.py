@@ -33,8 +33,18 @@ class Spot(object):
         self.geneNo = None
         self.expectedGamma = None
         self.expectedLogGamma = None
+        self.cellProb = None
+        self._TotPredictedB = None
         # 1) filter the spots
         self._filter_spots(iss)
+
+    @property
+    def TotPredictedB(self):
+        try:
+            self._TotPredictedB = np.bincount(self.geneNo, self.neighbors['prob'][:, -1])
+        except:
+            pass # swallow the exception (are you sure you wanna keep that??)
+        return self._TotPredictedB
 
     def loglik(self, cellObj, iss):
         cellYX = cellObj.YX
@@ -59,7 +69,7 @@ class Spot(object):
 
         y0 = iss.CellCallRegionYX[:, 0].min()
         x0 = iss.CellCallRegionYX[:, 1].min()
-        logger.info("Rebasing SpotYX to match the one-based indexed Matlab object.")
+        logger.info("Rebasing SpotYX to match the one-based indexed Matlab object. Not sure this is needed!!")
         spotyx = spotYX - 1  # I DO NOT THINK THIS IS NEEDED!! REMOVE IT!
         logger.info(
             "Rebasing Neighbors to match the one-based indexed Matlab object. Not sure this is needed! REMOVE IT")
@@ -115,7 +125,7 @@ class Spot(object):
         #populate it
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.name, return_inverse=True, return_counts=True)
         g.names = GeneNames
-        g.spotNo = SpotGeneNo
+        self.geneNo = SpotGeneNo
         g.totalSpots = TotGeneSpots
         g.nG = GeneNames.shape[0]
         g.expectedGamma = np.ones(g.nG)
@@ -123,7 +133,7 @@ class Spot(object):
 
     def calcGamma(self, iss, cells, genes, klasses):
         scaledMean = genes.expression * cells.areaFactor[:, None, None]
-        cellGeneCount = cells.geneCount(self.neighbors, genes)
+        cellGeneCount = cells.geneCount(self, genes)
         rho = iss.rSpot + cellGeneCount
         beta = iss.rSpot + scaledMean
         self.expectedGamma = utils.gammaExpectation(rho[:,:,None], beta)
@@ -137,15 +147,32 @@ class Spot(object):
         for n in range(nN - 1):
             c = self.neighbors['id'][:, n]
             logger.info('genes.spotNo should be something line spots.geneNo instead!!')
-            meanLogExpression = np.squeeze(genes.logExpression[:, genes.spotNo, :])
+            meanLogExpression = np.squeeze(genes.logExpression[:, self.geneNo, :])
             classProb = cells.classProb[c, :]
             term_1 = np.sum(classProb * meanLogExpression, axis=1)
             # temp = utils.bi(self.expectedLogGamma, c[:, None], genes.spotNo[:, None], np.arange(0, nK))
-            expectedLog = utils.bi2(self.expectedLogGamma, [nS, nK], c[:, None], genes.spotNo[:, None])
+            expectedLog = utils.bi2(self.expectedLogGamma, [nS, nK], c[:, None], self.geneNo[:, None])
             # term_2 = np.sum(cells.classProb[c, :] * temp, axis=1)
             term_2 = np.sum(cells.classProb[c, :] * expectedLog, axis=1)
             aSpotCell[:, n] = term_1 + term_2
         wSpotCell = aSpotCell + self.D
+        pSpotNeighb = utils.softmax(wSpotCell)
+        #self.cellProb = pSpotNeighb
+        self.neighbors['prob'] = pSpotNeighb
+
+    def zeroKlassProb(self, klasses, cells):
+        nK = klasses.nK
+        nN = self.neighbors['id'].shape[1]
+        klassProb = cells.classProb[:, nK-1]
+        neighbourProb = self.neighbors['prob']
+
+        neighbourProb[:, 0: nN - 1] * klassProb[self.neighbors['id'][:, 0: nN - 1]]
+        temp = neighbourProb[:, 0: nN - 1] * klassProb[self.neighbors['id'][:, 0: nN - 1]]
+        #temp = neighbourProb * klassProb
+        pSpotZero = np.sum(temp, 1)
+        out = pSpotZero
+        return out
+
 
 class Cell(object):
     def __init__(self, iss):
@@ -193,15 +220,15 @@ class Cell(object):
         CellAreaFactor = nom / denom
         self.areaFactor = CellAreaFactor
 
-    def geneCount(self, spotsNeighbors, genes):
+    def geneCount(self, spots, genes):
         nC = self.nC
         nG = genes.nG
-        nN = spotsNeighbors["id"].shape[1]
+        nN = spots.neighbors["id"].shape[1]
         CellGeneCount = np.zeros([nC, nG]);
         for n in range(nN - 1):
-            c = spotsNeighbors["id"][:, n]
-            group_idx = np.vstack((c[None, :], genes.spotNo[None, :]))
-            a = spotsNeighbors["prob"][:, n]
+            c = spots.neighbors["id"][:, n]
+            group_idx = np.vstack((c[None, :], spots.geneNo[None, :]))
+            a = spots.neighbors["prob"][:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
         return CellGeneCount
@@ -211,7 +238,7 @@ class Cell(object):
 
         ScaledExp = genes.expression * genes.expectedGamma[None, :, None]*self.areaFactor[:, None, None] + iss.SpotReg
         pNegBin = ScaledExp / (iss.rSpot + ScaledExp)
-        CellGeneCount = self.geneCount(spots.neighbors, genes)
+        CellGeneCount = self.geneCount(spots, genes)
         contr = negBinLoglik(CellGeneCount[:,:,None], iss.rSpot, pNegBin)
         wCellClass = np.sum(contr, axis=1) + klasses.logPrior
         pCellClass = utils.softmax(wCellClass)
@@ -233,8 +260,10 @@ class Gene(object):
         self.logExpression = None
 
     def updateGamma(self, cells, spots, klasses, iss):
+        spots.zeroKlassProb(klasses, cells)
         nK = klasses.nK
-        temp = spots.gamma * cells.classProb[..., None] * cells.areaFactor[..., None, None]
+        klassProb = cells.classProb.reshape((cells.nC, 1, klasses.nK))
+        temp = spots.expectedGamma * klassProb * cells.areaFactor[..., None, None]
         ClassTotPredicted = np.squeeze(np.sum(temp, axis=0)) * (klasses.expression + self.iss.SpotReg)
         TotPredicted = np.sum(ClassTotPredicted[np.arange(0, nK - 1), :], axis=0)
         nom = iss.rGene + self.totalSpots - self.totalBackground - self.totalZero
