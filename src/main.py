@@ -112,8 +112,10 @@ if __name__ == "__main__":
     # make now a genes object
     genes = spots.getGenes()
 
+    # calc the number of copies of each gene in each cell
     cells.geneCount(spots, genes)
 
+    # make a klass object
     klasses = klass.Klass(algo.gSet)
 
     #now you can set expressions and logexpressions (as the mean expession over klass)
@@ -121,10 +123,13 @@ if __name__ == "__main__":
 
     # algo.callCells(spots, cells, genes, klasses)
 
+    # cell calling: Assign cells to klasses
     cells.klassAssignment(spots, genes, klasses, algo.iss)
 
+    # spot calling: Assign spots to cells
     spots.cellAssignment(cells, genes, klasses)
 
+    # Update parameter
     genes.updateGamma(cells, spots, klasses, algo.iss)
 
 
