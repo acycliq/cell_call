@@ -276,3 +276,14 @@ def logGammaExpectation(r, b):
     '''
     return scipy.special.psi(r) - np.log(b)
 
+
+def negBinLoglik(x, r, p):
+    '''
+    Negative Binomial loglikehood
+    :param x:
+    :param r:
+    :param p:
+    :return:
+    '''
+    out = x * np.log(p) + r * np.log(1-p)
+    return out

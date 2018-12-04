@@ -3,7 +3,10 @@ from geneset import GeneSet
 import preprocess
 import numpy as np
 import utils
-import systemData
+import cell
+import gene
+import klass
+import spot
 
 import logging
 
@@ -98,10 +101,10 @@ if __name__ == "__main__":
     algo = algo()
 
     # make a cell object
-    cells = systemData.Cell(algo.iss)
+    cells = cell.Cell(algo.iss)
 
     # make a spots object
-    spots = systemData.Spot(algo.iss)
+    spots = spot.Spot(algo.iss)
 
     # calc the loglik and populate some of the object's properties
     spots.loglik(cells, algo.iss)
@@ -111,7 +114,7 @@ if __name__ == "__main__":
 
     cells.geneCount(spots, genes)
 
-    klasses = systemData.Klass(algo.gSet)
+    klasses = klass.Klass(algo.gSet)
 
     #now you can set expressions and logexpressions (as the mean expession over klass)
     genes.setKlassExpressions(klasses, algo.iss, algo.gSet)
