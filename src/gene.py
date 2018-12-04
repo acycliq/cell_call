@@ -29,14 +29,6 @@ class Gene(object):
         # pSpotZero = spots.zeroKlassProb(klasses, cells)
         TotPredictedZ = spots.TotPredictedZ(spots.geneNo, cells.classProb[:, -1])
 
-        # klassProb = cells.classProb.reshape((cells.nC, 1, klasses.nK))
-        # temp = spots.expectedGamma * klassProb * cells.areaFactor[..., None, None]
-        # temp = np.sum(temp, axis=0)
-        # temp = np.squeeze(temp)
-        # ClassTotPredicted = temp * (self.expression + iss.SpotReg)
-        # ClassTotPredicted = np.squeeze(ClassTotPredicted)
-        # TotPredicted = np.sum(ClassTotPredicted[:, :-1], axis=1)
-
         TotPredicted = cells.geneCountsPerKlass(self, spots, klasses, iss)
 
         nom = iss.rGene + self.totalSpots - spots.TotPredictedB - TotPredictedZ
