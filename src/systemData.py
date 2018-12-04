@@ -1,9 +1,9 @@
 
 import numpy as np
 import pandas as pd
+import utils
 from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
-import utils
 import numpy_groupies as npg
 from time import time
 import logging
@@ -34,6 +34,7 @@ class Spot(object):
         self.expectedGamma = None
         self.expectedLogGamma = None
         self.cellProb = None
+        self.zeroProb = None
         self._TotPredictedB = None
         # 1) filter the spots
         self._filter_spots(iss)
@@ -171,7 +172,20 @@ class Spot(object):
         #temp = neighbourProb * klassProb
         pSpotZero = np.sum(temp, 1)
         out = pSpotZero
+        #self.zeroProb = pSpotZero
         return out
+
+    def TotPredictedZ(self, geneNo, pCellZero):
+        '''
+        ' given a vector
+        :param spots:
+        :return:
+        '''
+        spotNeighbours = self.neighbors['id'][:, :-1]
+        neighbourProb = self.neighbors['prob'][:, :-1]
+        pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
+        TotPredictedZ = np.bincount(geneNo, pSpotZero)
+        return TotPredictedZ
 
 
 class Cell(object):
@@ -246,6 +260,16 @@ class Cell(object):
         self.classProb = pCellClass
         return pCellClass
 
+    def geneCountsPerKlass(self, genes, spots, klasses, iss):
+        klassProb = self.classProb.reshape((self.nC, 1, klasses.nK))
+        temp = spots.expectedGamma * klassProb * self.areaFactor[..., None, None]
+        temp = np.sum(temp, axis=0)
+        temp = np.squeeze(temp)
+        ClassTotPredicted = temp * (genes.expression + iss.SpotReg)
+        ClassTotPredicted = np.squeeze(ClassTotPredicted)
+        TotPredicted = np.sum(ClassTotPredicted[:, :-1], axis=1)
+        return TotPredicted
+
 
 class Gene(object):
     def __init__(self):
@@ -254,19 +278,31 @@ class Gene(object):
         self.totalSpots = None
         self.nG = None
         self.totalBackground = None
-        self.totalZero = None
+        # self._totalZero = None
         self.expectedGamma = None
         self.expression = None
         self.logExpression = None
 
+    # @property
+    # def totalZero(self, spots):
+    #     self._totalZero = np.bincount(spots.geneNo, spots.zeroProb)
+    #     return self._totalZero
+
     def updateGamma(self, cells, spots, klasses, iss):
-        spots.zeroKlassProb(klasses, cells)
-        nK = klasses.nK
-        klassProb = cells.classProb.reshape((cells.nC, 1, klasses.nK))
-        temp = spots.expectedGamma * klassProb * cells.areaFactor[..., None, None]
-        ClassTotPredicted = np.squeeze(np.sum(temp, axis=0)) * (klasses.expression + self.iss.SpotReg)
-        TotPredicted = np.sum(ClassTotPredicted[np.arange(0, nK - 1), :], axis=0)
-        nom = iss.rGene + self.totalSpots - self.totalBackground - self.totalZero
+        # pSpotZero = spots.zeroKlassProb(klasses, cells)
+        TotPredictedZ = spots.TotPredictedZ(spots.geneNo, cells.classProb[:, -1])
+
+        # klassProb = cells.classProb.reshape((cells.nC, 1, klasses.nK))
+        # temp = spots.expectedGamma * klassProb * cells.areaFactor[..., None, None]
+        # temp = np.sum(temp, axis=0)
+        # temp = np.squeeze(temp)
+        # ClassTotPredicted = temp * (self.expression + iss.SpotReg)
+        # ClassTotPredicted = np.squeeze(ClassTotPredicted)
+        # TotPredicted = np.sum(ClassTotPredicted[:, :-1], axis=1)
+
+        TotPredicted = cells.geneCountsPerKlass(self, spots, klasses, iss)
+
+        nom = iss.rGene + self.totalSpots - spots.TotPredictedB - TotPredictedZ
         denom = iss.rGene + TotPredicted
         self.expectedGamma = nom / denom
 
@@ -281,6 +317,14 @@ class Gene(object):
         logExpression = np.log(MeanClassExp + iss.SpotReg)
         self.expression = np.reshape(expression, (1, self.nG, klasses.nK))
         self.logExpression = np.reshape(logExpression, (1, self.nG, klasses.nK))
+
+    def totalZero(self, spots, zeroProb):
+        out = np.bincount(spots.geneNo, zeroProb)
+        # self._totalZero = out
+        # np.bincount(spots.geneNo, pSpotZero)
+        return out
+
+
 
 
 class Klass(object):
