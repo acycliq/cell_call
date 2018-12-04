@@ -38,8 +38,6 @@ if __name__ == "__main__":
     # now you can set expressions and logexpressions (as the mean expession over klass)
     genes.setKlassExpressions(klasses, algo.iss, algo.gSet)
 
-    # algo.callCells(spots, cells, genes, klasses)
-
     # cell calling: Assign cells to klasses
     cells.klassAssignment(spots, genes, klasses, algo.iss)
 
