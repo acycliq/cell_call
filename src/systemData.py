@@ -27,3 +27,7 @@ class algo:
     @property
     def gSet(self):
         return self._gSet
+
+    def getGeneSubset(self, geneNames):
+        out = self.gSet.GeneSubset(geneNames).ScaleCell(0)
+        return out
