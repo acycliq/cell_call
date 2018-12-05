@@ -36,9 +36,9 @@ class Gene(object):
 
     def setKlassExpressions(self, klasses, iss, gSet):
         MeanClassExp = np.zeros([self.nG, klasses.nK])
-        temp = gSet.GeneSubset(self.names).ScaleCell(0)
+        # temp = gSet.GeneSubset(self.names).ScaleCell(0)
         for k in range(klasses.nK - 1):
-            val = iss.Inefficiency * np.mean(temp.CellSubset(klasses.name[k]).GeneExp, 1)
+            val = iss.Inefficiency * np.mean(gSet.CellSubset(klasses.name[k]).GeneExp, 1)
             MeanClassExp[:, k] = val[None, :]
         # MeanClassExp = MeanClassExp, (1, self.nG, klasses.nK)
         expression = MeanClassExp
