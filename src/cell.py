@@ -83,6 +83,7 @@ class Cell(object):
         pCellClass = utils.softmax(wCellClass)
 
         self.classProb = pCellClass
+        logger.info('cell ---> klass probabilities updated')
         return pCellClass
 
     def geneCountsPerKlass(self, genes, spots, klasses, iss):

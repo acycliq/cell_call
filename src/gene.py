@@ -11,7 +11,6 @@ logging.basicConfig(
 class Gene(object):
     def __init__(self):
         self.names = None
-        self.spotNo = None
         self.totalSpots = None
         self.nG = None
         self.totalBackground = None

@@ -287,3 +287,12 @@ def negBinLoglik(x, r, p):
     '''
     out = x * np.log(p) + r * np.log(1-p)
     return out
+
+
+def isConverged(spots, p0, tol):
+    p1 = spots.neighbors['prob']
+    if p0 is None:
+        p0 = np.zeros(p1.shape)
+    delta = np.max(np.abs(p1 - p0))
+    converged = (delta < tol)
+    return converged, delta

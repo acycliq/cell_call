@@ -144,19 +144,19 @@ class Spot(object):
         aSpotCell = np.zeros([nS, nN])
         for n in range(nN - 1):
             c = self.neighbors['id'][:, n]
-            logger.info('genes.spotNo should be something line spots.geneNo instead!!')
+            # logger.info('genes.spotNo should be something line spots.geneNo instead!!')
             meanLogExpression = np.squeeze(genes.logExpression[:, self.geneNo, :])
             classProb = cells.classProb[c, :]
             term_1 = np.sum(classProb * meanLogExpression, axis=1)
-            # temp = utils.bi(self.expectedLogGamma, c[:, None], genes.spotNo[:, None], np.arange(0, nK))
             expectedLog = utils.bi2(self.expectedLogGamma, [nS, nK], c[:, None], self.geneNo[:, None])
-            # term_2 = np.sum(cells.classProb[c, :] * temp, axis=1)
             term_2 = np.sum(cells.classProb[c, :] * expectedLog, axis=1)
             aSpotCell[:, n] = term_1 + term_2
         wSpotCell = aSpotCell + self.D
+
+        # update the prob a spot belongs to a neighboring cell
         pSpotNeighb = utils.softmax(wSpotCell)
-        #self.cellProb = pSpotNeighb
         self.neighbors['prob'] = pSpotNeighb
+        logger.info('spot ---> cell probabilities updated')
 
     def zeroKlassProb(self, klasses, cells):
         nK = klasses.nK
