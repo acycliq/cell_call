@@ -27,7 +27,8 @@ class Base(object):
         return out
 
     def _carve_out_genes(self, IDs):
-        dc = copy.deepcopy(self)
+        # dc = copy.deepcopy(self)
+        dc = copy.copy(self)
         dc.GeneExp_df = self.GeneExp_df.loc[IDs, :]
         id_matched = np.isin(IDs, self.GeneName)
         if ~id_matched.all():
@@ -40,7 +41,8 @@ class Base(object):
         return dc
 
     def _carve_out_cells(self, IDs):
-        dc = copy.deepcopy(self)
+        # dc = copy.deepcopy(self)
+        dc = copy.copy(self)
         mask = None
         if np.issubdtype(np.array(IDs).dtype, np.number):
             dc.GeneExp_df = self.GeneExp_df.iloc[:, IDs]
