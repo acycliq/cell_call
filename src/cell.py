@@ -2,6 +2,7 @@ import numpy as np
 import utils
 from skimage.measure import regionprops
 import numpy_groupies as npg
+import time
 
 import logging
 
@@ -60,6 +61,7 @@ class Cell(object):
         self.areaFactor = CellAreaFactor
 
     def geneCount(self, spots, genes):
+        start = time.time()
         nC = self.nC
         nG = genes.nG
         nN = spots.neighbors["id"].shape[1]
@@ -70,6 +72,8 @@ class Cell(object):
             a = spots.neighbors["prob"][:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
+        end = time.time()
+        print('time in geneCount: ', end - start)
         return CellGeneCount
 
     def klassAssignment(self, spots, genes, klasses, iss):

@@ -6,6 +6,7 @@ import pickle
 from shapely.geometry import Point, MultiPoint, Polygon
 import logging
 import matplotlib.path as mpltPath
+import time
 
 
 logger = logging.getLogger()
@@ -285,7 +286,10 @@ def negBinLoglik(x, r, p):
     :param p:
     :return:
     '''
+    start = time.time()
     out = x * np.log(p) + r * np.log(1-p)
+    end = time.time()
+    print('time in negBinLoglik:', end - start)
     return out
 
 
