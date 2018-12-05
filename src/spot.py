@@ -108,14 +108,9 @@ class Spot(object):
         spotYX = iss.SpotGlobalYX[includeSpot, :].round()
         spotGeneName = allGeneNames[includeSpot]
 
-        # [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(spotGeneName, return_inverse=True, return_counts=True)
-
         self.YX = spotYX
         self.nS = spotYX.shape[0]
         self.name = spotGeneName
-        # self._name = GeneNames
-        # self._geneNo = SpotGeneNo
-        # self._nG = GeneNames.shape[0]
 
     def getGenes(self):
         #make a gene object

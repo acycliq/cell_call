@@ -49,7 +49,7 @@ if __name__ == "__main__":
         # Update parameter
         genes.updateGamma(cells, spots, klasses, algo.iss)
 
-        converged, delta = isConverged(spots, p0, algo.iss.CellCallTolerance)
+        converged, delta = utils.isConverged(spots, p0, algo.iss.CellCallTolerance)
         logger.info('Iteration %d, mean prob change %f' % (i, delta))
 
         # replace p0 with the latest probabilities
