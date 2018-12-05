@@ -32,13 +32,16 @@ if __name__ == "__main__":
     # make now a genes object
     genes = spots.getGenes()
 
+    # universe
+    gSet = algo.gSet.GeneSubset(genes.names).ScaleCell(0)
+
     p0 = None
     for i in range(algo.iss.CellCallMaxIter):
         # calc the number of copies of each gene in each cell
         cells.geneCount(spots, genes)
 
         # now you can set expressions and logexpressions (as the mean expression over klass)
-        genes.setKlassExpressions(klasses, algo.iss, algo.gSet)
+        genes.setKlassExpressions(klasses, algo.iss, gSet)
 
         # cell calling: Assign cells to klasses
         cells.klassAssignment(spots, genes, klasses, algo.iss)
