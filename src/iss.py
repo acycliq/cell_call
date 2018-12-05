@@ -22,9 +22,16 @@ class Iss:
         mat = utils.loadmat(pathStr)
         dictionary = mat["iss"]
         logger.info("reading iss.mat from %s", pathStr)
+        toKeep = ['CellMapFile', 'CellCallRegionYX', 'InsideCellBonus', 'GeneNames',
+                  'SpotCodeNo', 'SpotGlobalYX', 'SpotCombi', 'SpotScore',
+                  'CombiQualThresh', 'SpotIntensity', 'CombiIntensityThresh', 'cAnchorIntensities',
+                  'DetectionThresh', 'CombiAnchorsReq', 'CharCodes', 'ExtraCodes',
+                  'nNeighbors', 'MisreadDensity', 'CellCallMaxIter', 'Inefficiency',
+                  'SpotReg', 'rSpot', 'rGene', 'CellCallTolerance']
         for key in mat["iss"]:
-            setattr(self, key, dictionary[key])
-            logger.info("Attribute %s populated.", key)
+            if key in toKeep:
+                setattr(self, key, dictionary[key])
+                logger.info("Attribute %s populated.", key)
 
     def _load_cellMapFile(self):
         try:
