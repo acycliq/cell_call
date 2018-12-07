@@ -226,6 +226,7 @@ def bi2(X, dims, *args):
     nK = dims[1]
     inds = []
     if len(args) == 2:
+        # print('im in!')
         args = (*args, np.arange(0, nK))
 
     temp = np.zeros(dims).astype(int)
@@ -286,10 +287,10 @@ def negBinLoglik(x, r, p):
     :param p:
     :return:
     '''
-    start = time.time()
-    out = x * np.log(p) + r * np.log(1-p)
-    end = time.time()
-    print('time in negBinLoglik:', end - start)
+    # start = time.time()
+    out = x * np.log(p, where=x.astype(bool)) + r * np.log(1-p)
+    # end = time.time()
+    # print('time in negBinLoglik:', end - start)
     return out
 
 
