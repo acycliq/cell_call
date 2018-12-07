@@ -184,5 +184,9 @@ class Spot(object):
             id = self.neighbors['id']
             mask = np.argmax(prob, axis=1)
             # mask = mask[..., None]
+            np.hstack((np.arange(72336)[..., None], mask[..., None]))
+            '''
+            https://stackoverflow.com/questions/24692394/select-elements-from-an-array-using-another-array-as-index
+            '''
 
             return mask
