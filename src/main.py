@@ -62,6 +62,7 @@ if __name__ == "__main__":
             print("Success!!")
             break
 
+    spots.bestNeighbour()
     print("done")
 
 

@@ -178,3 +178,11 @@ class Spot(object):
         pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
         TotPredictedZ = np.bincount(geneNo, pSpotZero)
         return TotPredictedZ
+
+    def bestNeighbour(self):
+            prob = self.neighbors['prob']
+            id = self.neighbors['id']
+            mask = np.argmax(prob, axis=1)
+            # mask = mask[..., None]
+
+            return mask
