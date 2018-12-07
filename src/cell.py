@@ -61,7 +61,7 @@ class Cell(object):
         self.areaFactor = CellAreaFactor
 
     def geneCount(self, spots, genes):
-        start = time.time()
+        # start = time.time()
         nC = self.nC
         nG = genes.nG
         nN = spots.neighbors["id"].shape[1]
@@ -72,8 +72,8 @@ class Cell(object):
             a = spots.neighbors["prob"][:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
-        end = time.time()
-        print('time in geneCount: ', end - start)
+        # end = time.time()
+        # print('time in geneCount: ', end - start)
         return CellGeneCount
 
     def klassAssignment(self, spots, genes, klasses, iss):
