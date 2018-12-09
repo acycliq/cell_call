@@ -6,6 +6,7 @@ import pickle
 from shapely.geometry import Point, MultiPoint, Polygon
 import logging
 import matplotlib.path as mpltPath
+import numexpr as ne
 import time
 
 
@@ -276,7 +277,17 @@ def logGammaExpectation(r, b):
     :param b:
     :return: Expectetation of a rv log(X) where X follows a Gamma(r,b) distribution
     '''
-    return scipy.special.psi(r) - np.log(b)
+    # start = time.time()
+    # out = scipy.special.psi(r) - np.log(b)
+    # end = time.time()
+    # print('time in logGammaExpectation:', end - start)
+    start = time.time()
+    logb = np.zeros(b.shape)
+    ne.evaluate("log(b)", out=logb)
+    out = scipy.special.psi(r) - logb
+    end = time.time()
+    print('time in logGammaExpectation ne:', end - start)
+    return out
 
 
 def negBinLoglik(x, r, p):
@@ -287,10 +298,15 @@ def negBinLoglik(x, r, p):
     :param p:
     :return:
     '''
+    out=np.zeros(p.shape)
     # start = time.time()
-    out = x * np.log(p, where=x.astype(bool)) + r * np.log(1-p)
+    # out = x * np.log(p, where=x.astype(bool)) + r * np.log(1-p)
     # end = time.time()
     # print('time in negBinLoglik:', end - start)
+    start = time.time()
+    ne.evaluate("x * log(p) + r * log(1 - p)", out=out)
+    end = time.time()
+    print('time in negBinLoglik - ne:', end - start)
     return out
 
 
