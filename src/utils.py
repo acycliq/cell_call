@@ -234,8 +234,8 @@ def bi2(X, dims, *args):
     for i in range(len(args)):
         inds.append(temp + args[i])
 
-    out = X[inds]
-    return out
+    # out = X[inds]
+    return X[inds]
 
 
 def qualityThreshold(iss):
@@ -268,7 +268,8 @@ def gammaExpectation(r, b):
     :return: Expectetation of a rv X following a Gamma(r,b) distribution with pdf
     f(x;\alpha ,\beta )= \frac{\beta^r}{\Gamma(r)} x^{r-1}e^{-\beta x}
     '''
-    return r/b
+    out = np.empty(b.shape)
+    return ne.evaluate('r/b', out=out)
 
 
 def logGammaExpectation(r, b):
@@ -281,12 +282,12 @@ def logGammaExpectation(r, b):
     # out = scipy.special.psi(r) - np.log(b)
     # end = time.time()
     # print('time in logGammaExpectation:', end - start)
-    start = time.time()
-    logb = np.zeros(b.shape)
+    # start = time.time()
+    logb = np.empty(b.shape)
     ne.evaluate("log(b)", out=logb)
     out = scipy.special.psi(r) - logb
-    end = time.time()
-    print('time in logGammaExpectation ne:', end - start)
+    # end = time.time()
+    # print('time in logGammaExpectation ne:', end - start)
     return out
 
 
@@ -303,10 +304,10 @@ def negBinLoglik(x, r, p):
     # out = x * np.log(p, where=x.astype(bool)) + r * np.log(1-p)
     # end = time.time()
     # print('time in negBinLoglik:', end - start)
-    start = time.time()
+    # start = time.time()
     ne.evaluate("x * log(p) + r * log(1 - p)", out=out)
-    end = time.time()
-    print('time in negBinLoglik - ne:', end - start)
+    # end = time.time()
+    # print('time in negBinLoglik - ne:', end - start)
     return out
 
 
