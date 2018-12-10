@@ -181,12 +181,13 @@ class Spot(object):
 
     def bestNeighbour(self):
             prob = self.neighbors['prob']
-            id = self.neighbors['id']
-            mask = np.argmax(prob, axis=1)
+            nId = self.neighbors['id']
+            iBest = np.argmax(prob, axis=1)
             # mask = mask[..., None]
-            np.hstack((np.arange(72336)[..., None], mask[..., None]))
+            # z = np.hstack((np.arange(72336)[..., None], mask[..., None]))
             '''
             https://stackoverflow.com/questions/24692394/select-elements-from-an-array-using-another-array-as-index
             '''
-
-            return mask
+            r = np.arange(self.nS)[..., None]
+            c = iBest[..., None]
+            return nId[r, c]
