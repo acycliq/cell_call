@@ -11,11 +11,11 @@ logging.basicConfig(
 
 
 class Iss:
-    def __init__(self):
+    def __init__(self, ini):
         my_path = os.path.abspath(os.path.dirname(__file__))
-        issPath = os.path.join(my_path, "../data/iss.mat")
+        issPath = os.path.join(my_path, ini['issPath'])
         self._populate(issPath)
-        self._load_cellMapFile()
+        self._load_cellMapFile(ini)
         print(self.cell_map)
 
     def _populate(self, pathStr):
@@ -33,12 +33,13 @@ class Iss:
                 setattr(self, key, dictionary[key])
                 logger.info("Attribute %s populated.", key)
 
-    def _load_cellMapFile(self):
+    def _load_cellMapFile(self, ini):
         try:
             mat = utils.loadmat(self.CellMapFile)
             self.cell_map = mat["CellMap"]
-        except TypeError:
-            matStr = "..\data\CellMap.mat"
+            logger.info("reading CellMap from %s", self.CellMapFile)
+        except FileNotFoundError:
+            matStr = ini['cellMap']
             logger.info("reading CellMap from %s", matStr)
             mat = utils.loadmat(matStr)
             self.cell_map = mat["CellMap"]

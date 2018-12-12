@@ -14,10 +14,10 @@ class algo:
     '''
     Main routine. More to add here!
     '''
-    def __init__(self):
+    def __init__(self, ini):
         print('in systemData.algo')
         # create iss and gSet objects and add them as properties
-        self._iss = Iss()
+        self._iss = Iss(ini)
         self._gSet = GeneSet()
 
     @property

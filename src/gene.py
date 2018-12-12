@@ -38,6 +38,7 @@ class Gene(object):
         MeanClassExp = np.zeros([self.nG, klasses.nK])
         # temp = gSet.GeneSubset(self.names).ScaleCell(0)
         for k in range(klasses.nK - 1):
+            print('k = ', k)
             val = iss.Inefficiency * np.mean(gSet.CellSubset(klasses.name[k]).GeneExp, 1)
             MeanClassExp[:, k] = val[None, :]
         # MeanClassExp = MeanClassExp, (1, self.nG, klasses.nK)

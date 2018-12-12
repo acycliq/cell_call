@@ -33,12 +33,13 @@ class Cell(object):
         y0 = iss.CellCallRegionYX[:, 0].min()
         x0 = iss.CellCallRegionYX[:, 1].min()
 
-        matStr = "..\data\CellMap.mat"
-        logger.info("reading CellMap from %s", matStr)
-        mat = utils.loadmat(matStr)
+        # matStr = "..\data\CellMap.mat"
+        # logger.info("reading CellMap from %s", matStr)
+        # logger.info("Do I need that again?? cell map is set inside Iss class I think!")
+        # mat = utils.loadmat(matStr)
         # cell_map = mat["CellMap"]
 
-        rp = regionprops(mat["CellMap"])
+        rp = regionprops(iss.cell_map)
         cellYX = np.array([x.centroid for x in rp]) + np.array([y0, x0])
 
         cellArea0 = np.array([x.area for x in rp])

@@ -3,6 +3,7 @@ import cell
 import klass
 import spot
 import utils
+import config as cfg
 
 import logging
 
@@ -15,7 +16,10 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-    algo = systemData.algo()
+    # ini = cfg.settings['default']
+    ini = cfg.settings['3_1_left']
+
+    algo = systemData.algo(ini)
 
     # make a cell object
     cells = cell.Cell(algo.iss)
@@ -35,13 +39,13 @@ if __name__ == "__main__":
     # universe
     gSet = algo.gSet.GeneSubset(genes.names).ScaleCell(0)
 
+    # now you can set expressions and logexpressions (as the mean expression over klass)
+    genes.setKlassExpressions(klasses, algo.iss, gSet)
+
     p0 = None
     for i in range(algo.iss.CellCallMaxIter):
         # calc the number of copies of each gene in each cell
         cells.geneCount(spots, genes)
-
-        # now you can set expressions and logexpressions (as the mean expression over klass)
-        genes.setKlassExpressions(klasses, algo.iss, gSet)
 
         # cell calling: Assign cells to klasses
         cells.klassAssignment(spots, genes, klasses, algo.iss)
