@@ -79,7 +79,10 @@ class GeneSet(common.Base):
 
     def CellSubset(self, IDs):
         out = self._carve_out(IDs, 'Cells')
-        mask = self.GeneExp_df.columns.isin(out.GeneExp_df.columns)
+        if np.issubdtype(np.array(IDs).dtype, np.bool_):
+            mask = IDs
+        else:
+            mask = self.GeneExp_df.columns.isin(out.GeneExp_df.columns)
         if ~mask.all():
             update(out, mask)
         return out
