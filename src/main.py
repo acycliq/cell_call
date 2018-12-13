@@ -16,8 +16,8 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-    # ini = cfg.settings['default']
-    ini = cfg.settings['3_1_left']
+    ini = cfg.settings['default']
+    # ini = cfg.settings['4_3_right']
 
     algo = systemData.algo(ini)
 
@@ -37,10 +37,11 @@ if __name__ == "__main__":
     genes = spots.getGenes()
 
     # universe
-    gSet = algo.gSet.GeneSubset(genes.names).ScaleCell(0)
+    gSub = algo.gSet.GeneSubset(genes.names)
+    gSub = gSub.ScaleCell(0)
 
     # now you can set expressions and logexpressions (as the mean expression over klass)
-    genes.setKlassExpressions(klasses, algo.iss, gSet)
+    genes.setKlassExpressions(klasses, algo.iss, gSub)
 
     p0 = None
     for i in range(algo.iss.CellCallMaxIter):
