@@ -1,8 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
-import utils as utils
-import common
+import src.utils as utils
+import src.common
 import sys
 import logging
 
@@ -14,7 +14,7 @@ logging.basicConfig(
     )
 
 
-class GeneSet(common.Base):
+class GeneSet(src.common.Base):
     def __init__(self, ini):
         my_path = os.path.abspath(os.path.dirname(__file__))
         self._populate(os.path.join(my_path, ini['geneset']))

@@ -1,6 +1,6 @@
 
-from iss import Iss
-from geneset import GeneSet
+from src.iss import Iss
+from src.geneset import GeneSet
 import logging
 
 
