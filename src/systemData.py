@@ -18,7 +18,7 @@ class algo:
         print('in systemData.algo')
         # create iss and gSet objects and add them as properties
         self._iss = Iss(ini)
-        self._gSet = GeneSet()
+        self._gSet = GeneSet(ini)
 
     @property
     def iss(self):

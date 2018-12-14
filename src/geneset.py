@@ -15,9 +15,9 @@ logging.basicConfig(
 
 
 class GeneSet(common.Base):
-    def __init__(self):
+    def __init__(self, ini):
         my_path = os.path.abspath(os.path.dirname(__file__))
-        self._populate(os.path.join(my_path, "../data/GeneSet.mat"))
+        self._populate(os.path.join(my_path, ini['geneset']))
         self._GeneExp_df = pd.DataFrame(self._GeneExp, columns=self._CellName, index=self._GeneName)
 
     @property
