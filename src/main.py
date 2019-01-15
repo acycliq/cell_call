@@ -1,9 +1,9 @@
-import systemData
-import cell
-import klass
-import spot
-import utils
-import config as cfg
+import src.systemData
+import src.cell
+import src.klass
+import src.spot
+import src.utils
+import src.config as cfg
 
 import logging
 
@@ -19,16 +19,16 @@ if __name__ == "__main__":
     ini = cfg.settings['default']
     # ini = cfg.settings['4_3_right']
 
-    algo = systemData.algo(ini)
+    algo = src.systemData.algo(ini)
 
     # make a cell object
-    cells = cell.Cell(algo.iss)
+    cells = src.cell.Cell(algo.iss)
 
     # make a spots object
-    spots = spot.Spot(algo.iss)
+    spots = src.spot.Spot(algo.iss)
 
     # make a klass object
-    klasses = klass.Klass(algo.gSet)
+    klasses = src.klass.Klass(algo.gSet)
 
     # calc the loglik and populate some of the object's properties
     spots.loglik(cells, algo.iss)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         # Update parameter
         genes.updateGamma(cells, spots, klasses, algo.iss)
 
-        converged, delta = utils.isConverged(spots, p0, algo.iss.CellCallTolerance)
+        converged, delta = src.utils.isConverged(spots, p0, algo.iss.CellCallTolerance)
         logger.info('Iteration %d, mean prob change %f' % (i, delta))
 
         # replace p0 with the latest probabilities
