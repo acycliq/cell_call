@@ -1,8 +1,10 @@
 import numpy as np
+import pandas as pd
 import src.utils
 from sklearn.neighbors import NearestNeighbors
 from time import time
 import src.gene
+from starfish.types import Indices, Features, SpotAttributes
 import logging
 
 
@@ -111,6 +113,14 @@ class Spot(object):
         self.YX = spotYX
         self.nS = spotYX.shape[0]
         self.name = spotGeneName
+        sa = SpotAttributes(pd.DataFrame({Indices.Z.value: 0,
+                                     Indices.X.value: spotYX[:, 0],
+                                     Indices.Y.value: spotYX[:, 1],
+                                     Features.SPOT_RADIUS: np.nan,
+                                     Features.TARGET: spotGeneName,
+                                     })
+                       )
+        sa.data
 
     def getGenes(self):
         #make a gene object
