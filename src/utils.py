@@ -3,7 +3,7 @@ import scipy
 import scipy.io as spio
 import os
 import pickle
-from shapely.geometry import Point, MultiPoint, Polygon
+# from shapely.geometry import Point, MultiPoint, Polygon
 import logging
 import matplotlib.path as mpltPath
 import numexpr as ne
