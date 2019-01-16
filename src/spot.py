@@ -1,9 +1,11 @@
 import numpy as np
 import pandas as pd
+import xarray as xr
 import src.utils
 from sklearn.neighbors import NearestNeighbors
 from time import time
 import src.gene
+from pathlib import Path
 from starfish.types import Indices, Features, SpotAttributes
 import logging
 
@@ -26,6 +28,7 @@ class Spot(object):
         self.neighbors = None  # neighbors is a dict (top3 plus last one which is a dummy)
         self.D = None
         self.inCell = None
+        self.attributes = None
         self.YX = None
         self.nS = None
         self.name = None
@@ -48,11 +51,11 @@ class Spot(object):
 
     def loglik(self, cellObj, iss):
         cellYX = cellObj.YX
-        spotYX = self.YX
+        spotYX = self.attributes.data[['y', 'x']].values
         meanCellRadius = cellObj.meanRadius
         nC = cellYX.shape[0] + 1
         nN = iss.nNeighbors + 1
-        nS = spotYX.shape[0]
+        nS = self.nS
 
         # for each spot find the closest cell (in fact the top nN-closest cells...)
         nbrs = NearestNeighbors(n_neighbors=nN, algorithm='ball_tree').fit(cellYX)
@@ -97,30 +100,48 @@ class Spot(object):
         self.inCell = SpotInCell
 
     def _filter_spots(self, iss):
-        excludeGenes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
-        allGeneNames = iss.GeneNames[iss.SpotCodeNo - 1]  # -1 is needed because Matlab is 1-based
-        cond1 = ~np.isin(allGeneNames, excludeGenes)
-        start_time = time()
-        cond2 = src.utils.inpolygon(iss.SpotGlobalYX, iss.CellCallRegionYX)
-        print('Elapsed time: ' + str(time() - start_time))
 
-        cond3 = src.utils.qualityThreshold(iss)
+        saFile = '../data_preprocessed/spot_attributes.nc'
+        try:
+            Path(saFile).resolve(strict=True)
+        except FileNotFoundError:
+            # doesn't exist
+            excludeGenes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
+            allGeneNames = iss.GeneNames[iss.SpotCodeNo - 1]  # -1 is needed because Matlab is 1-based
+            cond1 = ~np.isin(allGeneNames, excludeGenes)
+            start_time = time()
+            cond2 = src.utils.inpolygon(iss.SpotGlobalYX, iss.CellCallRegionYX)
+            print('Elapsed time: ' + str(time() - start_time))
 
-        includeSpot = cond1 & cond2 & cond3
-        spotYX = iss.SpotGlobalYX[includeSpot, :].round()
-        spotGeneName = allGeneNames[includeSpot]
+            cond3 = src.utils.qualityThreshold(iss)
 
-        self.YX = spotYX
-        self.nS = spotYX.shape[0]
-        self.name = spotGeneName
-        sa = SpotAttributes(pd.DataFrame({Indices.Z.value: 0,
-                                     Indices.X.value: spotYX[:, 0],
-                                     Indices.Y.value: spotYX[:, 1],
-                                     Features.SPOT_RADIUS: np.nan,
-                                     Features.TARGET: spotGeneName,
-                                     })
-                       )
-        sa.data
+            includeSpot = cond1 & cond2 & cond3
+            spotYX = iss.SpotGlobalYX[includeSpot, :].round()
+            spotGeneName = allGeneNames[includeSpot]
+
+            self.YX = spotYX
+            self.nS = spotYX.shape[0]
+            self.name = spotGeneName
+            df = pd.DataFrame({Indices.Z.value: 0,
+                                         Indices.X.value: spotYX[:, 1],
+                                         Indices.Y.value: spotYX[:, 0],
+                                         Features.SPOT_RADIUS: np.nan,
+                                         Features.TARGET: spotGeneName,
+                                         })
+            # save to file
+            df.to_xarray().to_netcdf(saFile)
+        else:
+            '''
+            Faking it. 
+            Use a preprocessed file to instantiate the SpotAttributes class.
+            Eventually that will/should be replaced. SpotAttributes will be instantiated 
+            by used defined data
+            '''
+            sa = SpotAttributes(xr.open_dataset(saFile).to_dataframe())
+            self.attributes = sa
+            self.name = self.attributes.data['target'].values
+            self.nS = self.attributes.data.shape[0]
+
 
     def getGenes(self):
         #make a gene object
