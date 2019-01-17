@@ -87,8 +87,8 @@ def cell_info(iss):
     relCellRadius = np.sqrt(cellArea0 / np.pi) / meanCellRadius
     relCellRadius = np.append(relCellRadius, 1)
 
-    logger.info("Rebasing CellYX to match the one-based indexed Matlab object. ")
-    cellYX = cellYX + 1
+    # logger.info("Rebasing CellYX to match the one-based indexed Matlab object. ")
+    # cellYX = cellYX + 1 # Are you sure you need to do this? I think NOT. You are changing the coordinates by one pixel!!
 
     out = dict()
     out["cellYX"] = cellYX
