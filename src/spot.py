@@ -80,7 +80,7 @@ class Spot(object):
         # Lookup cell_map and infer which spot belongs to which cell.
         # This is kinda using the empirical....
         idx = spotyx - [y0, x0]  # First move the origin at (0, 0)
-        SpotInCell = src.utils.IndexArrayNan(iss.cell_map, idx.T)  # Now get the allocation of spots to cells
+        SpotInCell = src.utils.IndexArrayNan(iss.label_image, idx.T)  # Now get the allocation of spots to cells
         sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
         assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 

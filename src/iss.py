@@ -16,7 +16,7 @@ class Iss:
         issPath = os.path.join(my_path, ini['issPath'])
         self._populate(issPath)
         self._load_cellMapFile(ini)
-        print(self.cell_map)
+        print(self.label_image)
 
     def _populate(self, pathStr):
         mat = src.utils.loadmat(pathStr)
@@ -36,13 +36,13 @@ class Iss:
     def _load_cellMapFile(self, ini):
         try:
             mat = src.utils.loadmat(self.CellMapFile)
-            self.cell_map = mat["CellMap"]
+            self.label_image = mat["CellMap"]
             logger.info("reading CellMap from %s", self.CellMapFile)
         except FileNotFoundError:
-            matStr = ini['cellMap']
+            matStr = ini['label_image']
             logger.info("reading CellMap from %s", matStr)
             mat = src.utils.loadmat(matStr)
-            self.cell_map = mat["CellMap"]
+            self.label_image = mat["CellMap"]
 
 
 

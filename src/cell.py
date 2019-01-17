@@ -39,7 +39,7 @@ class Cell(object):
         # mat = utils.loadmat(matStr)
         # cell_map = mat["CellMap"]
 
-        rp = regionprops(iss.cell_map)
+        rp = regionprops(iss.label_image)
         cellYX = np.array([x.centroid for x in rp]) + np.array([y0, x0])
 
         cellArea0 = np.array([x.area for x in rp])
