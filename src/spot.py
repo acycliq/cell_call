@@ -137,7 +137,7 @@ class Spot(object):
             Eventually that will/should be replaced. SpotAttributes will be instantiated 
             by used defined data
             '''
-            logger.info('*********Getting spotattributes from %s **********', saFile)
+            logger.info('********* Getting spotattributes from %s **********', saFile)
             sa = SpotAttributes(xr.open_dataset(saFile).to_dataframe())
             self.attributes = sa
             self.name = self.attributes.data['target'].values
