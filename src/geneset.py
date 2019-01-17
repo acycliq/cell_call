@@ -13,7 +13,10 @@ logging.basicConfig(
     format="%(asctime)s:%(levelname)s:%(message)s"
     )
 
-
+'''
+THE WHOLE CODE HERE NEEDS SOME SERIOUS REVIEWING!!
+YOU BETTER START FROM SCRATCH. IS A MESS
+'''
 class GeneSet(src.common.Base):
     def __init__(self, ini):
         my_path = os.path.abspath(os.path.dirname(__file__))
