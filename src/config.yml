@@ -1,0 +1,82 @@
+DEFAULT:
+  ISSPATH: ../data/default/iss.mat
+  LABEL_IMAGE: ../data/default/CellMap.mat
+  GENESET: /data/GeneSet.mat
+  NAME: default
+
+threeOneLeft:
+  ISSPATH: ../data/3-1_left/iss.mat
+  LABEL_IMAGE: ../data/3-1_left/CellMap.mat
+  GENESET: /data/GeneSet.mat
+  NAME: 161220KI_3_1_left
+
+threeOneRight:
+  ISSPATH: ../data/3-1_right/iss.mat
+  LABEL_IMAGE: ../data/3-1_right/CellMap.mat
+  GENESET: /data/GeneSet.mat
+  NAME: 161220KI_3-1_right
+
+fourThreeRight:
+  ISSPATH: ../data/4-3_right/iss.mat
+  LABEL_IMAGE: ../data/4-3_right/CellMap.mat
+  GENESET: /data/GeneSet.mat
+  NAME: 161220KI_4-3_right
+
+
+CellCallMaxIter: 100
+CellCallRegionYX:
+  - - 17268
+    - 13751
+  - - 15629
+    - 12739
+  - - 16237
+    - 11839
+  - - 16528
+    - 11120
+  - - 16396
+    - 10333
+  - - 16105
+    - 9906
+  - - 15603
+    - 9231
+  - - 15286
+    - 8916
+  - - 12987
+    - 6263
+  - - 1364
+    - 6150
+  - - 14282
+    - 6150
+  - - 15074
+    - 6420
+  - - 15735
+    - 6735
+  - - 16369
+    - 7072
+  - - 16977
+    - 7522
+  - - 17637
+    - 8264
+  - - 18113
+    - 9119
+  - - 18324
+    - 10130
+  - - 18457
+    - 10872
+  - - 18298
+    - 11997
+  - - 17981
+    - 12626
+  - - 17479
+    - 13233
+  - - 17268
+    - 13751
+CellCallTolerance: 0.02
+CellMapFile: '\\\\basket.cortexlab.net\\data\\kenneth\\iss\\170315_161220KI_4-3\\Output\\CellMap.mat'
+Inefficiency: 0.2
+InsideCellBonus: 2
+MisreadDensity: 0.00001
+SpotReg: 0.1
+nNeighbors: 3
+rGene: 20
+rSpot: 2
