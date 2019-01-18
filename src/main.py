@@ -3,10 +3,11 @@ import src.cell
 import src.klass
 import src.spot
 import src.utils
-import src.config as cfg
-
+# import src.config as cfg
+import src.my_config as config
 import logging
 
+CONFIG_FILE = '../src/config.yml'
 
 logger = logging.getLogger()
 logging.basicConfig(
@@ -16,13 +17,14 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-    ini = cfg.settings['default']
+    ini = config.read(CONFIG_FILE)
+    # ini = cfg.settings['default']
     # ini = cfg.settings['4_3_right']
 
-    algo = src.systemData.algo(ini)
+    # algo = src.systemData.algo(ini)
 
     # make a cell object
-    cells = src.cell.Cell(algo.iss)
+    cells = src.cell.Cell(ini)
 
     # make a spots object
     spots = src.spot.Spot(algo.iss)
