@@ -16,7 +16,7 @@ fourThreeRight:
 
 GENESET: '/data/GeneSet.mat'
 CellCallMaxIter: 100
-CellCallRegionYX: !!python/object:numpy.array
+CellCallRegionYX:
   - - 17268
     - 13751
   - - 15629
