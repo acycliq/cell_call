@@ -1,30 +1,22 @@
 DEFAULT:
-  ISSPATH: ../data/default/iss.mat
-  LABEL_IMAGE: ../data/default/CellMap.mat
-  GENESET: /data/GeneSet.mat
-  NAME: default
+    LABEL_IMAGE: '../data/default/CellMap.mat'
+
 
 threeOneLeft:
-  ISSPATH: ../data/3-1_left/iss.mat
-  LABEL_IMAGE: ../data/3-1_left/CellMap.mat
-  GENESET: /data/GeneSet.mat
-  NAME: 161220KI_3_1_left
+    LABEL_IMAGE: '../data/3-1_left/CellMap.mat'
+
 
 threeOneRight:
-  ISSPATH: ../data/3-1_right/iss.mat
-  LABEL_IMAGE: ../data/3-1_right/CellMap.mat
-  GENESET: /data/GeneSet.mat
-  NAME: 161220KI_3-1_right
+    LABEL_IMAGE: '../data/3-1_right/CellMap.mat'
+
 
 fourThreeRight:
-  ISSPATH: ../data/4-3_right/iss.mat
-  LABEL_IMAGE: ../data/4-3_right/CellMap.mat
-  GENESET: /data/GeneSet.mat
-  NAME: 161220KI_4-3_right
+    LABEL_IMAGE: '../data/4-3_right/CellMap.mat'
 
 
+GENESET: '/data/GeneSet.mat'
 CellCallMaxIter: 100
-CellCallRegionYX:
+CellCallRegionYX: !!python/object:numpy.array
   - - 17268
     - 13751
   - - 15629
