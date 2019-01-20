@@ -15,7 +15,7 @@ logging.basicConfig(
 
 
 class Cell(object):
-    def __init__(self, iss):
+    def __init__(self, ini):
         # creates a cell object
         self.YX = None
         self.nC = None
@@ -23,15 +23,15 @@ class Cell(object):
         self.relativeRadius = None
         self.areaFactor = None
         self.classProb = None
-        self._cell_info(iss)
+        self._cell_info(ini)
 
-    def _cell_info(self, iss):
+    def _cell_info(self, ini):
         '''
         Read image and calc some statistics
         :return:
         '''
-        y0 = iss.CellCallRegionYX[:, 0].min()
-        x0 = iss.CellCallRegionYX[:, 1].min()
+        y0 = ini['CellCallRegionYX'][:, 0].min()
+        x0 = ini['CellCallRegionYX'][:, 1].min()
 
         # matStr = "..\data\CellMap.mat"
         # logger.info("reading CellMap from %s", matStr)
@@ -39,7 +39,7 @@ class Cell(object):
         # mat = utils.loadmat(matStr)
         # cell_map = mat["CellMap"]
 
-        rp = regionprops(iss.label_image)
+        rp = regionprops(ini['label_image'])
         cellYX = np.array([x.centroid for x in rp]) + np.array([y0, x0])
 
         cellArea0 = np.array([x.area for x in rp])
@@ -56,8 +56,8 @@ class Cell(object):
         self.meanRadius = meanCellRadius
         self.relativeRadius = relCellRadius
 
-        nom = np.exp(-self.relativeRadius ** 2 / 2) * (1 - np.exp(iss.InsideCellBonus)) + np.exp(iss.InsideCellBonus)
-        denom = np.exp(-0.5) * (1 - np.exp(iss.InsideCellBonus)) + np.exp(iss.InsideCellBonus)
+        nom = np.exp(-self.relativeRadius ** 2 / 2) * (1 - np.exp(ini['InsideCellBonus'])) + np.exp(ini['InsideCellBonus'])
+        denom = np.exp(-0.5) * (1 - np.exp(ini['InsideCellBonus'])) + np.exp(ini['InsideCellBonus'])
         CellAreaFactor = nom / denom
         self.areaFactor = CellAreaFactor
 
@@ -77,13 +77,13 @@ class Cell(object):
         # print('time in geneCount: ', end - start)
         return CellGeneCount
 
-    def klassAssignment(self, spots, genes, klasses, iss):
-        spots.calcGamma(iss, self, genes, klasses)
+    def klassAssignment(self, spots, genes, klasses, ini):
+        spots.calcGamma(ini, self, genes, klasses)
 
-        ScaledExp = genes.expression * genes.expectedGamma[None, :, None]*self.areaFactor[:, None, None] + iss.SpotReg
-        pNegBin = ScaledExp / (iss.rSpot + ScaledExp)
+        ScaledExp = genes.expression * genes.expectedGamma[None, :, None]*self.areaFactor[:, None, None] + ini['SpotReg']
+        pNegBin = ScaledExp / (ini['rSpot'] + ScaledExp)
         CellGeneCount = self.geneCount(spots, genes)
-        contr = src.utils.nb_negBinLoglik(CellGeneCount[:,:,None], iss.rSpot, pNegBin)
+        contr = src.utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
         # contr = utils.negBinLoglik(CellGeneCount[:, :, None], iss.rSpot, pNegBin)
         # assert np.all(nb_contr == contr)
         wCellClass = np.sum(contr, axis=1) + klasses.logPrior
@@ -93,12 +93,12 @@ class Cell(object):
         logger.info('cell ---> klass probabilities updated')
         return pCellClass
 
-    def geneCountsPerKlass(self, genes, spots, klasses, iss):
+    def geneCountsPerKlass(self, genes, spots, klasses, ini):
         klassProb = self.classProb.reshape((self.nC, 1, klasses.nK))
         temp = spots.expectedGamma * klassProb * self.areaFactor[..., None, None]
         temp = np.sum(temp, axis=0)
         temp = np.squeeze(temp)
-        ClassTotPredicted = temp * (genes.expression + iss.SpotReg)
+        ClassTotPredicted = temp * (genes.expression + ini['SpotReg'])
         ClassTotPredicted = np.squeeze(ClassTotPredicted)
         TotPredicted = np.sum(ClassTotPredicted[:, :-1], axis=1)
         return TotPredicted

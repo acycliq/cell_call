@@ -24,26 +24,26 @@ class Gene(object):
     #     self._totalZero = np.bincount(spots.geneNo, spots.zeroProb)
     #     return self._totalZero
 
-    def updateGamma(self, cells, spots, klasses, iss):
+    def updateGamma(self, cells, spots, klasses, ini):
         # pSpotZero = spots.zeroKlassProb(klasses, cells)
         TotPredictedZ = spots.TotPredictedZ(spots.geneNo, cells.classProb[:, -1])
 
-        TotPredicted = cells.geneCountsPerKlass(self, spots, klasses, iss)
+        TotPredicted = cells.geneCountsPerKlass(self, spots, klasses, ini)
 
-        nom = iss.rGene + self.totalSpots - spots.TotPredictedB - TotPredictedZ
-        denom = iss.rGene + TotPredicted
+        nom = ini['rGene'] + self.totalSpots - spots.TotPredictedB - TotPredictedZ
+        denom = ini['rGene'] + TotPredicted
         self.expectedGamma = nom / denom
 
-    def setKlassExpressions(self, klasses, iss, gSet):
+    def setKlassExpressions(self, klasses, ini, gSet):
         MeanClassExp = np.zeros([self.nG, klasses.nK])
         # temp = gSet.GeneSubset(self.names).ScaleCell(0)
         for k in range(klasses.nK - 1):
             # print('k = ', k)
-            val = iss.Inefficiency * np.mean(gSet.CellSubset(klasses.name[k]).GeneExp, 1)
+            val = ini['Inefficiency'] * np.mean(gSet.CellSubset(klasses.name[k]).GeneExp, 1)
             MeanClassExp[:, k] = val[None, :]
         # MeanClassExp = MeanClassExp, (1, self.nG, klasses.nK)
         expression = MeanClassExp
-        logExpression = np.log(MeanClassExp + iss.SpotReg)
+        logExpression = np.log(MeanClassExp + ini['SpotReg'])
         self.expression = np.reshape(expression, (1, self.nG, klasses.nK))
         self.logExpression = np.reshape(logExpression, (1, self.nG, klasses.nK))
 

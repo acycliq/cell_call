@@ -49,12 +49,12 @@ class Spot(object):
             pass # swallow the exception (are you sure you wanna keep that??)
         return self._TotPredictedB
 
-    def loglik(self, cellObj, iss):
+    def loglik(self, cellObj, ini):
         cellYX = cellObj.YX
         spotYX = self.attributes.data[['y', 'x']].values
         meanCellRadius = cellObj.meanRadius
         nC = cellYX.shape[0] + 1
-        nN = iss.nNeighbors + 1
+        nN = ini['nNeighbors'] + 1
         nS = self.nS
 
         # for each spot find the closest cell (in fact the top nN-closest cells...)
@@ -68,10 +68,10 @@ class Spot(object):
         D = -Dist ** 2 / (2 * meanCellRadius ** 2) - np.log(2 * np.pi * meanCellRadius ** 2)
 
         # last column (nN-closest) keeps the misreads,
-        D[:, -1] = np.log(iss.MisreadDensity)
+        D[:, -1] = np.log(ini['MisreadDensity'])
 
-        y0 = iss.CellCallRegionYX[:, 0].min()
-        x0 = iss.CellCallRegionYX[:, 1].min()
+        y0 = ini['CellCallRegionYX'][:, 0].min()
+        x0 = ini['CellCallRegionYX'][:, 1].min()
         logger.info("Rebasing SpotYX to match the one-based indexed Matlab object. Not sure this is needed!!")
         spotyx = spotYX - 1  # I DO NOT THINK THIS IS NEEDED!! REMOVE IT!
         logger.info(
@@ -80,11 +80,11 @@ class Spot(object):
         # Lookup cell_map and infer which spot belongs to which cell.
         # This is kinda using the empirical....
         idx = spotyx - [y0, x0]  # First move the origin at (0, 0)
-        SpotInCell = src.utils.IndexArrayNan(iss.label_image, idx.T)  # Now get the allocation of spots to cells
+        SpotInCell = src.utils.IndexArrayNan(ini['label_image'], idx.T)  # Now get the allocation of spots to cells
         sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
         assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
-        D[SpotInCell > 0, 0] = D[SpotInCell > 0, 0] + iss.InsideCellBonus
+        D[SpotInCell > 0, 0] = D[SpotInCell > 0, 0] + ini['InsideCellBonus']
 
         # set now some probabilities (spot to cell)
         pSpotNeighb = np.zeros([nS, nN])
@@ -156,11 +156,11 @@ class Spot(object):
         g.expectedGamma = np.ones(g.nG)
         return g
 
-    def calcGamma(self, iss, cells, genes, klasses):
+    def calcGamma(self, ini, cells, genes, klasses):
         scaledMean = genes.expression * cells.areaFactor[:, None, None]
         cellGeneCount = cells.geneCount(self, genes)
-        rho = iss.rSpot + cellGeneCount
-        beta = iss.rSpot + scaledMean
+        rho = ini['rSpot'] + cellGeneCount
+        beta = ini['rSpot'] + scaledMean
         self.expectedGamma = src.utils.gammaExpectation(rho[:,:,None], beta)
         self.expectedLogGamma = src.utils.logGammaExpectation(rho[:,:,None], beta)
 
