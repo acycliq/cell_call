@@ -14,9 +14,9 @@ fourThreeRight:
     LABEL_IMAGE: '../data/4-3_right/CellMap.mat'
 
 
-GENESET: '/data/GeneSet.mat'
+geneset: '../data/GeneSet.mat'
 CellCallMaxIter: 100
-CellCallRegionYX:
+CellCallRegionYX: !2darray
   - - 17268
     - 13751
   - - 15629
