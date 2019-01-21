@@ -140,6 +140,7 @@ class Spot(object):
             logger.info('********* Getting spotattributes from %s **********', saFile)
             sa = SpotAttributes(xr.open_dataset(saFile).to_dataframe())
             self.attributes = sa
+            self.YX = sa.data[['y', 'x']].values
             self.name = self.attributes.data['target'].values
             self.nS = self.attributes.data.shape[0]
 
