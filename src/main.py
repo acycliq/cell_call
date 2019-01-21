@@ -19,7 +19,8 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-    ini = config.read(CONFIG_FILE, 'DEFAULT')
+    # ini = config.read(CONFIG_FILE, 'DEFAULT')
+    ini = config.read(CONFIG_FILE, 'fourThreeRight')
     # ini = cfg.settings['default']
     # ini = cfg.settings['4_3_right']
 
