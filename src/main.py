@@ -4,7 +4,7 @@ import src.klass
 import src.spot
 import src.utils
 # import src.config as cfg
-import src.my_config2 as config
+import src.config as config
 import logging
 # import ruamel.yaml
 
