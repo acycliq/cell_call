@@ -15,7 +15,7 @@ logging.basicConfig(
 
 '''
 THE WHOLE CODE HERE NEEDS SOME SERIOUS REVIEWING!!
-YOU BETTER START FROM SCRATCH. IS A MESS
+YOU BETTER START FROM SCRATCH. IT IS A MESS
 '''
 class GeneSet(src.common.Base):
     def __init__(self, ini):
