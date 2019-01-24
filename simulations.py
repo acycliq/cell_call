@@ -5,8 +5,8 @@ import random
 
 
 df = pd.read_json("https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/default/json/iss.json")
-GeneExp = np.load('data_preprocessed\GeneExp.npy')
-ctc = np.load('data_preprocessed\cell_to_class_map.npy')
+GeneExp = np.load('GeneExp.npy')
+ctc = np.load('cell_to_class_map.npy')
 ctc = ['PC.Other1' if x == 'PC.CA2' else x for x in ctc]
 ctc = ['PC.Other2' if x == 'PC.CA3' else x for x in ctc]
 
@@ -50,20 +50,21 @@ nonZero = df['best_class'] != 'Zero'
 df = df[nonZero]
 
 my_cells = sorted(set(ctc))
-out = lambda: None
+out = dict.fromkeys(['cid', 'Cell', 'X', 'Y', 'class_name'])
+out = {'cid': [], 'Cell_Num': [], 'X': [], 'Y': [], 'class_name': [], 'GenExp': np.nan * np.zeros([GeneExp.shape[0], len(my_cells)])}
 for i in range(len(my_cells)):
     cell = my_cells[i]
     print(cell)
     temp = df[df['best_class'] == cell]
     cid = random.choice(temp.index)
-    out.cid = cid
-    out.Cell_Num = temp.loc[cid]['Cell_Num']
-    out.X = temp.loc[cid]['X']
-    out.Y = temp.loc[cid]['Y']
-    out.class_name = temp.loc[cid]['best_class']
+    out['cid'].append([cid])
+    out['Cell_Num'].append([temp.loc[cid]['Cell_Num']])
+    out['X'].append([temp.loc[cid]['X']])
+    out['Y'].append([temp.loc[cid]['Y']])
+    out['class_name'].append([temp.loc[cid]['best_class']])
     mask = [i for i in range(len(ctc)) if ctc[i] == cell]
     col = random.choice(mask)
-    out.GenExp = GeneExp[:, col]
+    out['GenExp'][:, i] = GeneExp[:, col]
 
 # select a cell
 cid = random.choice(range(df.shape[0]))
