@@ -5,7 +5,9 @@ import random
 
 df = pd.read_json("https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/default/json/iss.json")
 GeneExp = np.load('.\data_preprocessed\GeneExp.npy')
-ctc = np.load('.\data_preprocessed\cell_to_class_map.npy')
+ctc = [line.rstrip("\n''") for line in open('data_preprocessed/cell_to_class_map.csv')]
+
+# ctc = np.load('.\data_preprocessed\cell_to_class_map.npy')
 ctc = ['PC.Other1' if x == 'PC.CA2' else x for x in ctc]
 ctc = ['PC.Other2' if x == 'PC.CA3' else x for x in ctc]
 
