@@ -57,7 +57,7 @@ for i in range(N):
 
     # keep the data for that particular cell to a dictionary
     out['cid'].append(cid)
-    out['Cell_Num'].append(temp['Cell_Num'])
+    out['Cell_Num'].append(temp['Cell_Num']) # This is 1-based, not 0-based
     out['X'].append(temp['X'])
     out['Y'].append(temp['Y'])
     out['class_name'].append(temp['best_class'])
