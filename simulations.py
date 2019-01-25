@@ -1,17 +1,16 @@
 import numpy as np
 import pandas as pd
-import xarray as xr
 import random
 
 
 df = pd.read_json("https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/default/json/iss.json")
-GeneExp = np.load('GeneExp.npy')
-ctc = np.load('cell_to_class_map.npy')
+GeneExp = np.load('.\data_preprocessed\GeneExp.npy')
+ctc = np.load('.\data_preprocessed\cell_to_class_map.npy')
 ctc = ['PC.Other1' if x == 'PC.CA2' else x for x in ctc]
 ctc = ['PC.Other2' if x == 'PC.CA3' else x for x in ctc]
 
 
-def best_class_domain(df):
+def best_class(df):
     '''
     Returns a list with the names of all the optimal/best classes
     '''
@@ -21,61 +20,52 @@ def best_class_domain(df):
     return out
 
 
-def cell_selector(df, selected, best_classes):
-    while set(selected) != set(best_classes):
-        # select a cell
-        cid = random.choice(range(df.shape[0]))
+# for each cell find its most likely cell class
+bc = best_class(df)
 
-        # Get the most likely class the cell might belong to
-        class_names = df['ClassName'][cid]
-        prob = df['Prob'][cid]
-        class_name = class_names[np.argmax(prob)]
-
-        if class_name not in selected:
-            selected.append(class_name)
-            print('Appending %s', class_name)
-            print('length is ', len(selected))
-            cell_selector(df, selected, best_classes)
-        else:
-            print(class_name, '% has already been selected...Redoing loop')
-            cell_selector(df, selected, best_classes)
-
-    return selected
-
-
-selected = []
-bc = best_class_domain(df)
+# stick it at the end of the dataframe
 df['best_class'] = bc
+
+# remove cells belonging to the Zero class
 nonZero = df['best_class'] != 'Zero'
 df = df[nonZero]
 
-my_cells = sorted(set(ctc))
-out = dict.fromkeys(['cid', 'Cell', 'X', 'Y', 'class_name'])
-out = {'cid': [], 'Cell_Num': [], 'X': [], 'Y': [], 'class_name': [], 'GenExp': np.nan * np.zeros([GeneExp.shape[0], len(my_cells)])}
-for i in range(len(my_cells)):
-    cell = my_cells[i]
-    print(cell)
-    temp = df[df['best_class'] == cell]
-    cid = random.choice(temp.index)
-    out['cid'].append([cid])
-    out['Cell_Num'].append([temp.loc[cid]['Cell_Num']])
-    out['X'].append([temp.loc[cid]['X']])
-    out['Y'].append([temp.loc[cid]['Y']])
-    out['class_name'].append([temp.loc[cid]['best_class']])
-    mask = [i for i in range(len(ctc)) if ctc[i] == cell]
+# cell class (unique and ranked alphabetically)
+cell_classes = sorted(set(df['best_class']))
+N = len(cell_classes)
+out = {'cid': [],
+       'Cell_Num': [],
+       'X': [],
+       'Y': [],
+       'class_name': [],
+       'col': [],
+       'GenExp': np.nan * np.zeros([GeneExp.shape[0], N])
+       }
+for i in range(N):
+    # select a class
+    cell_class = cell_classes[i]
+    print(cell_class)
+
+    # carve out data only relevant to the selected class
+    class_df = df[df['best_class'] == cell_class]
+
+    # randomly select a cell of that specific class
+    cid = random.choice(class_df.index)
+    temp = class_df.loc[cid]
+
+    # keep the data for that particular cell to a dictionary
+    out['cid'].append(cid)
+    out['Cell_Num'].append(temp['Cell_Num'])
+    out['X'].append(temp['X'])
+    out['Y'].append(temp['Y'])
+    out['class_name'].append(temp['best_class'])
+    mask = [i for i in range(len(ctc)) if ctc[i] == cell_class]
     col = random.choice(mask)
+    out['col'].append(col)
     out['GenExp'][:, i] = GeneExp[:, col]
 
-# select a cell
-cid = random.choice(range(df.shape[0]))
 
-class_name = df['best_class'][cid]
-mask = [i for i in range(len(ctc)) if ctc[i] == class_name ]
-col = random.choice(mask)
-out = GeneExp[:, col]
-print('done')
-
-
+print('done!')
 
 
 
