@@ -74,41 +74,7 @@ df['best_class'] = bc
 nonZero = df['best_class'] != 'Zero'
 df = df[nonZero]
 
-junk = sample(df)
-
-# # cell class (unique and ranked alphabetically)
-# cell_classes = sorted(set(df['best_class']))
-# N = len(cell_classes)
-# out = {'cid': [],
-#        'Cell_Num': [],
-#        'X': [],
-#        'Y': [],
-#        'class_name': [],
-#        'col': [],
-#        'GenExp': np.nan * np.zeros([GeneExp.shape[0], N])
-#        }
-# for i in range(N):
-#     # select a class
-#     cell_class = cell_classes[i]
-#     print(cell_class)
-#
-#     # carve out data only relevant to the selected class
-#     class_df = df[df['best_class'] == cell_class]
-#
-#     # randomly select a cell of that specific class
-#     cid = random.choice(class_df.index)
-#     temp = class_df.loc[cid]
-#
-#     # keep the data for that particular cell to a dictionary
-#     out['cid'].append(cid)
-#     out['Cell_Num'].append(temp['Cell_Num']) # This is 1-based, not 0-based
-#     out['X'].append(temp['X'])
-#     out['Y'].append(temp['Y'])
-#     out['class_name'].append(temp['best_class'])
-#     mask = [i for i in range(len(ctc)) if ctc[i] == cell_class]
-#     col = random.choice(mask)
-#     out['col'].append(col)
-#     out['GenExp'][:, i] = GeneExp[:, col]
+data = sample(df)
 
 
 print('done!')
