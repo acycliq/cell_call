@@ -60,6 +60,24 @@ def sample(df):
 
     return out
 
+def thinner(data):
+    p = 0.1
+    mat = data['GenExp']
+    rnd = np.nan * np.ones(mat.shape)
+    nCols,nRows = mat.shape
+    for i in range(nCols):
+        for j in range(nRows):
+            n = mat[i, j]
+            rnd[i, j] = np.random.binomial(n, p, 1)
+
+    # you should be able to run this instead and avoid the loop
+    # it need GenExp to be defined as: np.zeros([GeneExp.shape[0], N], dtype=int)
+    # check why it not running
+    rnd = np.random.binomial(mat, p)
+
+    return rnd
+
+
 
 # Fetch the data
 df, GeneExp, ctc = fetch_data()
@@ -76,6 +94,7 @@ df = df[nonZero]
 
 data = sample(df)
 
+junk = thinner(data)
 
 print('done!')
 
