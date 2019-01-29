@@ -27,7 +27,7 @@ def best_class(df):
     out = [class_name[n][np.argmax(prob[n])] for n in range(class_name.shape[0])]
     return out
 
-def sample(df, ge):
+def draw_sample(df, ge):
     # cell class (unique and ranked alphabetically)
     best_classes = sorted(set(df['best_class']))
     class_list = ge.Class.values.tolist()
@@ -71,12 +71,12 @@ def sample(df, ge):
 def thinner(data):
     p = 0.1
     mat = data['GenExp']
-    rnd = np.nan * np.ones(mat.shape)
-    nCols,nRows = mat.shape
-    for i in range(nCols):
-        for j in range(nRows):
-            n = mat[i, j]
-            rnd[i, j] = np.random.binomial(n, p, 1)
+    # rnd = np.nan * np.ones(mat.shape)
+    # nCols,nRows = mat.shape
+    # for i in range(nCols):
+    #     for j in range(nRows):
+    #         n = mat[i, j]
+    #         rnd[i, j] = np.random.binomial(n, p, 1)
 
     # you should be able to run this instead and avoid the loop
     # it need GenExp to be defined as: np.zeros([GeneExp.shape[0], N], dtype=int)
@@ -92,29 +92,39 @@ def position_genes(data):
     xCoord = (data["X"]+u)*(data['GenExp']>0)
     yCoord = (data["Y"]+v)*(data['GenExp']>0)
     print('in position')
-
-# Fetch the data
-df, ge = fetch_data()
-
-# for each cell find its most likely cell class
-bc = best_class(df)
-
-# stick it at the end of the dataframe
-df['best_class'] = bc
-
-# remove cells belonging to the Zero class
-nonZero = df['best_class'] != 'Zero'
-df = df[nonZero]
-
-data = sample(df, ge)
-
-data = thinner(data)
-
-junk = position_genes(data)
+    return xCoord, yCoord
 
 
+if __name__ == "__main__":
+    n = 10 #sample size
+    xCoord = []
+    yCoord = []
 
-print('done!')
+    # Fetch the data
+    df, ge = fetch_data()
+
+    # for each cell find its most likely cell class
+    bc = best_class(df)
+
+    # stick it at the end of the dataframe
+    df['best_class'] = bc
+
+    # remove cells belonging to the Zero class
+    nonZero = df['best_class'] != 'Zero'
+    df = df[nonZero]
+
+    for i in range(3):
+        sample = draw_sample(df, ge)
+
+        data = thinner(sample)
+
+        _xCoord, _yCoord = position_genes(data)
+        xCoord.append(_xCoord)
+        yCoord.append(_yCoord)
+
+
+
+    print('done!')
 
 
 
