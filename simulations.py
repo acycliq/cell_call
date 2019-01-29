@@ -1,18 +1,22 @@
 import numpy as np
 import pandas as pd
+import xarray as xr
 import random
+import time
 
 
 def fetch_data():
     df = pd.read_json("https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/default/json/iss.json")
     GeneExp = np.load('.\data_preprocessed\GeneExp.npy')
+    genes = [line.rstrip("\n''") for line in open('data_preprocessed/genes.csv')]
     ctc = [line.rstrip("\n''") for line in open('data_preprocessed/cell_to_class_map.csv')]
 
     # Rename PC.CA2 to PC.Other1 and PC.CA3 to PC.Other2
     ctc = ['PC.Other1' if x == 'PC.CA2' else x for x in ctc]
     ctc = ['PC.Other2' if x == 'PC.CA3' else x for x in ctc]
 
-    return df, GeneExp, ctc
+    ge = xr.DataArray(GeneExp, coords=[genes, ctc], dims=['Genes', 'Class'])
+    return df, ge
 
 def best_class(df):
     '''
@@ -23,25 +27,27 @@ def best_class(df):
     out = [class_name[n][np.argmax(prob[n])] for n in range(class_name.shape[0])]
     return out
 
-def sample(df):
+def sample(df, ge):
     # cell class (unique and ranked alphabetically)
-    cell_classes = sorted(set(df['best_class']))
-    N = len(cell_classes)
+    best_classes = sorted(set(df['best_class']))
+    class_list = ge.Class.values.tolist()
+    N = len(best_classes)
+    M = ge.shape[0]
     out = {'cid': [],
            'Cell_Num': [],
            'X': [],
            'Y': [],
            'class_name': [],
            'col': [],
-           'GenExp': np.nan * np.zeros([GeneExp.shape[0], N])
+           'GenExp': np.empty([M, N], dtype=np.int32)
            }
     for i in range(N):
         # select a class
-        cell_class = cell_classes[i]
-        print(cell_class)
+        bc = best_classes[i]
+        print(bc)
 
         # carve out data only relevant to the selected class
-        class_df = df[df['best_class'] == cell_class]
+        class_df = df[df['best_class'] == bc]
 
         # randomly select a cell of that specific class
         cid = random.choice(class_df.index)
@@ -53,10 +59,12 @@ def sample(df):
         out['X'].append(temp['X'])
         out['Y'].append(temp['Y'])
         out['class_name'].append(temp['best_class'])
-        mask = [i for i in range(len(ctc)) if ctc[i] == cell_class]
+        start = time.time()
+        mask = [i for i in range(len(class_list)) if class_list[i] == bc]
+        print(time.time() - start)
         col = random.choice(mask)
         out['col'].append(col)
-        out['GenExp'][:, i] = GeneExp[:, col]
+        out['GenExp'][:, i] = ge.data[:, col]
 
     return out
 
@@ -74,13 +82,19 @@ def thinner(data):
     # it need GenExp to be defined as: np.zeros([GeneExp.shape[0], N], dtype=int)
     # check why it not running
     rnd = np.random.binomial(mat, p)
+    data['GenExp'] = rnd
+    return data
 
-    return rnd
-
-
+def position_genes(data):
+    r = 8.8673
+    u = np.random.normal(0, r, data['GenExp'].shape)
+    v = np.random.normal(0, r, data['GenExp'].shape)
+    xCoord = (data["X"]+u)*(data['GenExp']>0)
+    yCoord = (data["Y"]+v)*(data['GenExp']>0)
+    print('in position')
 
 # Fetch the data
-df, GeneExp, ctc = fetch_data()
+df, ge = fetch_data()
 
 # for each cell find its most likely cell class
 bc = best_class(df)
@@ -92,9 +106,13 @@ df['best_class'] = bc
 nonZero = df['best_class'] != 'Zero'
 df = df[nonZero]
 
-data = sample(df)
+data = sample(df, ge)
 
-junk = thinner(data)
+data = thinner(data)
+
+junk = position_genes(data)
+
+
 
 print('done!')
 
