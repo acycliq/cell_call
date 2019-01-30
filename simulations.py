@@ -92,8 +92,8 @@ def position_genes(data):
     r = 8.8673
     u = np.random.normal(0, r, data['GenExp'].shape)
     v = np.random.normal(0, r, data['GenExp'].shape)
-    xCoord = (data["X"]+u)*(data['GenExp']>0)
-    yCoord = (data["Y"]+v)*(data['GenExp']>0)
+    xCoord = (data["X"]+u)*(data['GenExp'] > 0)
+    yCoord = (data["Y"]+v)*(data['GenExp'] > 0)
     print('in position')
     return xCoord, yCoord
 
@@ -104,20 +104,20 @@ if __name__ == "__main__":
     yCoord = []
 
     # Fetch the data
-    df, ge = fetch_data()
+    raw_data, gene_expression = fetch_data()
 
     # for each cell find its most likely cell class
-    bc = best_class(df)
+    bc = best_class(raw_data)
 
     # stick it at the end of the dataframe
-    df['best_class'] = bc
+    raw_data['best_class'] = bc
 
     # remove cells belonging to the Zero class
-    nonZero = df['best_class'] != 'Zero'
-    df = df[nonZero]
+    nonZero = raw_data['best_class'] != 'Zero'
+    raw_data = raw_data[nonZero]
 
     for i in range(3):
-        sample = draw_sample(df, ge)
+        sample = draw_sample(raw_data, gene_expression)
 
         data = thinner(sample)
 
