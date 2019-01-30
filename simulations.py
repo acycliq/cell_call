@@ -30,7 +30,7 @@ def best_class(df):
     out = [class_name[n][np.argmax(prob[n])] for n in range(class_name.shape[0])]
     return out
 
-def draw_sample(df, ge):
+def draw_gene_expression(df, ge):
     # cell class (unique and ranked alphabetically)
     best_classes = sorted(set(df['best_class']))
     class_list = ge.Class.values.tolist()
@@ -41,6 +41,7 @@ def draw_sample(df, ge):
            'X': [],
            'Y': [],
            'class_name': [],
+           'gene_name': ge.Genes.values.tolist(),
            'col': [],
            'GenExp': np.empty([M, N], dtype=np.int32)
            }
@@ -67,7 +68,7 @@ def draw_sample(df, ge):
         print(time.time() - start)
         col = random.choice(mask)
         out['col'].append(col)
-        out['GenExp'][:, i] = ge.data[:, col]
+        out['GenExp'][:, i] = ge[:, col]
 
     return out
 
@@ -92,8 +93,17 @@ def position_genes(data):
     r = 8.8673
     u = np.random.normal(0, r, data['GenExp'].shape)
     v = np.random.normal(0, r, data['GenExp'].shape)
-    xCoord = (data["X"]+u)*(data['GenExp'] > 0)
-    yCoord = (data["Y"]+v)*(data['GenExp'] > 0)
+    _xCoord = (data["X"]+u)*(data['GenExp'] > 0)
+    _yCoord = (data["Y"]+v)*(data['GenExp'] > 0)
+
+    xCoord = xr.DataArray(_xCoord,
+                          coords=[data['gene_name'], data['class_name']],
+                          dims=['Genes', 'Class']
+                          )
+    yCoord = xr.DataArray(_yCoord,
+                          coords=[data['gene_name'], data['class_name']],
+                          dims=['Genes', 'Class'])
+
     print('in position')
     return xCoord, yCoord
 
@@ -117,11 +127,11 @@ if __name__ == "__main__":
     raw_data = raw_data[nonZero]
 
     for i in range(3):
-        sample = draw_sample(raw_data, gene_expression)
+        sample = draw_gene_expression(raw_data, gene_expression)
 
-        data = thinner(sample)
+        sample = thinner(sample)
 
-        _xCoord, _yCoord = position_genes(data)
+        _xCoord, _yCoord = position_genes(sample)
         xCoord.append(_xCoord)
         yCoord.append(_yCoord)
 
