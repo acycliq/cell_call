@@ -11,7 +11,7 @@ def fetch_data():
     print(dir_path)
     df = pd.read_json("https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/default/json/iss.json")
     GeneExp = np.load(dir_path + '/data_preprocessed/GeneExp.npy')
-    genes = [line.rstrip("\n''") for line in open(dir_path + '/data_preprocessed/mygenes.csv')]
+    genes = [line.rstrip("\n''") for line in open(dir_path + '/data_preprocessed/genes.csv')]
     ctc = [line.rstrip("\n''") for line in open(dir_path + '/data_preprocessed/cell_to_class_map.csv')]
 
     # Rename PC.CA2 to PC.Other1 and PC.CA3 to PC.Other2
