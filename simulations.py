@@ -96,13 +96,14 @@ def position_genes(data):
     _xCoord = (data["X"]+u)*(data['GenExp'] > 0)
     _yCoord = (data["Y"]+v)*(data['GenExp'] > 0)
 
-    xCoord = xr.DataArray(_xCoord,
-                          coords=[data['gene_name'], data['class_name']],
-                          dims=['Genes', 'Class']
+    xCoord = pd.DataFrame(_xCoord,
+                          columns=data['class_name'],
+                          index=data['gene_name']
                           )
-    yCoord = xr.DataArray(_yCoord,
-                          coords=[data['gene_name'], data['class_name']],
-                          dims=['Genes', 'Class'])
+    yCoord = pd.DataFrame(_yCoord,
+                          columns=data['class_name'],
+                          index=data['gene_name']
+                          )
 
     print('in position')
     return xCoord, yCoord
