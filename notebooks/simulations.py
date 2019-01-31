@@ -48,7 +48,7 @@ def draw_gene_expression(df, ge):
     for i in range(N):
         # select a class
         bc = best_classes[i]
-        print(bc)
+        # print(bc)
 
         # carve out data only relevant to the selected class
         class_df = df[df['best_class'] == bc]
@@ -63,9 +63,9 @@ def draw_gene_expression(df, ge):
         out['X'].append(temp['X'])
         out['Y'].append(temp['Y'])
         out['class_name'].append(temp['best_class'])
-        start = time.time()
+        # start = time.time()
         mask = [i for i in range(len(class_list)) if class_list[i] == bc]
-        print(time.time() - start)
+        # print(time.time() - start)
         col = random.choice(mask)
         out['col'].append(col)
         out['GenExp'][:, i] = ge[:, col]
@@ -75,16 +75,6 @@ def draw_gene_expression(df, ge):
 def thinner(data):
     p = 0.1
     mat = data['GenExp']
-    # rnd = np.nan * np.ones(mat.shape)
-    # nCols,nRows = mat.shape
-    # for i in range(nCols):
-    #     for j in range(nRows):
-    #         n = mat[i, j]
-    #         rnd[i, j] = np.random.binomial(n, p, 1)
-
-    # you should be able to run this instead and avoid the loop
-    # it need GenExp to be defined as: np.zeros([GeneExp.shape[0], N], dtype=int)
-    # check why it not running
     rnd = np.random.binomial(mat, p)
     data['GenExp'] = rnd
     return data
@@ -105,12 +95,50 @@ def position_genes(data):
                           index=data['gene_name']
                           )
 
-    print('in position')
     return xCoord, yCoord
 
 
+def flatten(df):
+    '''
+    flattens a dataframe
+    '''
+    temp = df.unstack()
+    values = temp.values
+    labels = temp.index.droplevel().values
+    out = np.hstack( (labels[:, None], values[:, None]) )
+    return out
+
+
+def xy_pairs(x, y):
+    '''
+    zips x, y lists to produce the coordinates
+    '''
+
+    # check is x and y are aligned
+    assert np.all(x[:, 0] == y[:, 0])
+
+    # remove if both are zero
+    isZero = (np.array(x[:, 1]) == 0) & (np.array(y[:, 1]) == 0)
+    x = x[~isZero, :]
+    y = y[~isZero, :]
+
+    # return the gene names and associated coordinates
+    _labels = x[:, 0]
+    _x = x[:, 1]
+    _y = y[:, 1]
+    out = np.hstack((_labels[:, None], _x[:, None], _y[:, None]))
+    return out
+
+
+def post_process(df1, df2):
+    x = flatten(df1)
+    y = flatten(df2)
+    out = xy_pairs(x, y)
+    return out
+
+
 if __name__ == "__main__":
-    n = 10 #sample size
+    n = 1000 #sample size
     xCoord = []
     yCoord = []
 
@@ -127,18 +155,23 @@ if __name__ == "__main__":
     nonZero = raw_data['best_class'] != 'Zero'
     raw_data = raw_data[nonZero]
 
-    for i in range(3):
+    spots = np.empty((0, 3))
+    start = time.time()
+    while spots.shape[0] < n:
         sample = draw_gene_expression(raw_data, gene_expression)
 
         sample = thinner(sample)
 
         _xCoord, _yCoord = position_genes(sample)
+        _spots = post_process(_xCoord, _yCoord)
+        spots = np.append(spots, _spots, axis=0)
         xCoord.append(_xCoord)
         yCoord.append(_yCoord)
 
 
+    print('Done!')
+    print('Collected %d spots in %4.2f secs' % (spots.shape[0], time.time()-start))
 
-    print('done!')
 
 
 
