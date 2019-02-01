@@ -72,6 +72,7 @@ def draw_gene_expression(df, ge):
 
     return out
 
+
 def thinner(data):
     p = 0.1
     mat = data['GenExp']
@@ -79,23 +80,78 @@ def thinner(data):
     data['GenExp'] = rnd
     return data
 
+
+def inflate(elem, counts):
+    '''
+    repeats each element in elem as many times as shown in the corresponding location in counts.
+    Example:
+        elem = ['name_1', 'name_2']
+        counts = [3, 2]
+        out = ['name_1', 'name_1', 'name_1', 'name_2', 'name_2']
+    :param elem: A list
+    :param counts: A list
+    :return: A numpy array
+    '''
+
+    assert len(elem) == len(counts)
+    l = []
+    for i in range(len(elem)):
+        x = [elem[i]] * np.int(counts[i])
+        l.append(x)
+
+    out = [item for sublist in l for item in sublist]
+    return np.array(out)
+
+
 def position_genes(data):
     r = 8.8673
-    u = np.random.normal(0, r, data['GenExp'].shape)
-    v = np.random.normal(0, r, data['GenExp'].shape)
-    _xCoord = (data["X"]+u)*(data['GenExp'] > 0)
-    _yCoord = (data["Y"]+v)*(data['GenExp'] > 0)
 
-    xCoord = pd.DataFrame(_xCoord,
-                          columns=data['class_name'],
-                          index=data['gene_name']
-                          )
-    yCoord = pd.DataFrame(_yCoord,
-                          columns=data['class_name'],
-                          index=data['gene_name']
-                          )
+    # make an array the same dim as GenExp filled with the gene names (ie repeat the gene_names num-of-columns times)
+    gn = np.array(data['gene_name'])
+    gn_arr = np.tile(gn[:, None], data['GenExp'].shape[1])
 
-    return xCoord, yCoord
+    # u = np.random.normal(0, r, data['GenExp'].shape)
+    # v = np.random.normal(0, r, data['GenExp'].shape)
+
+    # make an array the same dim as GenExp to keep the x and y
+    # coordinates of the corresponding cells when the gene expression
+    # is greater than zero
+    _xCoord = (data["X"])*(data['GenExp'] > 0)
+    _yCoord = (data["Y"])*(data['GenExp'] > 0)
+
+    # unstack (ie turn the 2d array in to one hugh column
+    xCoord = _xCoord.flatten()
+    yCoord = _yCoord.flatten()
+    gene_exp = data['GenExp'].flatten()
+    gene_names = gn_arr.flatten()
+
+    # find the positions where the column-arrays are zero
+    xZero = xCoord == 0
+    yZero = yCoord == 0
+    gene_expZero = gene_exp == 0
+
+    # Check if the are zero at the same array position (they should!)
+    assert np.all(xZero == yZero)
+    assert np.all(xZero == gene_expZero)
+    assert np.all(yZero == gene_expZero)
+
+    # Throw away the zero values
+    xCoord = xCoord[~xZero]
+    yCoord = yCoord[~yZero]
+    gene_exp = gene_exp[~gene_expZero]
+    gene_names = gene_names[~gene_expZero]
+
+    # expand xCoord by repeating each element as many time as shown in the corresponding position in
+    # the gene_exp array. Do the same for yCoord and gene_names
+    xCoord = inflate(xCoord.tolist(), gene_exp.tolist())
+    yCoord = inflate(yCoord.tolist(), gene_exp.tolist())
+    gene_names = inflate(gene_names.tolist(), gene_exp.tolist())
+
+    out = np.hstack((gene_names[:, None], xCoord[:, None], yCoord[:, None]))
+
+    # sanity check (length of out should be the same as sum of all elements in GenExp
+    assert out.shape[0] == data['GenExp'].sum()
+    return out
 
 
 def flatten(df):
