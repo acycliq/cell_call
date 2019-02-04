@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-import random
 import time
 import os
 
@@ -55,7 +54,7 @@ def draw_gene_expression(df, ge):
         class_df = df[df['best_class'] == bc]
 
         # randomly select a cell of that specific class
-        cid = random.choice(class_df.index)
+        cid = np.random.choice(class_df.index)
         temp = class_df.loc[cid]
 
         # keep the data for that particular cell to a dictionary
@@ -67,7 +66,7 @@ def draw_gene_expression(df, ge):
         # start = time.time()
         mask = [i for i in range(len(class_list)) if class_list[i] == bc]
         # print(time.time() - start)
-        col = random.choice(mask)
+        col = np.random.choice(mask)
         out['col'].append(col)
         out['GenExp'][:, i] = ge[:, col]
 
@@ -117,18 +116,18 @@ def position_genes(data):
     # make an array the same dim as GenExp to keep the x and y
     # coordinates of the corresponding cells when the gene expression
     # is greater than zero
-    _xCoord = (data["X"])*(data['GenExp'] > 0)
-    _yCoord = (data["Y"])*(data['GenExp'] > 0)
+    _x = (data["X"])*(data['GenExp'] > 0)
+    _y = (data["Y"])*(data['GenExp'] > 0)
 
     # unstack (ie turn the 2d array in to one hugh column
-    xCoord = _xCoord.flatten()
-    yCoord = _yCoord.flatten()
+    x = _x.flatten()
+    y = _y.flatten()
     gene_exp = data['GenExp'].flatten()
     gene_names = gn_arr.flatten()
 
     # find the positions where the column-arrays are zero
-    xZero = xCoord == 0
-    yZero = yCoord == 0
+    xZero = x == 0
+    yZero = y == 0
     gene_expZero = gene_exp == 0
 
     # Check if the are zero at the same array position (they should!)
@@ -137,18 +136,22 @@ def position_genes(data):
     assert np.all(yZero == gene_expZero)
 
     # Throw away the zero values
-    xCoord = xCoord[~xZero]
-    yCoord = yCoord[~yZero]
+    x = x[~xZero]
+    y = y[~yZero]
     gene_exp = gene_exp[~gene_expZero]
     gene_names = gene_names[~gene_expZero]
 
     # expand xCoord by repeating each element as many time as shown in the corresponding position in
     # the gene_exp array. Do the same for yCoord and gene_names
-    xCoord = inflate(xCoord.tolist(), gene_exp.tolist())
-    yCoord = inflate(yCoord.tolist(), gene_exp.tolist())
+    x = inflate(x.tolist(), gene_exp.tolist())
+    y = inflate(y.tolist(), gene_exp.tolist())
+
+    # generate normal distributed numbers centered at (x,y) with stdev = r
+    u = np.random.normal(x, r, x.shape[0])
+    v = np.random.normal(y, r, y.shape[0])
     gene_names = inflate(gene_names.tolist(), gene_exp.tolist())
 
-    out = np.hstack((gene_names[:, None], xCoord[:, None], yCoord[:, None]))
+    out = np.hstack((gene_names[:, None], u[:, None], v[:, None]))
 
     # sanity check (length of out should be the same as sum of all elements in GenExp
     assert out.shape[0] == data['GenExp'].sum()
@@ -195,9 +198,8 @@ def post_process(df1, df2):
 
 
 if __name__ == "__main__":
-    n = 1000 #sample size
-    xCoord = []
-    yCoord = []
+    _seed = 123456
+    np.random.seed(_seed)
 
     # Fetch the data
     raw_data, gene_expression = fetch_data()
@@ -212,23 +214,14 @@ if __name__ == "__main__":
     nonZero = raw_data['best_class'] != 'Zero'
     raw_data = raw_data[nonZero]
 
-    spots = np.empty((0, 3))
-    start = time.time()
-    while spots.shape[0] < n:
-        sample = draw_gene_expression(raw_data, gene_expression)
+    sample = draw_gene_expression(raw_data, gene_expression)
+    sample = thinner(sample)
+    spots = position_genes(sample)
 
-        sample = thinner(sample)
+    pd.DataFrame(spots).to_csv('spots_' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
 
-        _xCoord, _yCoord = position_genes(sample)
-        _spots = post_process(_xCoord, _yCoord)
-        spots = np.append(spots, _spots, axis=0)
-        xCoord.append(_xCoord)
-        yCoord.append(_yCoord)
-
-
+    print(spots[-3:, :])
     print('Done!')
-    print('Collected %d spots in %4.2f secs' % (spots.shape[0], time.time()-start))
-
 
 
 
