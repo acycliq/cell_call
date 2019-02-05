@@ -330,8 +330,6 @@ function initChart(data) {
 
     // callback for when the mouse moves across the overlay
     function mouseClickHandler() {
-        //make sure zValue is not empty
-        document.getElementById("zValue").value = '1'
 
         // get the current mouse position
         const [mx, my] = d3.mouse(this);

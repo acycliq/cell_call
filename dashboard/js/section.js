@@ -73,6 +73,14 @@ function section() {
     var renderYAxis = svg.append("g")
         .attr("class", "y axis")
 
+    //Create X grilines
+    var renderXGridline = svg.append("g")
+        .attr("class", "x gridline")
+
+    //Create Y gridlines
+    var renderYGridline = svg.append("g")
+        .attr("class", "y gridline")
+
     // set up axis generating functions
     var xTicks = Math.round(width / 50);
     var yTicks = Math.round(height / 50);
@@ -125,6 +133,8 @@ function section() {
     chartData.height = height;
     chartData.renderXAxis = renderXAxis;
     chartData.renderYAxis = renderYAxis;
+    chartData.renderXGridline = renderXGridline;
+    chartData.renderYGridline = renderYGridline;
     chartData.renderOrder = renderOrder;
     chartData.tsn = tsn;
     chartData.pointRadius = pointRadius;
@@ -241,11 +251,11 @@ function sectionChart(data) {
         .attr("transform", "translate(0, " + h + ")")
         .call(sectionFeatures.axis.x);
 
-    svg.append("g")
+    var xGrid = svg.append("g")
         .attr("class", "grid")
         .call(sectionFeatures.gridlines.x);
 
-    svg.append("g")
+    var yGrid = svg.append("g")
         .attr("class", "grid")
         .call(sectionFeatures.gridlines.y);
 
@@ -289,6 +299,7 @@ function sectionChart(data) {
     // add the overlay on top of everything to take the mouse events
     dotsGroup.append('rect')
         .attr('class', 'overlay')
+        .attr('id', 'sectionOverlay')
         .attr('width', sectionFeatures.width)
         .attr('height', sectionFeatures.height)
         // .style('fill', '#FFCE00')
@@ -298,11 +309,12 @@ function sectionChart(data) {
         .on('mouseleave', () => {
             // hide the highlight circle when the mouse leaves the chart
             console.log('mouse leave');
+            dapiConfig.map.removeLayer(voronoiMarker);
             highlight(null);
         });
 
     // Manually dispach a mouse click event. That will kick-off rendering of the other charts on the dashboard.
-    d3.select('.overlay').dispatch('click')
+    // d3.select('.overlay').dispatch('click')
 
 
     //collect the coordinates of the circles and push the to the data object
@@ -324,11 +336,22 @@ function sectionChart(data) {
         sectionFeatures.renderXAxis.call(sectionFeatures.axis.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
         sectionFeatures.renderYAxis.call(sectionFeatures.axis.y.scale(d3.event.transform.rescaleY(sectionFeatures.scale.y)));
 
+        xGrid.call(sectionFeatures.gridlines.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
+        yGrid.call(sectionFeatures.gridlines.y.scale(d3.event.transform.rescaleY(sectionFeatures.scale.y)));
+
         dotsGroup.attr("transform", d3.event.transform);
+        // xGrid.attr("transform", d3.event.transform);
+        // yGrid.attr("transform", d3.event.transform);
     }
 
 // callback for when the mouse moves across the overlay
     function mouseMoveHandler() {
+        // make sure you hide the rect
+        d3.select('.highlight-rect')
+            .attr("width", 0)
+            .attr("height",0)
+            .attr('opacity', 0)
+
         // get the current mouse position
         const [mx, my] = d3.mouse(this);
 
@@ -340,12 +363,41 @@ function sectionChart(data) {
         // highlight the point if we found one, otherwise hide the highlight circle
         highlight(site && site.data);
 
+        highlightDapi(site && site.data)
+
+    }
+
+    function highlightDapi(d){
+
+        try {
+            dapiConfig.map.removeLayer(voronoiMarker)
+        }
+        catch(err) {
+            // do nothing
+        }
+
+        if(d){
+            styleVoronoiMarkers(d)
+        }
+    }
+
+    var styleVoronoiMarkers = function (d) {
+        var p = dapiConfig.t.transform(L.point([d.x, d.y]));
+        voronoiMarker = L.circleMarker([p.y, p.x], {
+            radius: 15,
+            fillColor: "orange",
+            color: "red",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.5,
+            interactive: false,
+        }).addTo(dapiConfig.map);
     }
 
 // callback for when the mouse moves across the overlay
     function mouseClickHandler() {
-        //make sure zValue is not empty
-        document.getElementById("zValue").value = '1'
+        console.log('pageX is: ' + d3.event.pageX)
+        console.log('pageY is: ' + d3.event.pageY)
 
         // get the current mouse position
         const [mx, my] = d3.mouse(this);
@@ -355,10 +407,38 @@ function sectionChart(data) {
         //const site = voronoiDiagram.find(mx, my, voronoiRadius);
         const site = voronoiDiagram.find(mx, my);
 
-        // highlight the point if we found one, otherwise hide the highlight circle
+        // 1. highlight the point if we found one, otherwise hide the highlight circle
         highlight(site && site.data);
+
+        // 2.
         updateDashboard(site && site.data)
 
+        // 3.
+        drawMarker(site && site.data)
+
+    }
+
+    function drawMarker(d){
+        if (dapiConfig){
+            var p = dapiConfig.t.transform(L.point([d.x, d.y]));
+
+            try {
+                dapiConfig.map.removeLayer(voronoiMarker)
+            }
+            catch(err) {
+                // do nothing
+            }
+
+            voronoiMarker = L.circleMarker([p.y, p.x], {
+                radius: 15,
+                fillColor: "orange",
+                color: "red",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.5,
+                interactive: false,
+            }).addTo(dapiConfig.map);
+        }
     }
 
     var prevHighlightDotNum = null;

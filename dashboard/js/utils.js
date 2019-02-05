@@ -4,6 +4,10 @@ function partitioner(d){
     // For small values assign it to a separate class labeled 'Other'
     var datapoint = [];
     var ClassName;
+    if (!Array.isArray(d.Prob)){
+        //d.Prob can possibly be just a float. Make sure it is an array
+        d.Prob = [d.Prob]
+    }
     for (var i = 0; i < d.Prob.length; i++) {
         d.Prob[i] < 0.02? ClassName = 'Other': ClassName = d.ClassName[i]
         datapoint.push({

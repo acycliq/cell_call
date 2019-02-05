@@ -57,12 +57,12 @@ function dapi(config) {
         return r;
     }
 
-    var minZoom = 0,
-        maxZoom = 8;
+    var minZoom = getMinZoom(config.name),
+        maxZoom = 7;
 
     // The transformation in this CRS maps the the bottom left corner to (0,0) and the top right to (256, 256)
     L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
-        transformation: new L.Transformation(1 / 256, 0, -1 / 256, 256),
+        transformation: new L.Transformation(1 / 64, 0, -1 / 64, 256),
     });
 
     var yx = L.latLng;
@@ -80,24 +80,14 @@ function dapi(config) {
     ]);
 
 
-   try {
-        dapiData.map.off;
-        dapiData.map.remove();
-        console.log('Map removed')
-    }
-    catch(error)
-    {
-        //do nothing
-    }
-
     var map = L.map('mymap', {
         crs: L.CRS.MySimple, // http://leafletjs.com/reference-1.0.3.html#map-crs
         maxBounds: bounds.pad(.5), // http://leafletjs.com/reference-1.0.3.html#map-maxbounds
         minZoom: minZoom,
         maxZoom: maxZoom,
+        attributionControl: false,
     }).setView([img[1] / 2, img[0] / 5], 5);
-    //
-    // map.on('mouseover', function() {console.log("mouse over map");});
+
     // //remove the rect from the section chart when you leave the dapi chart
     // map.on('mouseout', hideRect);
     // function hideRect(e){
@@ -165,14 +155,14 @@ function dapi(config) {
                 "id": i,
                 "x": x,
                 "y": y,
-                "gene": gene,
+                "Gene": gene,
                 "taxonomy": glyphMap.get(gene).taxonomy,
                 "glyphName": glyphMap.get(gene).glyphName,
                 "glyphColor": getColor(glyphMap.get(gene).taxonomy),
                 "popup": label + " " + i,
-                "year": parseInt(data[i].Expt),
                 "size": 30,
                 "type": 'gene',
+                "neighbour": parseFloat(data[i].neighbour),
             };
 
             //create features with proper geojson structure
@@ -212,7 +202,6 @@ function dapi(config) {
                 "cx": data[i].cx,
                 "cy": data[i].cy,
                 "popup": "Cell " + i,
-                "year": parseInt(data[i].Expt),
                 "size": 30,
                 "type": 'cell',
             };
@@ -242,6 +231,43 @@ function dapi(config) {
             //create feature properties
             var p = {
                 "id": i, //just a basic one, something like a placeholder
+            };
+
+            //create features with proper geojson structure
+            out.features.push({
+                "geometry": g,
+                "type": "Feature",
+                "properties": p
+            });
+        }
+        return out;
+    }
+
+    function makeLineStringFeatures(destination, origin) {
+        var fromPoint = origin.generator;
+        var out = {
+            type: "FeatureCollection",
+            features: []
+        };
+        for (var i = 0; i < destination.length; ++i) {
+            var spot = destination[i]
+            var x = +spot.x,
+                y = +spot.y,
+                gene = spot.Gene,
+                lp = t.transform(L.point([x, y])),
+                toPoint = [lp.x, lp.y];
+            var g = {
+                "type": "LineString",
+                "coordinates": [fromPoint, toPoint]
+            };
+
+            //create feature properties
+            var p = {
+                "gene": gene,
+                "Cell_Num": origin.Cell_Num,
+                "fromPoint": fromPoint,
+                "toPoint": toPoint,
+                "color": getColor(glyphMap.get(gene).taxonomy),
             };
 
             //create features with proper geojson structure
@@ -356,10 +382,175 @@ function dapi(config) {
         };
     }
 
+
+
+
+
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // FlyTo
+    ////////////////////////////////////////////////////////////////////////////
+    var fly1 = document.getElementById("xValue");
+    var fly2 = document.getElementById("yValue");
+    //var container = document.getElementById("container");
+
+    fly1.addEventListener("change", function (event) {
+        event.preventDefault();
+        x = +document.getElementById("xValue").value
+        y = +document.getElementById("yValue").value
+        p = t.transform(L.point([x, y]));
+        //p = xy(project([x, y], img, grid))
+
+        if ((x === x) && (y === y)){
+            map.flyTo([p.y, p.x], 5);
+        }
+        // Note:
+        // Since NaN is the only JavaScript value that is treated as unequal to itself, you can always test if a value is NaN by checking it for equality to itself:
+        // From https://stackoverflow.com/questions/2652319/how-do-you-check-that-a-number-is-nan-in-javascript
+    });
+
+    fly2.addEventListener("change", function (event) {
+        event.preventDefault();
+        x = +document.getElementById("xValue").value
+        y = +document.getElementById("yValue").value
+        p = t.transform(L.point([x, y]));
+        //p = xy(project([x, y], img, grid))
+        if ((x === x) && (y === y)){
+            map.flyTo([p.y, p.x], 5);
+        }
+    });
+
+
+    dapiData = {};
+    dapiData.img = img;
+    dapiData.t = t;
+    dapiData.getColor = getColor;
+    dapiData.classColors = classColors;
+    dapiData.classColorsMap = classColorsMap;
+    dapiData.glyphs = glyphs;
+    dapiData.glyphMap = glyphMap;
+    dapiData.getRadius = getRadius;
+    dapiData.map = map;
+    dapiData.makeCellFeatures = makeCellFeatures;
+    dapiData.makePolygonFeatures = makePolygonFeatures;
+    dapiData.makeLineStringFeatures = makeLineStringFeatures;
+    dapiData.make_dots = make_dots;
+    dapiData.info = info;
+    dapiData.getRadius = getRadius;
+    dapiData.myRenderer = myRenderer;
+    dapiData.style = style;
+    // dapiData.highlightStyle = highlightStyle;
+    // // dapiData.clickDot = clickDot;
+    // dapiData.highlightDot = highlightDot;
+    // dapiData.resetDotHighlight = resetDotHighlight;
+    // dapiData.onEachDot = onEachDot;
+
+    return dapiData
+}
+
+var dapiConfig;
+function dapiChart(cellData, geneData, config) {
+    console.log('Doing Dapi plot')
+
+
+    dapiConfig = dapi(config)
+    var map = dapiConfig.map;
+    // mapOnDapi = dapiConfig.map;
+
+    map.on('mouseout', outsideMap)
+    map.on('mouseover', insideMap)
+    var isInside = true
+
+    function resetSectionRect(){
+        d3.select('.highlight-rect')
+            .attr("width", 0)
+            .attr("height",0)
+            .attr('opacity', 0)
+
+    }
+
+    function styleSectionRect(x,y){
+        var width = 35*1.6;
+        var height = 35;
+        d3.select('.highlight-rect')
+            .attr("x", x-width/2)
+            .attr("y", y-height/2)
+            .attr("width", width)
+            .attr("height",height)
+            .attr('fill', 'orange')
+            .attr('fill-opacity', 0.5)
+            .attr('opacity', 1)
+            .attr('stroke', 'red')
+            // .attr('stroke-dasharray', '10,5')
+            // .attr('stroke-linecap', 'butt')
+            .attr('stroke-width', '3')
+    }
+
+    function outsideMap(e){
+        resetSectionRect()
+        console.log('triggering mouseout event')
+    }
+
+    function insideMap(e){
+        console.log('triggering mouseover event')
+
+        // // make sure map is clear of voronoi markers when you enter the map
+        // try {
+        //     dapiConfig.map.removeLayer(voronoiMarker)
+        // }
+        // catch(err) {
+        //     // do nothing
+        // }
+    }
+
+    // var genes = d3.map(geneData, function (d) {return d.Gene;}).keys();
+    var myDots = dapiConfig.make_dots(geneData);
+
+    // Define an array to keep layers
+    var dotlayer = [];
+
+    //create marker layer and display it on the map
+    for (var i = 0; i < myDots.length; i += 1) {
+        dotlayer[i] = L.geoJson(myDots[i], {
+            pointToLayer: function (feature, latlng) {
+                return new svgGlyph(latlng, dapiConfig.style(feature, 'gene')).bindTooltip(feature.properties.Gene, {className: 'myCSSClass'});
+            },
+            onEachFeature: onEachDot
+        });
+    }
+
+    function onEachDot(feature, layer) {
+        layer.on({
+            mouseover: glyphMouseOver, // highlightDot,
+            mouseout: glyphMouseOut, //resetDotHighlight,
+            click: clickGlyph,
+        });
+    }
+
+    function glyphMouseOver(e){
+        // 1. hightlight glyph
+        highlightDot(e)
+        // 2. Highlight the voronoi generator
+        var point = voronoiHighlight(e);
+        // 3. Update the info control
+        dapiConfig.info.update(point.properties);
+        console.log("updating info control");
+        // 4. Highlight the rect on the section chart
+        rectHighlight(e)
+    }
+
+    function glyphMouseOut(e){
+        resetDotHighlight(e)
+        if (voronoiMarker) {
+            map.removeLayer(voronoiMarker)
+        }
+    }
+
     //create highlight style, with darker color and larger radius
     function highlightStyle(feature) {
         return {
-            radius: getRadius(feature.properties.size) * 2,
+            radius: dapiConfig.getRadius(feature.properties.size) * 2,
             fillColor: "#FFCE00",
             color: "#FFCE00",
             weight: 1,
@@ -369,27 +560,37 @@ function dapi(config) {
     }
 
 
-    function clickDot(e) {
-        //make sure zValue is empty
-        document.getElementById("zValue").value = ''
-        if (e.sourceTarget.feature.properties.type === 'cell') {
+    function clickGlyph(e) {
+        console.log('glyph clicked')
+        // 1.
+        fitBounds(e)
 
-            console.log('You clicked a ' + e.sourceTarget.feature.properties.type)
-            var layer = e.target;
-            dotStyleHighlight = highlightStyle(layer.feature);
-            layer.setStyle(dotStyleHighlight);
-            if (!L.Browser.ie && !L.Browser.opera) {
-                layer.bringToFront();
-            }
-            dispachClick(layer)
+        // 2.
+        updateDashboard(point.properties)
+
+        // voronoiHighlight(e)
+        var layer = e.target;
+        if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
         }
+
+    }
+
+    function fitBounds(e){
+        var idx = delaunay.find(e.latlng.lng, e.latlng.lat);
+        point = cellFeatures[idx];
+        var polyBounds = L.polygon(voronoi.cellPolygon(idx)).getBounds()
+        var checkMe = polyBounds
+        // Dont know why, but you have to swap the coordinates
+        polyBounds._northEast = new L.LatLng(polyBounds._northEast.lng, polyBounds._northEast.lat)
+        polyBounds._southWest = new L.LatLng(polyBounds._southWest.lng, polyBounds._southWest.lat)
+
+        map.fitBounds(polyBounds);
     }
 
     //attach styles and popups to the marker layer
     function highlightDot(e) {
         var layer = e.target;
-        var evtxx = new CustomEvent('moveMouse');
-        var evtyy = new CustomEvent('moveMouse');
         dotStyleHighlight = highlightStyle(layer.feature);
         layer.setStyle(dotStyleHighlight);
         if (!L.Browser.ie && !L.Browser.opera) {
@@ -408,111 +609,20 @@ function dapi(config) {
 
 
     function resetDotHighlight(e) {
+
         var layer = e.target;
-        dotStyleDefault = style(layer.feature);
+        dotStyleDefault = dapiConfig.style(layer.feature);
         layer.setStyle(dotStyleDefault);
 
-        layer.feature.properties.type === "cell" ?
-            (
-                console.log('resetting info...'),
-                    info.update()
-            ) :
+        if (layer.feature.properties.type === "cell"){
+            console.log('resetting info...')
+            info.update()
+
+        }else{
             console.log("I am not hovering over a cell");
-    }
-
-    function onEachDot(feature, layer) {
-        layer.on({
-            mouseover: highlightDot,
-            mouseout: resetDotHighlight,
-            // click: clickDot,
-        });
-    }
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////
-    // FlyTo
-    ////////////////////////////////////////////////////////////////////////////
-    var fly1 = document.getElementById("xValue");
-    var fly2 = document.getElementById("yValue");
-    //var container = document.getElementById("container");
-
-    fly1.addEventListener("change", function (event) {
-        event.preventDefault();
-        x = +document.getElementById("xValue").value
-        y = +document.getElementById("yValue").value
-        z = +document.getElementById("zValue").value
-        p = t.transform(L.point([x, y]));
-        //p = xy(project([x, y], img, grid))
-
-        if (z){
-            map.flyTo([p.y, p.x], 5);
         }
-    });
-
-    fly2.addEventListener("change", function (event) {
-        event.preventDefault();
-        x = +document.getElementById("xValue").value
-        y = +document.getElementById("yValue").value
-        z = +document.getElementById("zValue").value
-        p = t.transform(L.point([x, y]));
-        //p = xy(project([x, y], img, grid))
-        if (z){
-            map.flyTo([p.y, p.x], 5);
-        }
-    });
-
-
-    dapiData = {};
-    dapiData.img = img;
-    dapiData.t = t;
-    dapiData.getColor = getColor;
-    dapiData.classColors = classColors;
-    dapiData.classColorsMap = classColorsMap;
-    dapiData.glyphs = glyphs;
-    dapiData.glyphMap = glyphMap;
-    dapiData.getRadius = getRadius;
-    dapiData.map = map;
-    dapiData.makeCellFeatures = makeCellFeatures;
-    dapiData.makePolygonFeatures = makePolygonFeatures;
-    dapiData.make_dots = make_dots;
-    dapiData.info = info;
-    dapiData.getRadius = getRadius;
-    dapiData.myRenderer = myRenderer;
-    dapiData.style = style;
-    dapiData.highlightStyle = highlightStyle;
-    dapiData.clickDot = clickDot;
-    dapiData.highlightDot = highlightDot;
-    dapiData.resetDotHighlight = resetDotHighlight;
-    dapiData.onEachDot = onEachDot;
-
-    return dapiData
-}
-
-
-function dapiChart(cellData, geneData, config) {
-    console.log('Doing Dapi plot')
-
-
-    var dapiConfig = dapi(config)
-    var map = dapiConfig.map;
-
-    // var genes = d3.map(data, function (d) {return d.Gene;}).keys();
-    var myDots = dapiConfig.make_dots(geneData);
-
-    // Define an array to keep layers
-    var dotlayer = [];
-
-    //create marker layer and display it on the map
-    for (var i = 0; i < myDots.length; i += 1) {
-        dotlayer[i] = L.geoJson(myDots[i], {
-            pointToLayer: function (feature, latlng) {
-                return new svgGlyph(latlng, dapiConfig.style(feature, 'gene')).bindTooltip(feature.properties.gene, {className: 'myCSSClass'});
-            },
-            onEachFeature: dapiConfig.onEachDot
-        });
     }
+
 
 
     // Keep these layers on a single layer group and call this to add them to the map
@@ -588,6 +698,14 @@ function dapiChart(cellData, geneData, config) {
     var voronoiPolygons = dapiConfig.makePolygonFeatures(voronoiArray)
     // // *** *** *** *** *** *** *** *** *** *** *** ***
 
+    function getCellMembers(arr, val) {
+        var out = [], i;
+        for(i = 0; i < arr.length; i++)
+            if (parseFloat(arr[i].neighbour) === val)
+                out.push(arr[i]);
+        return out;
+    }
+
     // //push the features of the cells to polygons
     for (i = 0; i < cellFeatures.length; ++i) {
         voronoiPolygons.features[i].properties = cellDots.features[i].properties;
@@ -609,7 +727,7 @@ function dapiChart(cellData, geneData, config) {
             layer.on(
                 {
                     'mouseover': VoronoiMouseover,
-                    // 'mouseout': VoronoiMouseout,
+                    'mouseout': VoronoiMouseout,
                     'click': clickHandler,
                     // 'add': function(e){console.log('add pressed')},
                     // 'remove': function(e){console.log('remove pressed')},
@@ -619,63 +737,111 @@ function dapiChart(cellData, geneData, config) {
     }).addTo(map);
 
 
+    var lineStrings,
+        pinnedLineStrings;
     function clickHandler(e) {
         console.log('Voronoi was clicked');
         map.fitBounds(e.target.getBounds());
+        pinnedLineStrings = toggleLineStrings(e)
         updateDashboard(e.target.feature.properties)
+    }
 
+    function toggleLineStrings(e){
+        var cn = e.target.feature.properties.Cell_Num;
+        if(pinnedLineStrings){
+            map.removeLayer(pinnedLineStrings)
+        }
+        else{
+            pinnedLineStrings = drawPinnedLines(e)
+            return pinnedLineStrings
+        }
+    }
+
+    function drawLines(e){
+        console.log('in drawLines')
+        var center = e.target.feature.properties;
+        var spots = getCellMembers(geneData, center.Cell_Num);
+        var lineFeatureCollection = dapiConfig.makeLineStringFeatures(spots, center);
+
+        lineStrings = L.geoJSON(lineFeatureCollection, {
+            onEachFeature: onEachLineFeature
+        }).addTo(map);
+        return lineStrings
+    }
+
+    function drawPinnedLines(e){
+        console.log('in drawLines')
+        var center = e.target.feature.properties;
+        var spots = getCellMembers(geneData, center.Cell_Num);
+        var lineFeatureCollection = dapiConfig.makeLineStringFeatures(spots, center);
+
+        pinnedLineStrings = L.geoJSON(lineFeatureCollection, {
+            onEachFeature: onEachLineFeature
+        }).addTo(map);
+        return pinnedLineStrings
+    }
+
+    map.createPane("lineStringPane").style.zIndex = 200
+    function onEachLineFeature(feature, layer) {
+        if (layer instanceof L.Polyline) {
+            layer.setStyle({
+                'color': feature.properties.color,
+                'weight': 1.5,
+                'pane': 'lineStringPane',
+                //'opacity':0.5,
+            });
+        }
+        // // This is where it loop through your features
+        // if (feature.properties) {
+        //     console.log('in features')
+        //     // If there is a properties document we bind a tooltip with your property : name
+        //     //layer.bindTooltip(feature.properties.name);
+        // }
     }
 
 
-    var previousVoronoiCell = [];
-
     function VoronoiMouseover(e) {
-        voronoiHighlight(e);
-        dapiConfig.info.update(e.target.feature.properties);
+        var point;
+        // 1. Highlight the voronoi generator
+        point = voronoiHighlight(e);
+        // 2. Update the info control
+        dapiConfig.info.update(point.properties);
+        console.log("updating info control");
+        // 3. Highlight the rect on the section chart
+        rectHighlight(e)
+        // 4. Draw the lines connecting the cell to the spots
+        drawLines(e)
     }
 
     function voronoiHighlight(e) {
         console.log("Current position: x: " + e.latlng.lng + ", y: " + e.latlng.lat);
         var idx = delaunay.find(e.latlng.lng, e.latlng.lat);
-        var point = cellFeatures[idx];
+        point = cellFeatures[idx];
 
-        if (previousVoronoiCell != idx) {
-            console.log("moved into a new voronoi");
-            styleVoronoiMarkers(point);
-            previousVoronoiCell = idx;
-
-            // Look up and interact with section chart
-            var cn = e.target.feature.properties.Cell_Num
-            var xVal = d3.select('#Cell_Num_' + cn).attr('cx')
-            var yVal = d3.select('#Cell_Num_' + cn).attr('cy')
-            var rSize =  d3.select('#Cell_Num_' + cn).attr('r')
-
-            var width = 35*1.6;
-            var height = 35;
-            d3.select('.highlight-rect').attr("x", xVal-width/2)
-                .attr("y", yVal-height/2)
-                .attr("width", width)
-                .attr("height",height)
-                .attr('fill', 'orange')
-                .attr('fill-opacity', 0.5)
-                .attr('stroke', 'red')
-                // .attr('stroke-dasharray', '10,5')
-                // .attr('stroke-linecap', 'butt')
-                .attr('stroke-width', '3')
+        console.log("do voronoiHighlight");
+        if(this.voronoiMarker){
+            // that removes the voronoi marker but also the tooltip from the section chart.
+            // Both are created when page first loads
+            this.voronoiMarker.remove();
+            tooltip.style.opacity = 0.0;
         }
-        else {
-            console.log("moving within the same voronoi, dont lookup")
-        }
+        styleVoronoiMarkers(point);
+
+        return point
+    }
+
+    function rectHighlight(e){
+        // Look up and interact with section chart
+        var cn = point.properties.Cell_Num
+        var xVal = +d3.select('#Cell_Num_' + cn).attr('cx')
+        var yVal = +d3.select('#Cell_Num_' + cn).attr('cy')
+
+        console.log("Styling rect on section chart");
+        styleSectionRect(xVal, yVal)
     };
 
     var voronoiMarker
     var styleVoronoiMarkers = function (point) {
-        var myNum = point.properties.Cell_Num;
-        if (voronoiMarker) {
-            map.removeLayer(voronoiMarker)
-            console.log('removed previous Voronoi marker')
-        }
-        ;
         var p = point.geometry.coordinates
         voronoiMarker = L.circleMarker([p[1], p[0]], {
             radius: 15,
@@ -683,14 +849,49 @@ function dapiChart(cellData, geneData, config) {
             color: "red",
             weight: 1,
             opacity: 1,
-            fillOpacity: 0.5
+            fillOpacity: 0.5,
+            interactive: false,
         }).addTo(map);
 
     }
 
     function VoronoiMouseout(e){
-        d3.select('.highlight-rect').style('opacity', 0)
+        console.log('exiting voronoi...')
+
+        // remove the voronoi marker as well
+        if (voronoiMarker) {
+            // 1. remove the voronoi generator
+            map.removeLayer(voronoiMarker)
+            console.log('Voronoi marker removed')
+
+            // 2. clear now the info control
+            console.log('resetting info...')
+            dapiConfig.info.update()
+
+            // 3. reset the rect on the section chart
+            // resetSectionRect(e)
+
+            // 4. remove lineStrings
+            if (lineStrings){
+                map.removeLayer(lineStrings);
+            }
+
+            //just a blank line
+            console.log('')
+
+        }
     }
+
+    // Add now the polylines
+    // var spots = dapiConfig.makeLineStringFeatures(geneData);
+
+    // L.geoJSON(spots, {
+    //     //onEachFeature: onEachLineFeature
+    // }).addTo(map);
+
+
+
+
 
 
     // Toggle button to turn layers on and off
