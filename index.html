@@ -2,6 +2,19 @@
 <html>
 
 <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-128060564-1"></script>
+    <script>
+        var host = window.location.hostname;
+        if(host != 'localhost'){
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'UA-128060564-1');
+        }
+    </script>
+
     <meta charset='utf-8'>
 
     <title>Dashboard</title>
@@ -56,13 +69,15 @@
     <!-- Page loader -->
     <link rel="stylesheet" href="dashboard/css/normalize.css">
     <link rel="stylesheet" href="dashboard/css/main.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>-->
 
     <!--Font Awesome-->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
 
     <!-- Papa Parse -->
     <!--<script src="./lib/js/papaparse.min.js"></script>-->
+
+    <link rel="stylesheet" href="dashboard/js/contactUs.css">
 
     <!-- User scripts  -->
     <script src="dashboard/js/glyphs.js"></script>
@@ -100,7 +115,7 @@
 
         #mymap {
             position: relative;
-            height: 800px;
+            height: 790px;
         }
 
 
@@ -302,29 +317,49 @@
         .leaflet-tooltip-left.myCSSClass::before {border-left-color: transparent;}
         .leaflet-tooltip-right.myCSSClass::before {border-right-color: transparent;}
 
-
-        /*bootstrap multilevel dropdown*/
-        .dropdown-submenu {
-            position: relative;
-        }
-
-        .dropdown-submenu > a.dropdown-item:after {
-            font-family: FontAwesome;
-            content: "\f054";
-            float: right;
-        }
-
-        .dropdown-submenu > .dropdown-menu {
-            top: 0;
-            left: 100%;
-            margin-top: 0px;
-            margin-left: 0px;
-        }
-
-        .dropdown-submenu:hover > .dropdown-menu {
+        /*Show/hide dropdown menu on mouse hover*/
+        .dropdown:hover>.dropdown-menu {
             display: block;
         }
 
+
+        /*bootstrap multilevel dropdown*/
+        /*.dropdown-submenu {*/
+            /*position: relative;*/
+        /*}*/
+
+        /*.dropdown-submenu > a.dropdown-item:after {*/
+            /*font-family: FontAwesome;*/
+            /*content: "\f054";*/
+            /*float: right;*/
+        /*}*/
+
+        /*.dropdown-submenu > .dropdown-menu {*/
+            /*top: 0;*/
+            /*left: 100%;*/
+            /*margin-top: 0px;*/
+            /*margin-left: 0px;*/
+        /*}*/
+
+        /*.dropdown-submenu:hover > .dropdown-menu {*/
+            /*display: block;*/
+        /*}*/
+
+        /*transition for the rect on the section chart*/
+        .highlight-rect {
+            transition: all 0.3s;
+        }
+
+        #alignleft {
+            float: left;
+        }
+        #alignright {
+            float: right;
+        }
+        .chromeIcon {
+            position: relative; /* Declared position allows for location changes */
+            top: -2px; /* Moves the image 2px closer to the top of the page */
+        }
 
     </style>
 
@@ -346,12 +381,6 @@
 <form id="mapCenterForm">
     <input type="hidden" id="xValue" />
     <input type="hidden" id="yValue" />
-    <input type="hidden" id="zValue" />
-</form>
-
-<form id="scatterCenterForm">
-    <input type="hidden" id="xxValue" />
-    <input type="hidden" id="yyValue" />
 </form>
 
 <!-- Modal -->
@@ -365,33 +394,45 @@
                 <h2 class="modal-title">Transcriptomics viewer</h2>
             </div>
             <div class="modal-body">
-                <h2>Lorem ipsum dolor sit amet</h2>
 
-                <h3>Consectetur adipiscing elit</h3>
+                <p>
+                    This online viewer shows a spatial atlas of neuron types in the mouse hippocampus,
+                    based on their combinatorial expression of 99 genes.
+                </p>
 
-                <p><b>Q: Donec quis justo turpis?</b><br>
-                    A: Nulla suscipit eget felis non accumsan. Pellentesque nulla nunc, ultrices posuere imperdiet non, congue ut tellus.</p>
+                <p>
+                    The brain contains hundreds of types of cells, and understanding their organization is an essential
+                    step toward understanding how the brain operates. Each type of cell transcribes a unique combination
+                    of genes from DNA to RNA.
+                    If you know which RNA molecules a cell contains, you can find out what cell type it is.
+                </p>
 
-                <p style="margin-bottom: 0;"><b>Q: Integer eros nulla, luctus vel purus ut, dignissim aliquet purus.?</b><br>
-                    A:  Ut rutrum et ligula at venenatis:</p>
-                <ul>
-                    <li><b>Consequat lorem:</b>  Etiam malesuada nibh nibh.</li>
-                    <li><b>Aenean ac est:</b>  Vivamus luctus ac velit id lobortis. Sed ornare magna lectus, eget tempor nibh pretium in. Integer posuere ex sem, et eleifend lorem eleifend vitae.</li>
-                    <li><b>Morbi fermentum:</b>Pellentesque mollis ligula eget tempor mollis. Nam aliquam tempor cursus. Pellentesque velit quam, tincidunt a justo eget, maximus maximus nulla.</li>
-                </ul>
+                <p>
+                    We used <i>in situ</i> RNA sequencing to map the expression of 99 genes in 28 different sections of mouse
+                    hippocampus – a part of the brain involved in memory, where the subtypes of neurons are understood well.
+                </p>
 
-                <p><b>Q: Aliquam neque odio, aliquet nec purus in, tincidunt commodo ipsum.?</b><br>
-                    A: Donec nunc orci, faucibus id metus non, cursus condimentum justo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam bibendum vehicula turpis id bibendum. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                <p>
+                    The Gene Map on the left shows where the RNA molecules were detected.
+                    Each colored symbol represents an RNA detection – hover over a symbol to see what gene it represents.
+                    The white blobs show cell nuclei, and the gray dotted lines show their estimated borders.
+                    Hover over a cell to see what genes were assigned to it (they will connect by lines),
+                    and what cell classes it might belong to (in the bottom left corner).
+                    Click on a cell to show even more information, in the lower right panels.
+                </p>
 
-                <h3>De finibus</h3>
-                <p><b>Q: Nec tempor purus porttitor sed?</b><br>
-                    A:  Sed iaculis auctor nisi, ornare suscipit ipsum pulvinar non. Mauris fringilla tellus ut enim condimentum, vel blandit lacus mattis. Nullam mattis dui quis metus faucibus, non vulputate dolor facilisis. Mauris ornare eros diam, ac rhoncus lectus eleifend non. Ut sollicitudin elementum dolor vel mollis.</p>
+                <p>
+                    Use the Section Overview (top right panel) to zoom around – click any cell and it will take you straight there.
+                    To show data from a different experiment, click “Select Data”, in the top left of the window.
+                </p>
 
-                <h3>Morbi venenatis</h3>
-                <p><b>Q: Neque consequat tempor?</b><br>
-                    A: Nam porta efficitur maximus. Vestibulum venenatis magna ac molestie posuere. Phasellus suscipit egestas ipsum, eu tincidunt erat euismod eu:
-                    <a href="http://www.google.com" target="_blank">"Leo ac rutrum convallis"
-                    </a> (Fermentum).
+                <p>
+                    A full explanation of this data and algorithms that produced the atlas is in
+                    <a href="https://www.biorxiv.org/content/early/2018/10/01/431957" target="_blank"> this paper</a>, where you
+                    can also find details on how to contact us. An explanation of what the different cell types are,
+                    and how we know which RNAs they express,
+                    is in <a href="https://journals.plos.org/plosbiology/article/comments?id=10.1371/journal.pbio.2006387" target="_blank">
+                    this paper</a>.
                 </p>
 
             </div>
@@ -402,6 +443,7 @@
 
     </div>
 </div>
+
 
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
@@ -418,18 +460,22 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li class="dropdown" id="myDropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Select Data <span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            Select Data
+                            <span class="caret"></span>
+                        </a>
                         <script>
                             var aa="abc";
                             var bb=2;
                         </script>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("default")'>default</a></li>
+
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_left")'>161220KI_3-1_left</a></li>
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-1_right")'>161220KI_3-1_right</a></li>
 
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-2_left")'>161220KI_3-2_left</a></li>
-                            <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-2_right")'>161220KI_3-1_right</a></li>-->
+                            <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-2_right")'>161220KI_3-2_right</a></li>
 
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-3_left")'>161220KI_3-3_left</a></li>
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_3-3_right")'>161220KI_3-3_right</a></li>
@@ -444,7 +490,7 @@
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_4-3_right")'>161220KI_4-3_right</a></li>
 
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_5-1_left")'>161220KI_5-1_left</a></li>
-                            <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_5-1_right")'>161220KI_5-1_right</a></li>-->
+                            <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_5-1_right")'>161220KI_5-1_right</a></li>
 
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_5-2_left")'>161220KI_5-2_left</a></li>
                             <li><a class="dropdown-item" href="#" onclick='dispatcher("161220KI_5-2_right")'>161220KI_5-2_right</a></li>
@@ -473,13 +519,12 @@
                                     <!--<li><a class="dropdown-item" tabindex="-1" href="#">level 2</a></li>-->
                                     <!--<li><a class="dropdown-item" tabindex="-1" href="#">level 2</a></li>-->
                                 <!--</ul>-->
-                            </li>
+                            <!--</li>-->
                         </ul>
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a data-target="#myModal" data-toggle="modal" href="#myModal">About</a></li>
-                    <li><a href="#">Contact</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
@@ -561,26 +606,23 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-12">
-                        <div class="chart-wrapper">
-                            <div class="chart-title" id="dtTitle">
-                                Title
-                            </div>
-                            <div class="chart-stage">
-                                <div class="col-sm-6">
-                                    <div class="chart-stage">
-                                        <table id="dtTable" class="display compact custom" data-page-length='5' width=100%></table>
-                                    </div>
+                    <div class="chart-wrapper">
+                        <div class="chart-title" id="dtTitle">
+                            Title
+                        </div>
+                        <div class="chart-stage">
+                            <div class="col-sm-6">
+                                <div class="chart-stage">
+                                    <table id="dtTable" class="display compact custom" data-page-length='5' width=100%></table>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="chart-stage">
-                                        <table id="dtTable2" class="display compact custom" data-page-length='5' width=100%></table>
-                                    </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="chart-stage">
+                                    <table id="dtTable2" class="display compact custom" data-page-length='5' width=100%></table>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
             </div>
@@ -593,7 +635,12 @@
 </div>
 
 <hr>
-<p class="small text-muted">University College London - <a href="http://www.ucl.ac.uk/cortexlab">Cortexlab</a></p>
+
+<div id="footnote" style="margin-top:-15px;">
+    <p class="small text-muted" id="alignleft">University College London - <a href="http://www.ucl.ac.uk/cortexlab">Cortexlab</a></p>
+    <p class="small text-muted" id="alignright">Best viewed with  <img src="./dashboard/data/img/if_chrome_87865.png" class="chromeIcon" alt="Warning!"></p>
+</div>
+<!--<div style="clear: both;"></div>-->
 
 <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
 <script>
@@ -604,39 +651,16 @@
 </script>
 
 <script>
-    $(".dropdown-toggle").on("mouseenter", function () {
-        // make sure it is not shown:
-        if (!$(this).parent().hasClass("show")) {
-            $(this).click();
+
+    // when document ready, show selected on dropdown
+    $(function() {
+        if (cookie){
+            d3.select('.dropdown-toggle').node().text = cookie + '  '
+            $('.dropdown-toggle').append("<span class='caret'></span>");
         }
     });
 
-    $(".collapse, .dropdown").on("mouseleave", function () {
-        // make sure it is shown:
-        if ($(this).hasClass("show")){
-            $(this).children('.dropdown-toggle').first().click();
-        }
-    });
 
-    function test(x,y){
-        var msg="the number is "+y+" the text is "+x;
-        alert(msg);
-    }
-
-    // $(function() {
-    //     $('#myDropdown').on('hidden.bs.dropdown', function (e) {
-    //         // alert('Come on lets show the dropdown!!');
-    //         location.reload(true);
-    //         run("zcfs", "p13223")
-    //     });
-    // });
-//
-//     jQuery("#dataset-1").click(function(e){
-// //do something
-//         console.log("action taken")
-//         app("zcfs", "p13223")
-//         e.preventDefault();
-//     });
 </script>
 
 </body>
