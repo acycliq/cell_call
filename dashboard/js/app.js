@@ -71,35 +71,9 @@ function landingPoint(name){
 //create ramp
 function getLandingCellNum(str) {
     return str === 'default' ? 2279 :
-        str === '161220KI_3-1_left' ? 2383 :
-            str === '161220KI_3-1_right' ? 1421 :
-                str === '161220KI_3-2_left' ? 2109 :
-                    str === '161220KI_3-2_right' ? 1567 :
-                        str === '161220KI_3-3_left' ? 1091 :
-                            str === '161220KI_3-3_right' ? 1376 :
-                                str === '161220KI_3-4_left' ? 1329 :
-                                    str === '161220KI_3-4_right' ? 999 :
-                                        str === '161220KI_4-1_left' ? 2141 :
-                                            str === '161220KI_4-1_right' ? 898 :
-                                                str === '161220KI_4-3_left' ? 1369 :
-                                                    str === '161220KI_4-3_right' ? 1244 :
-                                                        str === '161220KI_5-1_left' ? 2261 :
-                                                            str === '161220KI_5-1_right' ? 1270 :
-                                                                str === '161220KI_5-2_left' ? 1672 :
-                                                                    str === '161220KI_5-2_right' ? 986 :
-                                                                        str === '161220KI_5-3_left' ? 1310 :
-                                                                            str === '161220KI_5-3_right' ? 2034 :
-                                                                                str === '161220KI_5-4_left' ? 1251 :
-                                                                                    str === '161220KI_5-4_right' ? 1110 :
-                                                                                        str === '161220KI_7-1_left' ? 3188 :
-                                                                                            str === '161220KI_7-1_right' ? 1805 :
-                                                                                                str === '161220KI_7-2_left' ? 2431 :
-                                                                                                    str === '161220KI_7-2_right' ? 1338 :
-                                                                                                        str === '161220KI_7-3_left' ? 1252 :
-                                                                                                            str === '161220KI_7-3_right' ? 1093 :
-                                                                                                                str === '161220KI_7-4_left' ? 2568 :
-                                                                                                                    str === '161220KI_7-4_right' ? 696 :
-                                                                                                                        1;
+        str === 'Simulation_1' ? 2279 :
+            str === 'Simulation_2' ? 2279 :
+                1;
 }
 
 
