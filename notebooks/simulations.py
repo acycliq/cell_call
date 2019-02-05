@@ -198,7 +198,7 @@ def post_process(df1, df2):
 
 
 if __name__ == "__main__":
-    _seed = 123456
+    _seed = np.int(time.time())
     np.random.seed(_seed)
 
     # Fetch the data
