@@ -32,9 +32,9 @@ def best_class(df):
 
 def draw_gene_expression(df, ge):
     # cell class (unique and ranked alphabetically)
-    best_classes = sorted(set(df['best_class']))
+    # best_classes = sorted(set(df['best_class']))
     class_list = ge.Class.values.tolist()
-    N = len(best_classes)
+    N = df.shape[0]
     M = ge.shape[0]
     out = {'cid': [],
            'Cell_Num': [],
@@ -45,9 +45,9 @@ def draw_gene_expression(df, ge):
            'col': [],
            'GenExp': np.empty([M, N], dtype=np.int32)
            }
-    for i in range(N):
+    for i in range(N):  # loop over the cells
         # select a class
-        bc = best_classes[i]
+        bc = df['best_class'].iloc[i]
         # print(bc)
 
         # carve out data only relevant to the selected class
@@ -59,7 +59,7 @@ def draw_gene_expression(df, ge):
 
         # keep the data for that particular cell to a dictionary
         out['cid'].append(cid)
-        out['Cell_Num'].append(temp['Cell_Num'])  # This is 1-based, not 0-based
+        out['Cell_Num'].append(temp['Cell_Num'])  # Cell_Num is 1-based, not 0-based
         out['X'].append(temp['X'])
         out['Y'].append(temp['Y'])
         out['class_name'].append(temp['best_class'])
@@ -198,7 +198,13 @@ def post_process(df1, df2):
 
 
 if __name__ == "__main__":
-    _seed = np.int(time.time())
+    # _seed = np.int(time.time())
+    # _seed = 123456
+    # _seed = 1549392942
+    # _seed = 1549455337
+    # _seed = 1549473190
+    # _seed = 1549473240
+    _seed = 1549473273
     np.random.seed(_seed)
 
     # Fetch the data
