@@ -11,6 +11,8 @@ def fetch_data():
     print(dir_path)
     df = pd.read_json("https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/default/json/iss.json")
     GeneExp = np.load(dir_path + '/../data_preprocessed/GeneExp.npy')
+    eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/eGeneGamma.csv')]
+    eGeneGamma = [float(i) for i in eGeneGamma]
     genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/genes.csv')]
     ctc = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/cell_to_class_map.csv')]
 
@@ -19,7 +21,8 @@ def fetch_data():
     ctc = ['PC.Other2' if x == 'PC.CA3' else x for x in ctc]
 
     ge = xr.DataArray(GeneExp, coords=[genes, ctc], dims=['Genes', 'Class'])
-    return df, ge
+
+    return df, ge, eGeneGamma
 
 def best_class(df):
     '''
@@ -73,10 +76,10 @@ def draw_gene_expression(df, ge):
     return out
 
 
-def thinner(data):
-    p = 0.1
+def thinner(data, eGeneGamma):
+    p = np.array([min(1.0, x) for x in eGeneGamma])
     mat = data['GenExp']
-    rnd = np.random.binomial(mat, p)
+    rnd = np.random.binomial(mat, p[:, None])
     data['GenExp'] = rnd
     return data
 
@@ -208,7 +211,7 @@ if __name__ == "__main__":
     np.random.seed(_seed)
 
     # Fetch the data
-    raw_data, gene_expression = fetch_data()
+    raw_data, gene_expression, eGeneGamma = fetch_data()
 
     # for each cell find its most likely cell class
     bc = best_class(raw_data)
@@ -221,7 +224,7 @@ if __name__ == "__main__":
     raw_data = raw_data[nonZero]
 
     sample = draw_gene_expression(raw_data, gene_expression)
-    sample = thinner(sample)
+    sample = thinner(sample, eGeneGamma)
     spots = position_genes(sample)
 
     pd.DataFrame(spots).to_csv('spots_' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
