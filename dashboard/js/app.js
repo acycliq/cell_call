@@ -77,6 +77,7 @@ function getLandingCellNum(str) {
                     str === 'Simulation_4' ? 2279 :
                         str === 'Simulation_5' ? 2279 :
                             str === 'Simulation_6' ? 2279 :
+                                str === 'Simulation_7' ? 2279 :
                 1;
 }
 

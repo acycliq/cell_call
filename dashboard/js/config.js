@@ -10,6 +10,7 @@ function config(){
         {name: 'Simulation_4', roi: {x0: 6150, x1: 13751, y0: 12987, y1: 18457}, imageSize: [16384, 11791], cellData: './dashboard/data/img/sim_1549473190/json/iss.json', geneData: './dashboard/data/img/sim_1549473190/csv/Dapi_overlays.csv', tiles: './dashboard/data/img/default/16384px/{z}/{x}/{y}.png'},  // 5
         {name: 'Simulation_5', roi: {x0: 6150, x1: 13751, y0: 12987, y1: 18457}, imageSize: [16384, 11791], cellData: './dashboard/data/img/sim_1549473240/json/iss.json', geneData: './dashboard/data/img/sim_1549473240/csv/Dapi_overlays.csv', tiles: './dashboard/data/img/default/16384px/{z}/{x}/{y}.png'},  // 6
         {name: 'Simulation_6', roi: {x0: 6150, x1: 13751, y0: 12987, y1: 18457}, imageSize: [16384, 11791], cellData: './dashboard/data/img/sim_1549473273/json/iss.json', geneData: './dashboard/data/img/sim_1549473273/csv/Dapi_overlays.csv', tiles: './dashboard/data/img/default/16384px/{z}/{x}/{y}.png'},  // 7
+        {name: 'Simulation_7', roi: {x0: 6150, x1: 13751, y0: 12987, y1: 18457}, imageSize: [16384, 11791], cellData: './dashboard/data/img/sim_1549473273_eGeneGamma_mean/json/iss.json', geneData: './dashboard/data/img/sim_1549473273_eGeneGamma_mean/csv/Dapi_overlays.csv', tiles: './dashboard/data/img/default/16384px/{z}/{x}/{y}.png'},  // 7
     ];
     var out = d3.map(ini, function (d) {return d.name;});
     return out
