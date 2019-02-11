@@ -79,7 +79,7 @@ def draw_gene_expression(df, ge):
 def thinner(data, eGeneGamma):
     p = np.array([min(1.0, x) for x in eGeneGamma])
     mat = data['GenExp']
-    rnd = np.random.binomial(mat, p[:, None])
+    rnd = np.random.binomial(mat, np.mean(eGeneGamma))
     data['GenExp'] = rnd
     return data
 
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     sample = thinner(sample, eGeneGamma)
     spots = position_genes(sample)
 
-    pd.DataFrame(spots).to_csv('spots_' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
+    pd.DataFrame(spots).to_csv('spots_eGeneGammaMean' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
 
     print(spots[-3:, :])
     print('Done!')
