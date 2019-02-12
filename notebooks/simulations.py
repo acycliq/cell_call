@@ -40,6 +40,7 @@ def draw_gene_expression(df, ge):
     N = df.shape[0]
     M = ge.shape[0]
     out = {'cid': [],
+           'best_class': [],
            'Cell_Num': [],
            'X': [],
            'Y': [],
@@ -51,6 +52,9 @@ def draw_gene_expression(df, ge):
     for i in range(N):  # loop over the cells
         # select a class
         bc = df['best_class'].iloc[i]
+        _cell_num = df['Cell_Num'].iloc[i]
+        _x = df['X'].iloc[i]
+        _y = df['Y'].iloc[i]
         # print(bc)
 
         # carve out data only relevant to the selected class
@@ -58,14 +62,14 @@ def draw_gene_expression(df, ge):
 
         # randomly select a cell of that specific class
         cid = np.random.choice(class_df.index)
-        temp = class_df.loc[cid]
+        # temp = class_df.loc[cid]
 
         # keep the data for that particular cell to a dictionary
         out['cid'].append(cid)
-        out['Cell_Num'].append(temp['Cell_Num'])  # Cell_Num is 1-based, not 0-based
-        out['X'].append(temp['X'])
-        out['Y'].append(temp['Y'])
-        out['class_name'].append(temp['best_class'])
+        out['Cell_Num'].append(_cell_num)  # Cell_Num is 1-based, not 0-based
+        out['X'].append(_x)
+        out['Y'].append(_y)
+        out['class_name'].append(bc)
         # start = time.time()
         mask = [i for i in range(len(class_list)) if class_list[i] == bc]
         # print(time.time() - start)
@@ -79,7 +83,7 @@ def draw_gene_expression(df, ge):
 def thinner(data, eGeneGamma):
     p = np.array([min(1.0, x) for x in eGeneGamma])
     mat = data['GenExp']
-    rnd = np.random.binomial(mat, np.mean(eGeneGamma))
+    rnd = np.random.binomial(mat, p[:, None])
     data['GenExp'] = rnd
     return data
 
@@ -204,10 +208,10 @@ if __name__ == "__main__":
     # _seed = np.int(time.time())
     # _seed = 123456
     # _seed = 1549392942
-    # _seed = 1549455337
+    _seed = 1549455337
     # _seed = 1549473190
     # _seed = 1549473240
-    _seed = 1549473273
+    # _seed = 1549473273
     np.random.seed(_seed)
 
     # Fetch the data
@@ -227,7 +231,7 @@ if __name__ == "__main__":
     sample = thinner(sample, eGeneGamma)
     spots = position_genes(sample)
 
-    pd.DataFrame(spots).to_csv('spots_eGeneGammaMean' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
+    pd.DataFrame(spots).to_csv('spots_' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
 
     print(spots[-3:, :])
     print('Done!')
