@@ -19,7 +19,7 @@ function renderDataTable(d) {
     for (i = 0; i < n; i++) {
         mydata2.push({
             "ClassName": (d.ClassName[i] === undefined) ? "" : d.ClassName[i],
-            "Prob": (d.Prob[i] === undefined) ? "" : d.Prob[i],
+            "Prob": (d.ClassName[i] === undefined) ? "" : (!Array.isArray(d.Prob)) ? [d.Prob] : d.Prob[i], // d.Prob can be just a float, make sure it is an array
         })
     }
 
