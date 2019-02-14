@@ -30,80 +30,78 @@ def flat_list(l):
     return np.array(out)
 
 
-def plot_confusion_matrix(cm, classes,
-                          normalize=False,
-                          title='Confusion matrix',
+def plot_confusion_matrix(cm,
+                          norm,
                           cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
 
-    print(cm)
-
+    title = 'Confusion matrix' + ' (Norm: ' + norm + ')'
+    fntSize = 7
+    xClasses = cm.columns
+    yClasses = cm.index
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
+    xTick_marks = np.arange(len(xClasses))
+    yTick_marks = np.arange(len(yClasses))
+    plt.xticks(xTick_marks, xClasses, rotation=45, ha='right', fontsize=fntSize)
+    plt.yticks(yTick_marks, yClasses, fontsize=fntSize)
 
-    fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+    # fmt = '.2f'
+    # thresh = cm.max() / 2.
+    # for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+    #     plt.text(j, i, format(cm.iloc[i, j], fmt),
+    #              horizontalalignment="center",
+    #              color="white" if cm.iloc[i, j] > thresh else "black")
 
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
+    plt.ylabel('Predicted')
+    plt.xlabel('True')
     plt.tight_layout()
 
 
-def helper(df):
+def aggregator(df, column_names, norm):
     N = df.shape[0]
-    labels = sorted(set(flat_list(df.ClassName.tolist())))
-    out = pd.DataFrame(np.zeros([N, len(labels)]), columns=labels)
+    temp = pd.DataFrame(np.zeros([N, len(column_names)]), columns=column_names)
+    for i, key in enumerate(df.index):
+        labels = df.loc[key, 'ClassName']
+        prob = df.loc[key, 'Prob']
+        temp.loc[i, labels] = prob
 
+    if norm == 'median':
+        out = temp.median(axis=0)
+    elif norm == 'mean':
+        out = temp.median(axis=0)
+    else:
+        print('NORM should be either "mean" or "media"')
+        out = None
+
+    print(out.sum())
     return out
 
 
-def confusion_matrix(model_data, sim_data):
+def confusion_matrix(model_data, sim_data, norm='mean'):
     'get the model class, ie most likely as this is derived from the model'
     _model_class = best_class(model_data)
 
     df = sim_data[["Cell_Num", "ClassName", "Prob"]]
     df = df.assign(model_class=_model_class)
-    # df.loc[:, 'model_class'] = _model_class
 
     all_class_names = sorted(set(flat_list(df.ClassName)))
 
     'get all the unique model_class names'
     umc = sorted(list(set(_model_class)))
 
-    N = len(umc)
-    M = len(all_class_names)
-    out = pd.DataFrame(np.zeros((M, N)), columns=umc, index=all_class_names)
+    n = len(umc)
+    m = len(all_class_names)
+    out = pd.DataFrame(np.zeros((m, n)), columns=umc, index=all_class_names)
 
     'loop over the class names (those assigned my the model)'
     for c in umc:
         mask = df['model_class'] == c
         temp = df[mask]
-        testMe = helper(temp)
-        class_name = flat_list(temp['ClassName'].values)
-        prob = flat_list(temp['Prob'].values)
-
-        x = pd.DataFrame({'class_name': class_name, 'Prob': prob})
-
-        res = x.groupby(['class_name']).sum()
-        val = [x[0] for x in res.values]
-        out.loc[res.index, c] = val
-
+        agg = aggregator(temp, all_class_names, norm)
+        key = agg.index
+        prob = agg.values
+        out.loc[key, c] = prob
         print('Finished with %s' % c)
 
     return out
@@ -112,7 +110,11 @@ def confusion_matrix(model_data, sim_data):
 if __name__ == "__main__":
     model_data = pd.read_json(MODEL_DATA)
     sim_data = pd.read_json(SIM_DATA)
+    norm = 'median'
+    # norm = 'mean'
 
-    cm = confusion_matrix(model_data, sim_data)
+    cm = confusion_matrix(model_data, sim_data, norm)
+    cm.sum(axis=0)
+    plot_confusion_matrix(cm, norm)
 
     print('Done')
