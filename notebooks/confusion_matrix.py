@@ -69,7 +69,7 @@ def aggregator(df, column_names, norm):
     if norm == 'median':
         out = temp.median(axis=0)
     elif norm == 'mean':
-        out = temp.median(axis=0)
+        out = temp.mean(axis=0)
     else:
         print('NORM should be either "mean" or "media"')
         out = None
@@ -110,11 +110,11 @@ def confusion_matrix(model_data, sim_data, norm='mean'):
 if __name__ == "__main__":
     model_data = pd.read_json(MODEL_DATA)
     sim_data = pd.read_json(SIM_DATA)
-    norm = 'median'
-    # norm = 'mean'
+    # norm = 'median'
+    norm = 'mean'
 
     cm = confusion_matrix(model_data, sim_data, norm)
-    cm.sum(axis=0)
+    print(cm.sum(axis=0))
     plot_confusion_matrix(cm, norm)
 
     print('Done')
