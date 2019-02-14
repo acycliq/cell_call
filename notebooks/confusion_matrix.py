@@ -43,7 +43,7 @@ def plot_confusion_matrix(cm,
     plt.colorbar()
     xTick_marks = np.arange(len(xClasses))
     yTick_marks = np.arange(len(yClasses))
-    plt.xticks(xTick_marks, xClasses, rotation=45, ha='right', fontsize=fntSize)
+    plt.xticks(xTick_marks, xClasses, rotation=45, ha='right', fontsize=fntSize-2)
     plt.yticks(yTick_marks, yClasses, fontsize=fntSize)
 
     # fmt = '.2f'
@@ -56,6 +56,7 @@ def plot_confusion_matrix(cm,
     plt.ylabel('Predicted')
     plt.xlabel('True')
     plt.tight_layout()
+    plt.savefig('cm_' + norm + '.png')
 
 
 def aggregator(df, column_names, norm):
@@ -110,8 +111,8 @@ def confusion_matrix(model_data, sim_data, norm='mean'):
 if __name__ == "__main__":
     model_data = pd.read_json(MODEL_DATA)
     sim_data = pd.read_json(SIM_DATA)
-    # norm = 'median'
-    norm = 'mean'
+    norm = 'median'
+    # norm = 'mean'
 
     cm = confusion_matrix(model_data, sim_data, norm)
     print(cm.sum(axis=0))
