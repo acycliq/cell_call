@@ -146,7 +146,6 @@ def pool(df):
     return df
 
 
-
 if __name__ == "__main__":
     # norm = 'median'
     norm = 'mean'
