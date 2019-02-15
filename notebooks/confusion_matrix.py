@@ -107,12 +107,57 @@ def confusion_matrix(model_data, sim_data, norm='mean'):
 
     return out
 
+def pool(df):
+    print('Pooling all Non Neurons together.')
+    non_neuron = ['Astro.1',
+                 'Astro.2',
+                 'Astro.3',
+                 'Astro.4',
+                 'Astro.5',
+                 'Choroid',
+                 'Endo',
+                 'Eryth.1',
+                 'Eryth.2',
+                 'Microglia.1',
+                 'Microglia.2',
+                 'Oligo.1',
+                 'Oligo.2',
+                 'Oligo.3',
+                 'Oligo.4',
+                 'Oligo.5',
+                 'Vsmc'
+                 ]
+
+    class_names = df['ClassName']
+    prob = df['Prob']
+    out_names = []
+    out_prob = []
+    for key, name in enumerate(class_names):
+        name = ['Non.Neuron' if x in non_neuron else x for x in name]
+        temp = pd.DataFrame({'class_name': name, 'prob': prob[key]} )
+        temp = temp.groupby('class_name').sum()
+
+        out_names.append(temp.index.tolist())
+        out_prob.append(temp['prob'].tolist())
+
+    df['ClassName'] = out_names
+    df['Prob'] = out_prob
+    return df
+
+
 
 if __name__ == "__main__":
+    # norm = 'median'
+    norm = 'mean'
+
+    use_pool = False
+
     model_data = pd.read_json(MODEL_DATA)
     sim_data = pd.read_json(SIM_DATA)
-    norm = 'median'
-    # norm = 'mean'
+
+    if use_pool:
+        model_data = pool(model_data)
+        sim_data = pool(sim_data)
 
     cm = confusion_matrix(model_data, sim_data, norm)
     print(cm.sum(axis=0))
