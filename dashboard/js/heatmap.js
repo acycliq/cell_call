@@ -8,7 +8,7 @@ function heatmap(dataset) {
     var xLabels = d3.map(dataset, function (d) {return d.xLabel;}).keys(),
         yLabels = d3.map(dataset, function (d) {return d.yLabel;}).keys();
 
-    var margin = {top: 0, right: 0, bottom: 20, left: 55};
+    var margin = {top: 0, right: 0, bottom: 20, left: 120};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -19,11 +19,13 @@ function heatmap(dataset) {
 
     var valRange = d3.extent(dataset, function (d) {return d.val});
 
-    var colors = ['#2C7BB6', '#00A6CA', '#00CCBC', '#90EB9D', '#FFFF8C', '#F9D057', '#F29E2E', '#E76818', '#D7191C'];
+    // var colors = ['#2C7BB6', '#00A6CA', '#00CCBC', '#90EB9D', '#FFFF8C', '#F9D057', '#F29E2E', '#E76818', '#D7191C'];
+    var bluecolors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'],
+        redcolors  = ['#fff5f0','#fee0d2','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15','#67000d'];
 
     var colorScale = d3.scaleQuantile()
-        .domain([valRange[0], colors.length - 1, valRange[1]])
-        .range(colors);
+        .domain(valRange)
+        .range(bluecolors);
 
 
     var max_val = d3.max( dataset, function(d) { return d.val });
@@ -162,7 +164,7 @@ function renderHeatmap(dataset) {
         .transition(chartData.tsn)
         .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth();})
         .attr("cy", function (d) {return chartData.scale.y(d.yKey) + chartData.yBand.bandwidth();})
-        .attr("fill", function (d) { return chartData.colorScale(d.val*25);} );
+        .attr("fill", function (d) { return chartData.colorScale(d.val);} );
 
     update.exit().remove();
 

@@ -80,7 +80,7 @@
     <!-- Papa Parse -->
     <!--<script src="./lib/js/papaparse.min.js"></script>-->
 
-    <link rel="stylesheet" href="dashboard/js/contactUs.css">
+    <!--<link rel="stylesheet" href="dashboard/js/contactUs.css">-->
 
     <!-- User scripts  -->
     <script src="dashboard/js/glyphs.js"></script>
@@ -93,6 +93,7 @@
     <script src='dashboard/js/dt.js'></script>
     <script src='dashboard/js/dapi.js'></script>
     <script src='dashboard/js/glyphAssignment.js'></script>
+    <script src='dashboard/js/heatmap.js'></script>
     <script src='dashboard/js/config.js'></script>
     <script src='dashboard/js/app.js'></script> <!--Keep that at the bottom. below all other js files-->
 
@@ -364,6 +365,16 @@
             top: -2px; /* Moves the image 2px closer to the top of the page */
         }
 
+        /*this prevents a dotted outline line from appearing on the active tab*/
+        a, a:active, a:focus {
+            outline: none;
+        }
+
+        /*styles for the layer control itself */
+        .layer-control { padding: 7px; font-size: 12px; line-height: 15px; position: absolute; top: 72px; right: 20px; background: #fff; border-radius: 4px; color: #333; box-shadow: 0 1px 5px rgba(0,0,0,0.4); z-index: 1005; }
+        .layer-control label { display: block; font-weight: normal; margin-left: 3px; }
+        .layer-control input { margin: -3px 0 0; vertical-align: middle; }
+
     </style>
 
 </head>
@@ -504,8 +515,8 @@
 
         <!-- nav bar left side: tabs -the map, table, about nav tabs, for content, see below -->
         <li class="active"><a href="#map-content" data-toggle="tab" id="map-tab">Viewer</a></li>
-        <li><a href="#table-content" data-toggle="tab" id="table-tab">Confusion Matrix</a></li>
-        <li><a href="#about-content" data-toggle="tab" id="about-tab">About</a></li>
+        <!--<li><a href="#table-content" data-toggle="tab" id="table-tab">Confusion Matrix</a></li>-->
+        <li><a href="#about-content" data-toggle="tab" id="about-tab">Confusion Matrix</a></li>
 
     </ul>
 
@@ -676,7 +687,38 @@
 
         <!-- about content tab -->
         <div class="tab-pane fade" id="about-content">
-            this is some text
+            <div data-panel="layers" class="layer-control">
+                <!-- basemaps: radio buttons, see initMapLayerControl() -->
+                <div id="layers-base">
+                    <label><input type="radio" name="basemaps" data-baselayer="basemap"
+                                  checked="checked"><span> Basemap</span></label>
+                    <label><input type="radio" name="basemaps" data-baselayer="hybrid"><span> Hybrid</span></label>
+                    <label><input type="radio" name="basemaps"
+                                  data-baselayer="satellite"><span> Satellite</span></label>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row" style="margin-top:5px">
+                    <!--//top row-->
+                    <div class="row" style="margin-top:5px">
+                        <div class="col-sm-12">
+                            <!-- Map -->
+                            <div class="col-sm-10">
+                                <div class="chart-wrapper">
+                                    <div class="chart-title">
+                                        Confusion Matrix
+                                    </div>
+                                    <div class="chart-stage" div id="heat-chart">
+                                        <svg width="1400" height="700"></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Map -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div><!-- about content tab -->
 
     </div><!-- tab-content -->
@@ -688,6 +730,69 @@
         <p class="small text-muted" id="alignright">Best viewed with  <img src="./dashboard/data/img/if_chrome_87865.png" class="chromeIcon" alt="Warning!"></p>
     </div>
     <!--<div style="clear: both;"></div>-->
+
+    <script>
+        // listener on the Confusion matrix tab
+        $('#layers-base input').change(function() {
+            var selected = $(this).data().baselayer;
+            // remove current basemap
+            console.log('radio button: ' + selected +' was selected')
+        });
+
+        $('#about-tab').on('shown.bs.tab', function (e) {
+            console.log('Confusion matrix tab was clicked.')
+            // set current_tab to the current tab id
+            CURRENT_TAB = 'about-tab';
+            var dataset = [
+                {'xKey':1, 'xLabel':'x1','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
+                {'xKey':1, 'xLabel':'x1','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
+                {'xKey':1, 'xLabel':'x1','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+                {'xKey':1, 'xLabel':'x1','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
+                {'xKey':2, 'xLabel':'x2','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
+                {'xKey':2, 'xLabel':'x2','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
+                {'xKey':2, 'xLabel':'x2','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+                {'xKey':2, 'xLabel':'x2','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
+                {'xKey':3, 'xLabel':'x3','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
+                {'xKey':3, 'xLabel':'x3','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
+                {'xKey':3, 'xLabel':'x3','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+                {'xKey':3, 'xLabel':'x3','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
+                {'xKey':4, 'xLabel':'x4','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
+                {'xKey':4, 'xLabel':'x4','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
+                {'xKey':4, 'xLabel':'x4','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+                {'xKey':4, 'xLabel':'x4','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
+                {'xKey':5, 'xLabel':'x5','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
+                {'xKey':5, 'xLabel':'x5','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
+                {'xKey':5, 'xLabel':'x5','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+                {'xKey':5, 'xLabel':'x5','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
+//
+            ]
+
+            d3.json("./notebooks/confusionMatrixData.json", function(data) {
+                dataset = []
+                for (var i=0; i<data.index.length; i++){
+                    console.log(' i: ', i)
+                    for (var j=0; j<data.columns.length; j++){
+                        console.log('i: ' + i + ' j: ' + j + 'value: ' + data.data[i][j])
+                        dataset.push({
+                            xKey: i+1,
+                            xLabel: data.index[i],
+                            yKey: j+1,
+                            yLabel: data.columns[j],
+                            val: + data.data[i][j],
+                        })
+                    }
+                }
+                console.log('json parsed!');
+                renderHeatmap(dataset);
+            });
+            // renderHeatmap(dataset);
+
+            // hide the search forms
+            $('#nav-table-search').hide();
+            $('#nav-place-search').hide();
+        });
+    </script>
+
 
     <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
     <script>
