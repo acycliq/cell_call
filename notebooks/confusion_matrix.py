@@ -8,7 +8,8 @@ from scipy.stats import gmean
 VIEWER_PATH = 'https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/'
 SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/master/dashboard/data/img/'
 MODEL_DATA = VIEWER_PATH + '/default/json/iss.json'
-SIM_DATA = SIM_PATH + '/sim_123456_excludedClasses/json/iss.json'  # Simulation 1
+SIM_DATA = SIM_PATH + '/sim_123456/json/iss.json'  # Simulation 1
+# SIM_DATA = SIM_PATH + '/sim_123456_excludedClasses/json/iss.json'  # Simulation 1
 
 
 def best_class(df):
