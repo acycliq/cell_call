@@ -26,7 +26,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 
     <!-- bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./lib/css/bootstrap.min.css">
     <script src="./lib/js/bootstrap.min.js"></script>
 
     <!-- bootstrap switch -->
@@ -447,187 +447,269 @@
     </div>
 </div>
 
-
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container-fluid">
+<!-- main page container, holding the nav tabs and content -->
+<div id="container">
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container-fluid">
-            <div class="navbar-header">
-                <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">-->
-                    <!--<span class="sr-only">Toggle navigation</span>-->
-                    <!--<span class="icon-bar"></span>-->
-                    <!--<span class="icon-bar"></span>-->
-                    <!--<span class="icon-bar"></span>-->
-                <!--</button>-->
-                <a class="navbar-brand" href="#">Cell Mapping Visualization</a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li class="dropdown" id="myDropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                            Select Data
-                            <span class="caret"></span>
-                        </a>
-                        <script>
-                            var aa="abc";
-                            var bb=2;
-                        </script>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("default")'>default</a></li>
-
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_1")'>Simulation_1</a></li>
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_2")'>Simulation_2</a></li>
-
-                            <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_3")'>Simulation_3</a></li>
-
-                            <!--<li class="dropdown-submenu">-->
-                                <!--<a class="dropdown-item" tabindex="-1" href="#">161220KI_3-1</a>-->
-                                <!--<ul class="dropdown-menu">-->
-                                    <!--<li><a class="dropdown-item" tabindex="-1" href="#">level 2</a></li>-->
-                                    <!--<li><a class="dropdown-item" tabindex="-1" href="#">level 2</a></li>-->
-                                <!--</ul>-->
-                            <!--</li>-->
-                        </ul>
-                    </li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a data-target="#myModal" data-toggle="modal" href="#myModal">About</a></li>
-                </ul>
-            </div><!--/.nav-collapse -->
-        </div><!--/.container-fluid -->
-
-    </div>
-</div>
-
-<div class="container-fluid">
-
-    <!--//top row-->
-    <div class="row">
-        <div class="col-sm-12">
-            <!-- Map -->
-            <div class="col-sm-7">
-                <div class="chart-wrapper">
-                    <div class="chart-title">
-                        Gene Map
-                    </div>
-                    <div class="chart-stage">
-                        <div id="leafletmap">
-                            <div id="mymap" style="width: 100%;"></div>
-                        </div>
-                    </div>
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">-->
+                        <!--<span class="sr-only">Toggle navigation</span>-->
+                        <!--<span class="icon-bar"></span>-->
+                        <!--<span class="icon-bar"></span>-->
+                        <!--<span class="icon-bar"></span>-->
+                    <!--</button>-->
+                    <a class="navbar-brand" href="#">Cell Mapping Visualization</a>
                 </div>
-            </div>
-            <!-- Map -->
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown" id="myDropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                Select Data
+                                <span class="caret"></span>
+                            </a>
+                            <script>
+                                var aa="abc";
+                                var bb=2;
+                            </script>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("default")'>default</a></li>
 
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_1")'>Simulation_1</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_2")'>Simulation_2</a></li>
 
-            <div class="col-sm-5">
-                <div class="row">
-                    <!-- Scatter Plot -->
-                    <div class="chart-wrapper">
-                        <div class="chart-title">
-                            Section Overview
-                        </div>
-                        <div class="chart-stage">
-                            <div id="scatter-plot" class="display compact custom" ; width=100%>
-                                <svg></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_3")'>Simulation_3</a></li>
 
-                <div class="row">
-                    <!-- Bar and Pie Chart -->
-                    <div class="chart-wrapper">
-                        <div class="chart-title">
-                            Cell Type Probabilities
-                        </div>
-                        <div class="chart-stage">
-                            <div class="col-sm-7">
-                                <div class="chart-stage" id="bar-chart">
-                                    <svg width="400" height="200">
-                                        <!-- Add a clip path -->
-                                        <defs>
-                                            <clipPath id="my-clip-path">
-                                                <rect></rect>
-                                            </clipPath>
-                                        </defs>
-                                        <g class="focus">
-                                            <g class="axis"></g>
-                                            <g class="axis axis--y"></g>
-                                        </g>
-                                        <g class="context">
-                                            <g class="axis2"></g>
-                                            <g class="brush"></g>
-                                        </g>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-5">
-                                <div class="chart-stage" id="pie">
-                                    <svg width="280" height="200"></svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="chart-wrapper">
-                        <div class="chart-title" id="dtTitle">
-                            Title
-                        </div>
-                        <div class="chart-stage">
-                            <div class="col-sm-6">
-                                <div class="chart-stage">
-                                    <table id="dtTable" class="display compact custom" data-page-length='5' width=100%></table>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="chart-stage">
-                                    <table id="dtTable2" class="display compact custom" data-page-length='5' width=100%></table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+                                <!--<li class="dropdown-submenu">-->
+                                    <!--<a class="dropdown-item" tabindex="-1" href="#">161220KI_3-1</a>-->
+                                    <!--<ul class="dropdown-menu">-->
+                                        <!--<li><a class="dropdown-item" tabindex="-1" href="#">level 2</a></li>-->
+                                        <!--<li><a class="dropdown-item" tabindex="-1" href="#">level 2</a></li>-->
+                                    <!--</ul>-->
+                                <!--</li>-->
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a data-target="#myModal" data-toggle="modal" href="#myModal">About</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container-fluid -->
 
         </div>
     </div>
 
+<!-- tab navigation -->
+    <ul class="nav nav-tabs" role="tablist" id="index-tabs" style="margin-top:-6px;">
+
+        <!-- nav bar left side: tabs -the map, table, about nav tabs, for content, see below -->
+        <li class="active"><a href="#map-content" data-toggle="tab" id="map-tab">Viewer</a></li>
+        <li><a href="#table-content" data-toggle="tab" id="table-tab">Confusion Matrix</a></li>
+        <li><a href="#about-content" data-toggle="tab" id="about-tab">About</a></li>
+
+    </ul>
+
+    <!-- content for the nav tabs -->
+    <div class="tab-content">
+
+        <!-- map content tab -->
+        <div class="tab-pane active fade in" id="map-content">
+            <div class="container-fluid">
+                <div class="row" style="margin-top:5px">
+                    <!--//top row-->
+                    <div class="row" style="margin-top:5px">
+                        <div class="col-sm-12">
+                            <!-- Map -->
+                            <div class="col-sm-7">
+                                <div class="chart-wrapper">
+                                    <div class="chart-title">
+                                        Gene Map
+                                    </div>
+                                    <div class="chart-stage">
+                                        <div id="leafletmap">
+                                            <div id="mymap" style="width: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Map -->
 
 
+                            <div class="col-sm-5">
+                                <div class="row">
+                                    <!-- Scatter Plot -->
+                                    <div class="chart-wrapper">
+                                        <div class="chart-title">
+                                            Section Overview
+                                        </div>
+                                        <div class="chart-stage">
+                                            <div id="scatter-plot" class="display compact custom" ; width=100%>
+                                                <svg></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <!-- Bar and Pie Chart -->
+                                    <div class="chart-wrapper">
+                                        <div class="chart-title">
+                                            Cell Type Probabilities
+                                        </div>
+                                        <div class="chart-stage">
+                                            <div class="col-sm-7">
+                                                <div class="chart-stage" id="bar-chart">
+                                                    <svg width="400" height="200">
+                                                        <!-- Add a clip path -->
+                                                        <defs>
+                                                            <clipPath id="my-clip-path">
+                                                                <rect></rect>
+                                                            </clipPath>
+                                                        </defs>
+                                                        <g class="focus">
+                                                            <g class="axis"></g>
+                                                            <g class="axis axis--y"></g>
+                                                        </g>
+                                                        <g class="context">
+                                                            <g class="axis2"></g>
+                                                            <g class="brush"></g>
+                                                        </g>
+                                                    </svg>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-5">
+                                                <div class="chart-stage" id="pie">
+                                                    <svg width="280" height="200"></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="chart-wrapper">
+                                        <div class="chart-title" id="dtTitle">
+                                            Title
+                                        </div>
+                                        <div class="chart-stage">
+                                            <div class="col-sm-6">
+                                                <div class="chart-stage">
+                                                    <table id="dtTable" class="display compact custom"
+                                                           data-page-length='5' width=100%></table>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="chart-stage">
+                                                    <table id="dtTable2" class="display compact custom"
+                                                           data-page-length='5' width=100%></table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- table content tab -->
+        <div class="tab-pane fade" id="table-content">
+            <div id="table" class="table-container">
+                <h2><span>All records</span></h2>
+                <table class="table table-striped table-hover display nowrap" cellspacing="0" width="100%" data-page-navigation=".pagination">
+                    <thead>
+                        <!-- placeholders only: see initTable() -->
+                        <tr>
+                            <!-- this is the field ("expand") that will get the plus button on phone/tablet -->
+                            <th data-class="expand">
+                                Main Column
+                            </th>
+                            <!-- use data-hide to indicate which fields get pushed under the row on which devices -->
+                            <th data-hide="phone">
+                                Column 1
+                            </th>
+                            <th data-hide="phone,tablet">
+                                Column 2
+                            </th>
+                            <th>
+                                Column 3
+                            </th>
+                            <th data-hide="phone">
+                                Column 4
+                            </th>
+                            <th data-hide="phone">
+                                Column 5
+                            </th>
+                            <th data-hide="phone,tablet">
+                                Column 6
+                            </th>
+                            <th data-hide="phone">
+                                Column 7
+                            </th>
+                            <th data-hide="phone">
+                                Column 8
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- placeholders only: see initTable() -->
+                        <tr><td><a href="#">Text to appear on the link</a></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div><!-- table wrapper-->
+        </div><!--table tab-->
+
+        <!-- about content tab -->
+        <div class="tab-pane fade" id="about-content">
+            this is some text
+        </div><!-- about content tab -->
+
+    </div><!-- tab-content -->
+
+    <!--<hr>-->
+
+    <div id="footnote" style="margin-top:-15px;">
+        <p class="small text-muted" id="alignleft">University College London - <a href="http://www.ucl.ac.uk/cortexlab">Cortexlab</a></p>
+        <p class="small text-muted" id="alignright">Best viewed with  <img src="./dashboard/data/img/if_chrome_87865.png" class="chromeIcon" alt="Warning!"></p>
+    </div>
+    <!--<div style="clear: both;"></div>-->
+
+    <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
+    <script>
+        setTimeout(function(){
+            $('body').addClass('loaded');
+            $('h1').css('color','#222222');
+        }, 3000);
+    </script>
+
+    <script>
+
+        // when document ready, show selected on dropdown
+        $(function() {
+            if (cookie){
+                d3.select('.dropdown-toggle').node().text = cookie + '  '
+                $('.dropdown-toggle').append("<span class='caret'></span>");
+            }
+        });
+
+
+    </script>
 </div>
-
-<hr>
-
-<div id="footnote" style="margin-top:-15px;">
-    <p class="small text-muted" id="alignleft">University College London - <a href="http://www.ucl.ac.uk/cortexlab">Cortexlab</a></p>
-    <p class="small text-muted" id="alignright">Best viewed with  <img src="./dashboard/data/img/if_chrome_87865.png" class="chromeIcon" alt="Warning!"></p>
-</div>
-<!--<div style="clear: both;"></div>-->
-
-<!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
-<script>
-    setTimeout(function(){
-        $('body').addClass('loaded');
-        $('h1').css('color','#222222');
-    }, 3000);
-</script>
-
-<script>
-
-    // when document ready, show selected on dropdown
-    $(function() {
-        if (cookie){
-            d3.select('.dropdown-toggle').node().text = cookie + '  '
-            $('.dropdown-toggle').append("<span class='caret'></span>");
-        }
-    });
-
-
-</script>
 
 </body>
 
