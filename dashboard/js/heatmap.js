@@ -128,7 +128,7 @@ function renderHeatmap(dataset) {
 
     var svg = d3.select("#heat-chart")
         .select("svg");
-    if (svg.select("#clip").empty()) {
+    if (svg.select("#clip2").empty()) {
         chartData = heatmap(dataset);
     }
 
