@@ -5,17 +5,28 @@ function heatmap(dataset) {
 
     var tsn = d3.transition().duration(1000);
 
-    var xLabels = d3.map(dataset, function (d) {return d.xLabel;}).keys(),
-        yLabels = d3.map(dataset, function (d) {return d.yLabel;}).keys();
+    // var xLabels = d3.map(dataset, function (d) {return d.xLabel;}).keys(),
+    //     yLabels = d3.map(dataset, function (d) {return d.yLabel;}).keys();
+
+    var labels = {
+        x: d3.map(dataset, function (d) {return d.xLabel;}).keys(),
+        y: d3.map(dataset, function (d) {return d.yLabel;}).keys(),
+    };
 
     var margin = {top: 0, right: 0, bottom: 20, left: 120};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
 
-    var dotSpacing = 0,
-        dotWidth = width / (2 * (xLabels.length)),
-        dotHeight = height / (2 * yLabels.length);
+    // var dotSpacing = 0,
+    //     dotWidth = width / (2 * (labels.x.length)),
+    //     dotHeight = height / (2 * labels.y.length);
+
+    var dot = {
+        spacing: 0,
+        width: width / (2 * (labels.x.length)),
+        height: height / (2 * labels.y.length),
+    }
 
     var valRange = d3.extent(dataset, function (d) {return d.val});
 
@@ -43,16 +54,16 @@ function heatmap(dataset) {
         x: d3.scaleQuantile().range([0, width])
     };
 
-    var xBand = d3.scaleBand().domain(xLabels).range([0, width]),
-        yBand = d3.scaleBand().domain(yLabels).rangeRound([height-2*dotHeight, 2*dotHeight]);
+    var xBand = d3.scaleBand().domain(labels.x).range([0, width]),
+        yBand = d3.scaleBand().domain(labels.y).rangeRound([height-2*dot.height, 2*dot.height]);
 
     var axis = {
-        x: d3.axisBottom(scale.x).tickFormat((d, e) => xLabels[d]),
-        y: d3.axisLeft(scale.y).ticks(yLabels.length).tickFormat((d, e) => yLabels[d]),
+        x: d3.axisBottom(scale.x).tickFormat((d, e) => labels.x[d]),
+        y: d3.axisLeft(scale.y).ticks(labels.y.length).tickFormat((d, e) => labels.y[d]),
     };
 
     var zoom = d3.zoom()
-        .scaleExtent([1, dotHeight])
+        .scaleExtent([1, dot.height])
         .on("zoom", zoomed);
 
     var tooltip = d3.select("body").append("div")
@@ -89,7 +100,7 @@ function heatmap(dataset) {
     //Create Y axis
     var renderYAxis = svg.append("g")
         .attr("class", "y axis")
-        .attr("transform", "translate(0," + (-1)*dotHeight + ")")
+        .attr("transform", "translate(0," + (-1)*dot.height + ")")
 
 
     function zoomed() {
@@ -106,14 +117,20 @@ function heatmap(dataset) {
 
     var chartData = {};
     chartData.scale = scale;
+    // chartData.xLabels = xLabels;
+    // chartData.yLabels = yLabels;
+    chartData.labels = labels;
     chartData.axis = axis;
     chartData.xBand = xBand;
     chartData.yBand = yBand;
     chartData.colorScale = colorScale;
     chartData.heatDotsGroup = heatDotsGroup;
-    chartData.dotWidth = dotWidth;
-    chartData.dotHeight = dotHeight;
+    // chartData.dotWidth = dotWidth;
+    // chartData.dotHeight = dotHeight;
+    chartData.dot = dot;
     chartData.tsn = tsn;
+    chartData.width = width;
+    chartData.height = height;
 
     return chartData;
 
@@ -123,6 +140,17 @@ function updateScales(data, scale){
     scale.x.domain([0, d3.max(data, d => d.xKey)]),
     scale.y.domain([0, d3.max(data, d => d.yKey)])
 }
+
+function updateLabels(data, labels){
+    labels.x = d3.map(dataset, function (d) {return d.xLabel;}).keys(),
+    labels.y = d3.map(dataset, function (d) {return d.yLabel;}).keys()
+}
+
+function updateDot(dot, width, height, labels){
+    dot.width = width / (2 * (labels.x.length)),
+    dot.height = height / (2 * labels.y.length)
+}
+
 
 function renderHeatmap(dataset) {
 
@@ -135,6 +163,11 @@ function renderHeatmap(dataset) {
     //chartData = svg.datum();
     //Do the axes
     updateScales(dataset, chartData.scale);
+
+    updateLabels(dataset, chartData.labels);
+
+    updateDot(chartData.dot, chartData.width, chartData.height, chartData.labels);
+
     svg.select('.y.axis').call(chartData.axis.y)
     svg.select('.x.axis')
         .attr("transform", "translate(0, " + chartData.scale.y(0.0) + ")")
@@ -148,8 +181,8 @@ function renderHeatmap(dataset) {
     update
         .enter()
         .append("ellipse")
-        .attr("rx", chartData.dotWidth)
-        .attr("ry", chartData.dotHeight)
+        .attr("rx", chartData.dot.width)
+        .attr("ry", chartData.dot.height)
         .on("mouseover", function (d) {
             $("#tooltip").html("x: " + d.xLabel + "<br/>y: " + d.yLabel + "<br/>Value: " + Math.round(d.val * 100) / 100);
             var xpos = d3.event.pageX + 10;
