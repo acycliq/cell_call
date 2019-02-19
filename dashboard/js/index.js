@@ -1,21 +1,50 @@
 function renderHeatmapTab(selected) {
+
     'hide the toolip raised by the section chart'
     d3.select('#tooltip').style('opacity', 0)
 
-    if (selected == 'hybrid'){
+    var radioButton,
+        checkBox1,
+        checkBox2,
+        json;
+
+    if (selected === 'basemap'){
+        radioButton = 'arithmetic_mean';
         json = "./notebooks/confusionMatrixData.json"
     }
-    else if (selected == 'satellite'){
+    else if (selected === 'hybrid'){
+        radioButton = 'geometric_mean';
         json = "./notebooks/confusionMatrixData.json"
     }
-    else if (selected == 'basemap'){
+    else if (selected === 'satellite'){
+        radioButton = 'median';
         json = "./notebooks/confusionMatrixData.json"
     }
     else {
+        radioButton = '';
         json = ''
     }
 
-    d3.json(json, function (data) {
+    if (document.getElementById('nonNeurons').checked){
+        checkBox1 = 'nonNeuronsOn'
+    }
+    else {
+        checkBox1 = 'nonNeuronsOff'
+    }
+
+
+    if (document.getElementById('rangeDomain').checked){
+        checkBox2 = 'rangeDomainOn'
+    }
+    else {
+        checkBox2 = 'rangeDomainOff'
+    }
+
+    var confMatrixjson =    '.\\notebooks\\out\\' + radioButton +
+                            '\\' + checkBox1 +
+                            '\\' + checkBox2 +
+                            '\\' + 'confusionMatrix.json';
+    d3.json(confMatrixjson, function (data) {
         dataset = []
         for (var i = 0; i < data.index.length; i++) {
             // console.log(' i: ', i)
