@@ -94,6 +94,7 @@
     <script src='dashboard/js/dapi.js'></script>
     <script src='dashboard/js/glyphAssignment.js'></script>
     <script src='dashboard/js/heatmap.js'></script>
+    <script src='dashboard/js/index.js'></script>
     <script src='dashboard/js/config.js'></script>
     <script src='dashboard/js/app.js'></script> <!--Keep that at the bottom. below all other js files-->
 
@@ -371,9 +372,14 @@
         }
 
         /*styles for the layer control itself */
-        .layer-control { padding: 7px; font-size: 12px; line-height: 15px; position: absolute; top: 72px; right: 20px; background: #fff; border-radius: 4px; color: #333; box-shadow: 0 1px 5px rgba(0,0,0,0.4); z-index: 1005; }
+        .layer-control { padding: 7px; font-size: 12px; line-height: 15px; position: absolute; top: 106px; left: 20px; background: #fff; border-radius: 4px; color: #333; box-shadow: 0 1px 5px rgba(0,0,0,0.4); z-index: 1005; }
         .layer-control label { display: block; font-weight: normal; margin-left: 3px; }
         .layer-control input { margin: -3px 0 0; vertical-align: middle; }
+
+        /*styles for the layer control itself */
+        .layer-control-2 { padding: 7px; font-size: 12px; line-height: 15px; position: relative; background: #fff; border-radius: 4px; color: #333; z-index: 1005; }
+        .layer-control-2 label { display: inline; font-weight: normal; margin-left: 3px; }
+        .layer-control-2 input { margin: -3px 0 0; vertical-align: middle; }
 
     </style>
 
@@ -687,22 +693,66 @@
 
         <!-- about content tab -->
         <div class="tab-pane fade" id="about-content">
-            <div data-panel="layers" class="layer-control">
-                <!-- basemaps: radio buttons, see initMapLayerControl() -->
-                <div id="layers-base">
-                    <label><input type="radio" name="basemaps" data-baselayer="basemap"
-                                  checked="checked"><span> Basemap</span></label>
-                    <label><input type="radio" name="basemaps" data-baselayer="hybrid"><span> Hybrid</span></label>
-                    <label><input type="radio" name="basemaps"
-                                  data-baselayer="satellite"><span> Satellite</span></label>
-                </div>
-            </div>
+            <!--<div data-panel="layers" class="layer-control">-->
+                <!--&lt;!&ndash; basemaps: radio buttons, see initMapLayerControl() &ndash;&gt;-->
+                <!--<div id="layers-base">-->
+                    <!--<label><input type="radio" name="basemaps" data-baselayer="basemap"-->
+                                  <!--checked="checked"><span> Basemap</span></label>-->
+                    <!--<label><input type="radio" name="basemaps" data-baselayer="hybrid"><span> Hybrid</span></label>-->
+                    <!--<label><input type="radio" name="basemaps"-->
+                                  <!--data-baselayer="satellite"><span> Satellite</span></label>-->
+                <!--</div>-->
+            <!--</div>-->
 
             <div class="container-fluid">
                 <div class="row" style="margin-top:5px">
                     <!--//top row-->
                     <div class="row" style="margin-top:5px">
                         <div class="col-sm-12">
+                            <div class="col-sm-2">
+                                <div class="chart-wrapper">
+                                    <div class="chart-title">
+                                        Controls
+                                    </div>
+                                    <div class="chart-stage" div id="heat-controls">
+                                        <div data-panel="layers" class="layer-control-2">
+                                            <!-- basemaps: radio buttons, see initMapLayerControl() -->
+                                            <div id="layers-base">
+                                                <label><input type="radio" name="basemaps" data-baselayer="basemap"
+                                                              checked="checked"><span> Basemap</span></label>
+                                                <label><input type="radio" name="basemaps"
+                                                              data-baselayer="hybrid"><span> Hybrid</span></label>
+                                                <label><input type="radio" name="basemaps"
+                                                              data-baselayer="satellite"><span> Satellite</span></label>
+                                            </div>
+                                            <hr>
+
+                                            <div id="layers-base-2">
+                                                <!--<input type="checkbox" class="form-check-input" id="exampleCheck1">-->
+                                                <!--<label class="form-check-label" for="exampleCheck1">Check me out</label>-->
+                                                <label>
+                                                    <input type="checkbox" name="NonNeurons">
+                                                    <span> Group Non Neurons together </span>
+                                                </label>
+                                            </div>
+
+                                            <hr>
+
+                                            <div id="layers-base-3">
+                                                <!--<input type="checkbox" class="form-check-input" id="exampleCheck1">-->
+                                                <!--<label class="form-check-label" for="exampleCheck1">Check me out</label>-->
+                                                <label>
+                                                    <input type="checkbox" name="foo">
+                                                    <span> Range same as domain </span>
+                                                </label>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Map -->
                             <div class="col-sm-10">
                                 <div class="chart-wrapper">
@@ -735,57 +785,17 @@
         // listener on the Confusion matrix tab
         $('#layers-base input').change(function() {
             var selected = $(this).data().baselayer;
-            // remove current basemap
             console.log('radio button: ' + selected +' was selected')
+            renderHeatmapTab(selected)
         });
+
 
         $('#about-tab').on('shown.bs.tab', function (e) {
             console.log('Confusion matrix tab was clicked.')
-            // set current_tab to the current tab id
-            CURRENT_TAB = 'about-tab';
-            var dataset = [
-                {'xKey':1, 'xLabel':'x1','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
-                {'xKey':1, 'xLabel':'x1','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
-                {'xKey':1, 'xLabel':'x1','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
-                {'xKey':1, 'xLabel':'x1','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
-                {'xKey':2, 'xLabel':'x2','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
-                {'xKey':2, 'xLabel':'x2','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
-                {'xKey':2, 'xLabel':'x2','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
-                {'xKey':2, 'xLabel':'x2','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
-                {'xKey':3, 'xLabel':'x3','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
-                {'xKey':3, 'xLabel':'x3','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
-                {'xKey':3, 'xLabel':'x3','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
-                {'xKey':3, 'xLabel':'x3','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
-                {'xKey':4, 'xLabel':'x4','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
-                {'xKey':4, 'xLabel':'x4','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
-                {'xKey':4, 'xLabel':'x4','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
-                {'xKey':4, 'xLabel':'x4','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
-                {'xKey':5, 'xLabel':'x5','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
-                {'xKey':5, 'xLabel':'x5','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
-                {'xKey':5, 'xLabel':'x5','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
-                {'xKey':5, 'xLabel':'x5','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
-//
-            ]
+            var selected = $('#layers-base input').data().baselayer
+            console.log('Radio button ' + selected + ' is selected')
+            renderHeatmapTab(selected)
 
-            d3.json("./notebooks/confusionMatrixData.json", function(data) {
-                dataset = []
-                for (var i=0; i<data.index.length; i++){
-                    console.log(' i: ', i)
-                    for (var j=0; j<data.columns.length; j++){
-                        console.log('i: ' + i + ' j: ' + j + 'value: ' + data.data[i][j])
-                        dataset.push({
-                            xKey: i+1,
-                            xLabel: data.index[i],
-                            yKey: j+1,
-                            yLabel: data.columns[j],
-                            val: + data.data[i][j],
-                        })
-                    }
-                }
-                console.log('json parsed!');
-                renderHeatmap(dataset);
-            });
-            // renderHeatmap(dataset);
 
             // hide the search forms
             $('#nav-table-search').hide();
