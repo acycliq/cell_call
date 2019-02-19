@@ -164,4 +164,6 @@ if __name__ == "__main__":
     print(cm.sum(axis=0))
     plot_confusion_matrix(cm, norm)
 
+    cm.to_json('confusionMatrix.json', orient='split')
+
     print('Done')
