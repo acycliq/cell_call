@@ -58,8 +58,8 @@ function heatmap(dataset) {
         yBand = d3.scaleBand().domain(labels.y).rangeRound([height-2*dot.height, 2*dot.height]);
 
     var axis = {
-        x: d3.axisBottom(scale.x).tickFormat((d, e) => labels.x[d]),
-        y: d3.axisLeft(scale.y).ticks(labels.y.length).tickFormat((d, e) => labels.y[d]),
+        x: d3.axisBottom(scale.x).ticks(labels.x.length).tickFormat((d, i) => labels.x[i]),
+        y: d3.axisLeft(scale.y).ticks(labels.y.length).tickFormat((d, i) => labels.y[i]),
     };
 
     var zoom = d3.zoom()
@@ -95,12 +95,12 @@ function heatmap(dataset) {
     //Create X axis
     var renderXAxis = svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + scale.y(-0.5) + ")")
+        // .attr("transform", "translate(0,0)")
 
     //Create Y axis
     var renderYAxis = svg.append("g")
         .attr("class", "y axis")
-        .attr("transform", "translate(0," + (-1)*dot.height + ")")
+        // .attr("transform", "translate(0," + (-1)*dot.height + ")")
 
 
     function zoomed() {
@@ -137,8 +137,8 @@ function heatmap(dataset) {
 };
 
 function updateScales(data, scale){
-    scale.x.domain([1, d3.max(data, d => d.xKey)]),
-    scale.y.domain([1, d3.max(data, d => d.yKey)])
+    scale.x.domain([0.5, 0.5+d3.max(data, d => d.xKey)]),
+    scale.y.domain([0.5, 0.5+d3.max(data, d => d.yKey)])
 }
 
 function updateLabels(data, labels){
@@ -195,8 +195,8 @@ function renderHeatmap(dataset) {
         })
         .merge(update)
         .transition(chartData.tsn)
-        .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth();})
-        .attr("cy", function (d) {return chartData.scale.y(d.yKey) + chartData.yBand.bandwidth();})
+        .attr("cx", function (d) {return chartData.scale.x(d.xKey);})
+        .attr("cy", function (d) {return chartData.scale.y(d.yKey);})
         .attr("fill", function (d) { return chartData.colorScale(d.val);} );
 
     update.exit().remove();
