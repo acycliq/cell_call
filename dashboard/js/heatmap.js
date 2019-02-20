@@ -13,7 +13,7 @@ function heatmap(dataset) {
         y: d3.map(dataset, function (d) {return d.yLabel;}).keys(),
     };
 
-    var margin = {top: 0, right: 0, bottom: 20, left: 140};
+    var margin = {top: 0, right: 0, bottom: 120, left: 140};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -95,7 +95,7 @@ function heatmap(dataset) {
     //Create X axis
     var renderXAxis = svg.append("g")
         .attr("class", "x axis")
-        // .attr("transform", "translate(0,0)")
+        // .attr("transform", "translate(0," + scale.y(-0.5) + ")")
 
     //Create Y axis
     var renderYAxis = svg.append("g")
@@ -172,6 +172,11 @@ function renderHeatmap(dataset) {
     svg.select('.x.axis')
         .attr("transform", "translate(0, " + chartData.height + ")")
         .call(chartData.axis.x)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-60)");
 
 
     // Do the chart
