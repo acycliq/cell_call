@@ -137,8 +137,8 @@ function heatmap(dataset) {
 };
 
 function updateScales(data, scale){
-    scale.x.domain([0, d3.max(data, d => d.xKey)]),
-    scale.y.domain([0, d3.max(data, d => d.yKey)])
+    scale.x.domain([1, d3.max(data, d => d.xKey)]),
+    scale.y.domain([1, d3.max(data, d => d.yKey)])
 }
 
 function updateLabels(data, labels){
