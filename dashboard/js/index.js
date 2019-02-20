@@ -8,22 +8,8 @@ function renderHeatmapTab(selected) {
         checkBox2,
         json;
 
-    if (selected === 'basemap'){
-        radioButton = 'arithmetic_mean';
-        json = "./notebooks/confusionMatrixData.json"
-    }
-    else if (selected === 'hybrid'){
-        radioButton = 'geometric_mean';
-        json = "./notebooks/confusionMatrixData.json"
-    }
-    else if (selected === 'satellite'){
-        radioButton = 'median';
-        json = "./notebooks/confusionMatrixData.json"
-    }
-    else {
-        radioButton = '';
-        json = ''
-    }
+    radioButton = selected;
+    json = "./notebooks/confusionMatrixData.json"
 
     if (document.getElementById('nonNeurons').checked){
         checkBox1 = 'nonNeuronsOn'

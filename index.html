@@ -718,14 +718,16 @@
                                         <div data-panel="layers" class="layer-control-2">
                                             <!-- basemaps: radio buttons, see initMapLayerControl() -->
                                             <div id="layers-base">
-                                                <label><input type="radio" name="basemaps" data-baselayer="basemap"
-                                                              checked="checked"><span> Arithmetic Mean</span></label>
-                                                <label><input type="radio" name="basemaps"
-                                                              data-baselayer="hybrid"><span> Geometric Mean</span></label>
-                                                <br>
-                                                <br>
-                                                <label><input type="radio" name="basemaps"
-                                                              data-baselayer="satellite"><span> Median</span></label>
+                                                <form name="ConfusionMatrixRadioButton">
+                                                    <input value="arithmetic_mean" type="radio" name="norm" checked/>
+                                                    <span> Arithmetic Mean &nbsp &nbsp</span>
+                                                    <input value="geometric_mean" type="radio" name="norm"/>
+                                                    <span> Geometric Mean </span>
+                                                    <br>
+                                                    <br>
+                                                    <input value="median" type="radio" name="norm"/>
+                                                    <span> Median </span>
+                                                </form>
                                             </div>
                                             <hr>
 
@@ -786,19 +788,19 @@
     <script>
         // listener on the Confusion matrix tab
         $('#layers-base input').change(function() {
-            var selected = $(this).data().baselayer;
+            var selected = document.ConfusionMatrixRadioButton.norm.value;
             console.log('radio button: ' + selected +' was selected')
             renderHeatmapTab(selected)
         });
 
         $('#layers-base-2 input').change(function() {
-            var selected = $('#layers-base input').data().baselayer;
+            var selected = document.ConfusionMatrixRadioButton.norm.value;
             console.log('check box clicked')
             renderHeatmapTab(selected)
         });
 
         $('#layers-base-3 input').change(function() {
-            var selected = $('#layers-base input').data().baselayer;
+            var selected = document.ConfusionMatrixRadioButton.norm.value;
             console.log('check box clicked')
             renderHeatmapTab(selected)
         });
@@ -806,7 +808,7 @@
 
         $('#about-tab').on('shown.bs.tab', function (e) {
             console.log('Confusion matrix tab was clicked.')
-            var selected = $('#layers-base input').data().baselayer
+            var selected = document.ConfusionMatrixRadioButton.norm.value;
             console.log('Radio button ' + selected + ' is selected')
             renderHeatmapTab(selected)
 
