@@ -142,13 +142,18 @@ function updateScales(data, scale){
 }
 
 function updateLabels(data, labels){
-    labels.x = d3.map(dataset, function (d) {return d.xLabel;}).keys(),
-    labels.y = d3.map(dataset, function (d) {return d.yLabel;}).keys()
+    labels.x = d3.map(data, function (d) {return d.xLabel;}).keys(),
+    labels.y = d3.map(data, function (d) {return d.yLabel;}).keys()
 }
 
 function updateDot(dot, width, height, labels){
     dot.width = width / (2 * (labels.x.length)),
     dot.height = height / (2 * labels.y.length)
+}
+
+function updateAxes(data, scale, labels, axis){
+    axis.x = d3.axisBottom(scale.x).ticks(labels.x.length).tickFormat((d, i) => labels.x[i]),
+    axis.y = d3.axisLeft(scale.y).ticks(labels.y.length).tickFormat((d, i) => labels.y[i])
 }
 
 
@@ -163,6 +168,8 @@ function renderHeatmap(dataset) {
     //chartData = svg.datum();
     //Do the axes
     updateScales(dataset, chartData.scale);
+
+    updateAxes(dataset, chartData.scale, chartData.labels, chartData.axis);
 
     updateLabels(dataset, chartData.labels);
 
