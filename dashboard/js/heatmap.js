@@ -170,7 +170,7 @@ function renderHeatmap(dataset) {
 
     svg.select('.y.axis').call(chartData.axis.y)
     svg.select('.x.axis')
-        .attr("transform", "translate(0, " + chartData.scale.y(0.0) + ")")
+        .attr("transform", "translate(0, " + chartData.height + ")")
         .call(chartData.axis.x)
 
 
