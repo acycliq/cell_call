@@ -115,6 +115,23 @@ function heatmap(dataset) {
         heatDotsGroup.attr("transform", d3.event.transform.toString().replace(/scale\((.*?)\)/, "scale($1, 1)"));
     }
 
+    // text label for the x axis
+    svg.append("text")
+      .attr("transform",
+            "translate(" + (width/2) + " ," +
+                           (height + margin.bottom) + ")")
+      .style("text-anchor", "middle")
+      .text("Predicted");
+
+    // text label for the y axis
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y",0 - margin.left)
+        .attr("x",0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text("Actual");
+
     var chartData = {};
     chartData.scale = scale;
     // chartData.xLabels = xLabels;
@@ -131,6 +148,7 @@ function heatmap(dataset) {
     chartData.tsn = tsn;
     chartData.width = width;
     chartData.height = height;
+    chartData.margin = margin;
 
     return chartData;
 
