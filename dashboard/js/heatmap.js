@@ -74,7 +74,7 @@ function heatmap(dataset) {
     svg = d3.select("#heat-chart").select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .call(zoom)
+        // .call(zoom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
