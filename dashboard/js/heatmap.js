@@ -176,6 +176,7 @@ function updateAxes(data, scale, labels, axis){
 
 
 function renderHeatmap(dataset) {
+    var percentFormat = d3.format('.2%');
 
     var svg = d3.select("#heat-chart")
         .select("svg");
@@ -214,7 +215,7 @@ function renderHeatmap(dataset) {
         .attr("rx", chartData.dot.width)
         .attr("ry", chartData.dot.height)
         .on("mouseover", function (d) {
-            $("#tooltip").html("x: " + d.xLabel + "<br/>y: " + d.yLabel + "<br/>Value: " + Math.round(d.val * 100) / 100);
+            $("#tooltip").html("Predicted: " + d.xLabel + "<br/>Actual: " + d.yLabel + "<br/>Prob: " + percentFormat(d.val));
             var xpos = d3.event.pageX + 10;
             var ypos = d3.event.pageY + 20;
             $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
