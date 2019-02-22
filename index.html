@@ -593,7 +593,7 @@
         <!-- nav bar left side: tabs -the map, table, about nav tabs, for content, see below -->
         <li class="active"><a href="#map-content" data-toggle="tab" id="map-tab">Viewer</a></li>
         <!--<li><a href="#table-content" data-toggle="tab" id="table-tab">Confusion Matrix</a></li>-->
-        <li><a href="#about-content" data-toggle="tab" id="about-tab">Confusion Matrix</a></li>
+        <li><a href="#confusion-table-content" data-toggle="tab" id="confusion-table-tab">Confusion Matrix</a></li>
 
     </ul>
 
@@ -708,7 +708,7 @@
 
 
         <!-- Confusion table tab -->
-        <div class="tab-pane fade" id="about-content">
+        <div class="tab-pane fade" id="confusion-table-content">
             <div class="container-fluid">
                 <div class="row" style="margin-top:5px">
                     <!--//top row-->
@@ -891,7 +891,7 @@
         });
 
 
-        $('#about-tab').on('shown.bs.tab', function (e) {
+        $('#confusion-table-tab').on('shown.bs.tab', function (e) {
             console.log('Confusion matrix tab was clicked.')
             var selected = document.ConfusionMatrixRadioButton.norm.value;
             console.log('Radio button ' + selected + ' is selected')
