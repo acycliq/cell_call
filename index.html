@@ -94,6 +94,7 @@
     <script src='dashboard/js/dapi.js'></script>
     <script src='dashboard/js/glyphAssignment.js'></script>
     <script src='dashboard/js/heatmap.js'></script>
+    <script src='dashboard/js/exporter.js'></script>
     <script src='dashboard/js/index.js'></script>
     <script src='dashboard/js/config.js'></script>
     <script src='dashboard/js/app.js'></script> <!--Keep that at the bottom. below all other js files-->
@@ -381,6 +382,12 @@
         .layer-control-2 label { display: inline; font-weight: normal; margin-left: 3px; }
         .layer-control-2 input { margin: -3px 0 0; vertical-align: middle; }
 
+        /* Darker background on mouse-over */
+        .btn:hover {
+            background-color: #C0C0C0;
+        }
+        .btn:focus {outline:0;}
+
     </style>
 
 </head>
@@ -493,9 +500,9 @@
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("default")'>default</a></li>
 
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_1")'>Simulation_1</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_2")'>Simulation_2</a></li>
+                                <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_2")'>Simulation_2</a></li>-->
 
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_3")'>Simulation_3</a></li>
+                                <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_3")'>Simulation_3</a></li>-->
 
                                 <!--<li class="dropdown-submenu">-->
                                     <!--<a class="dropdown-item" tabindex="-1" href="#">161220KI_3-1</a>-->
@@ -720,11 +727,7 @@
                                             <div id="layers-base">
                                                 <form name="ConfusionMatrixRadioButton">
                                                     <input value="arithmetic_mean" type="radio" name="norm" checked/>
-                                                    <span> Arithmetic Mean &nbsp &nbsp</span>
-                                                    <input value="geometric_mean" type="radio" name="norm"/>
-                                                    <span> Geometric Mean </span>
-                                                    <br>
-                                                    <br>
+                                                    <span> Mean &nbsp &nbsp</span>
                                                     <input value="median" type="radio" name="norm"/>
                                                     <span> Median </span>
                                                 </form>
@@ -750,6 +753,10 @@
                                                     <span> Range same as domain </span>
                                                 </label>
                                             </div>
+                                            <hr>
+                                            <div>
+                                                <button class="btn" onclick="saveSvg()"><i class="fa fa-download"></i> SVG</button>
+                                            </div>
 
 
                                         </div>
@@ -764,7 +771,7 @@
                                         Confusion Matrix
                                     </div>
                                     <div class="chart-stage" id="heat-chart">
-                                        <svg width="1100" height="700"></svg>
+                                        <svg width="1100" height="780"></svg>
                                     </div>
                                 </div>
                             </div>
