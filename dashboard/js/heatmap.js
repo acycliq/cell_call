@@ -13,7 +13,7 @@ function heatmap(dataset) {
         y: d3.map(dataset, function (d) {return d.yLabel;}).keys(),
     };
 
-    var margin = {top: 0, right: 0, bottom: 120, left: 140};
+    var margin = {top: 10, right: 10, bottom: 130, left: 160};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
