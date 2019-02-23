@@ -48,6 +48,7 @@ function section() {
 
     var tooltip = d3.select("body").append("div")
         .attr("id", "tooltip")
+        .attr("class", "tooltip")
         .style("opacity", 0);
 
     // initialize main SVG
