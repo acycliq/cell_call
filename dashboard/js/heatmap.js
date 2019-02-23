@@ -152,9 +152,10 @@ function updateDot(chartData){
 }
 
 function updateAxes(data, chartData){
-    band = chartData.band,
-    labels = chartData.labels,
-    chartData.axis.x = d3.axisBottom(band.x).ticks(labels.x.length).tickFormat((d, i) => d),
+    var band = chartData.band,
+        labels = chartData.labels;
+
+    chartData.axis.x = d3.axisBottom(band.x).ticks(labels.x.length).tickFormat((d, i) => d)
     chartData.axis.y = d3.axisLeft(band.y).ticks(labels.y.length).tickFormat((d, i) => d) // if (d, i) => d is too cryptic it can be replaced by (d) => labels.y[i]
     // The following also work:
     // d3.axisBottom(band.x).ticks(labels.x.length)
