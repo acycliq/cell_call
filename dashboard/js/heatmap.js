@@ -146,14 +146,16 @@ function updateLabels(data, labels){
     labels.y = d3.map(data, function (d) {return d.yLabel;}).keys()
 }
 
-function updateDot(dot, width, height, labels){
-    dot.width = width / (1 * (labels.x.length)),
-    dot.height = height / (1 * labels.y.length)
+function updateDot(chartData){
+    chartData.dot.width = chartData.width / (1 * (chartData.labels.x.length)),
+    chartData.dot.height = chartData.height / (1 * chartData.labels.y.length)
 }
 
-function updateAxes(data, band, labels, axis){
-    axis.x = d3.axisBottom(band.x).ticks(labels.x.length).tickFormat((d, i) => d),
-    axis.y = d3.axisLeft(band.y).ticks(labels.y.length).tickFormat((d, i) => d) // if (d, i) => d is too cryptic it can be replaced by (d) => labels.y[i]
+function updateAxes(data, chartData){
+    band = chartData.band,
+    labels = chartData.labels, chartData.axis,
+    chartData.axis.x = d3.axisBottom(band.x).ticks(labels.x.length).tickFormat((d, i) => d),
+    chartData.axis.y = d3.axisLeft(band.y).ticks(labels.y.length).tickFormat((d, i) => d) // if (d, i) => d is too cryptic it can be replaced by (d) => labels.y[i]
     // The following also work:
     // d3.axisBottom(band.x).ticks(labels.x.length)
     // d3.axisLeft(band.y).ticks(labels.x.length).tickFormat((d, i) => d)
@@ -166,9 +168,9 @@ function updateAxes(data, band, labels, axis){
     // seems to be just fine!!
 }
 
-function updateBands(band, labels, width, height){
-    band.x = d3.scaleBand().domain(labels.x).range([0, width]),
-    band.y = d3.scaleBand().domain(labels.y).range([height, 0])
+function updateBands(chartData){
+    chartData.band.x = d3.scaleBand().domain(chartData.labels.x).range([0, chartData.width]),
+    chartData.band.y = d3.scaleBand().domain(chartData.labels.y).range([chartData.height, 0])
 }
 
 function renderHeatmap(dataset) {
@@ -184,13 +186,13 @@ function renderHeatmap(dataset) {
     //Do the axes
     updateLabels(dataset, chartData.labels);
 
-    updateBands(chartData.band, chartData.labels,  chartData.width, chartData.height)
+    updateBands(chartData)
 
     //updateScales(dataset, chartData.scale);
 
-    updateAxes(dataset, chartData.band, chartData.labels, chartData.axis);
+    updateAxes(dataset, chartData);
 
-    updateDot(chartData.dot, chartData.width, chartData.height, chartData.labels);
+    updateDot(chartData);
 
     svg.select('.y.axis').call(chartData.axis.y)
     svg.select('.x.axis')
