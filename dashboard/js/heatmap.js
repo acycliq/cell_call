@@ -5,28 +5,10 @@ function heatmap(dataset) {
 
     var tsn = d3.transition().duration(1000);
 
-    // var xLabels = d3.map(dataset, function (d) {return d.xLabel;}).keys(),
-    //     yLabels = d3.map(dataset, function (d) {return d.yLabel;}).keys();
-
-    var labels = {
-        x: d3.map(dataset, function (d) {return d.xLabel;}).keys(),
-        y: d3.map(dataset, function (d) {return d.yLabel;}).keys(),
-    };
-
     var margin = {top: 10, right: 10, bottom: 130, left: 160};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
-
-    // var dotSpacing = 0,
-    //     dotWidth = width / (2 * (labels.x.length)),
-    //     dotHeight = height / (2 * labels.y.length);
-
-    var dot = {
-        spacing: 0,
-        width: width / (2 * (labels.x.length)),
-        height: height / (2 * labels.y.length),
-    }
 
     var valRange = d3.extent(dataset, function (d) {return d.val});
 
@@ -38,28 +20,32 @@ function heatmap(dataset) {
         .domain(valRange)
         .range(bluecolors);
 
-
-    var max_val = d3.max( dataset, function(d) { return d.val });
-    var min_val = d3.min( dataset, function(d) { return d.val });
-    var median_val = d3.median( dataset, function(d) { return d.val });
-    var color_scale = d3.scaleLinear().domain([min_val, median_val, max_val]).range(['blue', 'beige', 'red']);
-
     // the scale
     var scale = {
         x: d3.scaleLinear().range([0, width]),
         y: d3.scaleLinear().range([height, 0]),
     };
 
-    var q = {
-        x: d3.scaleQuantile().range([0, width])
+    // these will be populated later on
+    var labels = {
+        x: null,
+        y: null,
     };
 
-    var xBand = d3.scaleBand().domain(labels.x).range([0, width]),
-        yBand = d3.scaleBand().domain(labels.y).rangeRound([height-2*dot.height, 2*dot.height]);
+    var dot = {
+        spacing: null,
+        width: null,
+        height: null,
+    }
+
+    var band = {
+        x: null,
+        y: null
+    };
 
     var axis = {
-        x: d3.axisBottom(scale.x).ticks(labels.x.length).tickFormat((d, i) => labels.x[i]),
-        y: d3.axisLeft(scale.y).ticks(labels.y.length).tickFormat((d, i) => labels.y[i]),
+        x: null,
+        y: null,
     };
 
     var zoom = d3.zoom()
@@ -67,7 +53,8 @@ function heatmap(dataset) {
         .on("zoom", zoomed);
 
     var tooltip = d3.select("body").append("div")
-        .attr("id", "tooltip")
+        .attr("id", "tooltip_heatmap")
+        .attr('class', 'tooltip')
         .style("opacity", 0);
 
     // SVG canvas
@@ -80,7 +67,7 @@ function heatmap(dataset) {
 
     // Clip path
     svg.append("clipPath")
-        .attr("id", "clip2")
+        .attr("id", "clipHeatMap")
         .append("rect")
         .attr("width", width)
         .attr("height", height);
@@ -88,7 +75,7 @@ function heatmap(dataset) {
 
     // Heatmap dots
     var heatDotsGroup = svg.append("g")
-        .attr("clip-path", "url(#clip2)")
+        .attr("clip-path", "url(#clipHeatMap)")
         .append("g");
 
 
@@ -134,16 +121,11 @@ function heatmap(dataset) {
 
     var chartData = {};
     chartData.scale = scale;
-    // chartData.xLabels = xLabels;
-    // chartData.yLabels = yLabels;
     chartData.labels = labels;
     chartData.axis = axis;
-    chartData.xBand = xBand;
-    chartData.yBand = yBand;
+    chartData.band = band;
     chartData.colorScale = colorScale;
     chartData.heatDotsGroup = heatDotsGroup;
-    // chartData.dotWidth = dotWidth;
-    // chartData.dotHeight = dotHeight;
     chartData.dot = dot;
     chartData.tsn = tsn;
     chartData.width = width;
@@ -155,8 +137,8 @@ function heatmap(dataset) {
 };
 
 function updateScales(data, scale){
-    scale.x.domain([0.5, 0.5+d3.max(data, d => d.xKey)]),
-    scale.y.domain([0.5, 0.5+d3.max(data, d => d.yKey)])
+    scale.x.domain([0, d3.max(data, d => d.xKey)]),
+    scale.y.domain([0, d3.max(data, d => d.yKey)])
 }
 
 function updateLabels(data, labels){
@@ -165,32 +147,48 @@ function updateLabels(data, labels){
 }
 
 function updateDot(dot, width, height, labels){
-    dot.width = width / (2 * (labels.x.length)),
-    dot.height = height / (2 * labels.y.length)
+    dot.width = width / (1 * (labels.x.length)),
+    dot.height = height / (1 * labels.y.length)
 }
 
-function updateAxes(data, scale, labels, axis){
-    axis.x = d3.axisBottom(scale.x).ticks(labels.x.length).tickFormat((d, i) => labels.x[i]),
-    axis.y = d3.axisLeft(scale.y).ticks(labels.y.length).tickFormat((d, i) => labels.y[i])
+function updateAxes(data, band, labels, axis){
+    axis.x = d3.axisBottom(band.x).ticks(labels.x.length).tickFormat((d, i) => d),
+    axis.y = d3.axisLeft(band.y).ticks(labels.y.length).tickFormat((d, i) => d) // if (d, i) => d is too cryptic it can be replaced by (d) => labels.y[i]
+    // The following also work:
+    // d3.axisBottom(band.x).ticks(labels.x.length)
+    // d3.axisLeft(band.y).ticks(labels.x.length).tickFormat((d, i) => d)
+    // d3.axisLeft(band.y).ticks(labels.x.length).tickFormat((d, i) => labels.x[i])
+    // BUT NOT
+    // d3.axisLeft(band.y).ticks(labels.x.length).tickFormat(d)
+    //
+    // Also just writing
+    // axis.x = d3.axisBottom(band.x)
+    // seems to be just fine!!
 }
 
+function updateBands(band, labels, width, height){
+    band.x = d3.scaleBand().domain(labels.x).range([0, width]),
+    band.y = d3.scaleBand().domain(labels.y).range([height, 0])
+}
 
 function renderHeatmap(dataset) {
     var percentFormat = d3.format('.2%');
 
     var svg = d3.select("#heat-chart")
         .select("svg");
-    if (svg.select("#clip2").empty()) {
+    if (svg.select("#clipHeatMap").empty()) {
         chartData = heatmap(dataset);
     }
 
     //chartData = svg.datum();
     //Do the axes
-    updateScales(dataset, chartData.scale);
-
-    updateAxes(dataset, chartData.scale, chartData.labels, chartData.axis);
-
     updateLabels(dataset, chartData.labels);
+
+    updateBands(chartData.band, chartData.labels,  chartData.width, chartData.height)
+
+    //updateScales(dataset, chartData.scale);
+
+    updateAxes(dataset, chartData.band, chartData.labels, chartData.axis);
 
     updateDot(chartData.dot, chartData.width, chartData.height, chartData.labels);
 
@@ -206,28 +204,28 @@ function renderHeatmap(dataset) {
 
 
     // Do the chart
-    const update = chartData.heatDotsGroup.selectAll("ellipse")
+    const update = chartData.heatDotsGroup.selectAll("rect")
         .data(dataset);
 
     update
         .enter()
-        .append("ellipse")
-        .attr("rx", chartData.dot.width)
-        .attr("ry", chartData.dot.height)
+        .append("rect")
         .on("mouseover", function (d) {
-            $("#tooltip").html("Predicted: " + d.xLabel + "<br/>Actual: " + d.yLabel + "<br/>Prob: " + percentFormat(d.val));
+            $("#tooltip_heatmap").html("Predicted: " + d.xLabel + "<br/>Actual: " + d.yLabel + "<br/>Prob: " + percentFormat(d.val));
             var xpos = d3.event.pageX + 10;
             var ypos = d3.event.pageY + 20;
-            $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
+            $("#tooltip_heatmap").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
         }).on("mouseout", function () {
-            $("#tooltip").animate({
+            $("#tooltip_heatmap").animate({
                 duration: 500
             }).css("opacity", 0);
         })
         .merge(update)
         .transition(chartData.tsn)
-        .attr("cx", function (d) {return chartData.scale.x(d.xKey);})
-        .attr("cy", function (d) {return chartData.scale.y(d.yKey);})
+        .attr("width", chartData.dot.width)
+        .attr("height", chartData.dot.height)
+        .attr("x", function (d) {return chartData.band.x(d.xLabel);})
+        .attr("y", function (d) {return chartData.band.y(d.yLabel);})
         .attr("fill", function (d) { return chartData.colorScale(d.val);} );
 
     update.exit().remove();
