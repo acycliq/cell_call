@@ -21,10 +21,10 @@ function heatmap(dataset) {
         .range(bluecolors);
 
     // the scale
-    var scale = {
-        x: d3.scaleLinear().range([0, width]),
-        y: d3.scaleLinear().range([height, 0]),
-    };
+    // var scale = {
+    //     x: d3.scaleLinear().range([0, width]),
+    //     y: d3.scaleLinear().range([height, 0]),
+    // };
 
     // these will be populated later on
     var labels = {
@@ -131,7 +131,7 @@ function heatmap(dataset) {
         .text("Actual");
 
     var chartData = {};
-    chartData.scale = scale;
+    // chartData.scale = scale;
     chartData.labels = labels;
     chartData.axis = axis;
     chartData.band = band;
