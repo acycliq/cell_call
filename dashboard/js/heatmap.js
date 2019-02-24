@@ -48,9 +48,12 @@ function heatmap(dataset) {
         y: null,
     };
 
+    // just set the variable here, them stick it to the return object and then do the rest
+    // inside renderHeatmap()
     var zoom = d3.zoom()
-        .scaleExtent([1, dot.height])
-        .on("zoom", zoomed);
+    // var zoom = d3.zoom()
+    //     .scaleExtent([1, dot.height])
+    //     .on("zoom", zoomed);
 
     var tooltip = d3.select("body").append("div")
         .attr("id", "tooltip_heatmap")
@@ -61,7 +64,7 @@ function heatmap(dataset) {
     svg = d3.select("#heat-chart").select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        // .call(zoom)
+        .call(zoom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -71,6 +74,14 @@ function heatmap(dataset) {
         .append("rect")
         .attr("width", width)
         .attr("height", height);
+
+    svg.append('clipPath')
+        .attr('id', 'xClipHeatMap')
+        .append("rect")
+        .attr('x', 0)
+        .attr('y', height)
+        .attr("width", width)
+        .attr("height", margin.bottom);
 
 
     // Heatmap dots
@@ -90,17 +101,17 @@ function heatmap(dataset) {
         // .attr("transform", "translate(0," + (-1)*dot.height + ")")
 
 
-    function zoomed() {
-        d3.event.transform.y = 0;
-        d3.event.transform.x = Math.min(d3.event.transform.x, 5);
-        d3.event.transform.x = Math.max(d3.event.transform.x, (1 - d3.event.transform.k) * width);
-
-        // update: rescale x axis
-        renderXAxis.call(axis.x.scale(d3.event.transform.rescaleX(scale.x)));
-
-        // Make sure that only the x axis is zoomed
-        heatDotsGroup.attr("transform", d3.event.transform.toString().replace(/scale\((.*?)\)/, "scale($1, 1)"));
-    }
+    // function zoomed() {
+    //     d3.event.transform.y = 0;
+    //     d3.event.transform.x = Math.min(d3.event.transform.x, 5);
+    //     d3.event.transform.x = Math.max(d3.event.transform.x, (1 - d3.event.transform.k) * width);
+    //
+    //     // update: rescale x axis
+    //     renderXAxis.call(axis.x.scale(d3.event.transform.rescaleX(scale.x)));
+    //
+    //     // Make sure that only the x axis is zoomed
+    //     heatDotsGroup.attr("transform", d3.event.transform.toString().replace(/scale\((.*?)\)/, "scale($1, 1)"));
+    // }
 
     // text label for the x axis
     svg.append("text")
@@ -131,6 +142,7 @@ function heatmap(dataset) {
     chartData.width = width;
     chartData.height = height;
     chartData.margin = margin;
+    chartData.zoom = zoom;
 
     return chartData;
 
@@ -195,8 +207,8 @@ function renderHeatmap(dataset) {
 
     updateDot(chartData);
 
-    svg.select('.y.axis').call(chartData.axis.y)
-    svg.select('.x.axis')
+    var yAxis = svg.select('.y.axis').call(chartData.axis.y)
+    var xAxis = svg.select('.x.axis')
         .attr("transform", "translate(0, " + chartData.height + ")")
         .call(chartData.axis.x)
         .selectAll("text")
@@ -205,6 +217,36 @@ function renderHeatmap(dataset) {
         .attr("dy", ".15em")
         .attr("transform", "rotate(-60)");
 
+    var zoom = chartData.zoom
+        .scaleExtent([1, chartData.dot.height])
+        // .on("zoom", zoomed); // Inactivate the zoom until it is properly working
+
+    function zoomed() {
+        // I am almost there. What doesnt work:
+        // 1) x axis needs a clip path cause it stretches beyond the proper boundaries
+        // 2) When the user changed the data passed in (using the checkboxes for example) the heatmap is messed up
+        //
+        // Code here based at
+        // https://stackoverflow.com/questions/49279159/add-zoom-to-a-grouped-bar-chart-that-uses-a-scaleband/49286715#49286715
+        // and
+        // https://stackoverflow.com/questions/49334856/scaleband-with-zoom/49342403#49342403
+        //
+        var _t = d3.event.transform;
+        var t = _t
+        t.x = Math.min(_t.x, 5);
+        t.x = Math.max(t.x, (1 - t.k) * chartData.width);
+
+        // translate and scale the x dimension only
+        var my_transform =  "translate(" + t.x + ", " + 0 + ") scale(" + t.k + ", 1)"
+
+        chartData.band.x.range([0, chartData.width * t.k]);
+        chartData.heatDotsGroup.selectAll("rect")
+            .attr("transform",  my_transform);
+
+        svg.select('.x.axis')
+            .attr("transform", "translate(" + t.x + "," + (chartData.height) + ")")
+            .call(chartData.axis.x);
+    }
 
     // Do the chart
     const update = chartData.heatDotsGroup.selectAll("rect")
