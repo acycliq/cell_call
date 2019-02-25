@@ -4,12 +4,20 @@ function renderHeatmapTab(selected) {
     d3.select('#tooltip').style('opacity', 0)
 
     var radioButton,
+        checkBox0,
         checkBox1,
         checkBox2,
         json;
 
     radioButton = selected;
     json = "./notebooks/confusionMatrixData.json"
+
+    if (document.getElementById('genes42').checked){
+        checkBox0 = '42genes'
+    }
+    else {
+        checkBox0 = 'allGenes'
+    }
 
     if (document.getElementById('nonNeurons').checked){
         checkBox1 = 'nonNeuronsOn'
@@ -26,7 +34,7 @@ function renderHeatmapTab(selected) {
         checkBox2 = 'rangeDomainOff'
     }
 
-    var confMatrixjson =    '.\\notebooks\\out\\' + radioButton +
+    var confMatrixjson =    '.\\notebooks\\out\\' + checkBox0 + '\\' + radioButton +
                             '\\' + checkBox1 +
                             '\\' + checkBox2 +
                             '\\' + 'confusionMatrix.json';

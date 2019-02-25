@@ -6,14 +6,26 @@ import os
 
 
 
-def fetch_data():
+def fetch_data(dataset_name):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     print(dir_path)
-    df = pd.read_json("https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/default/json/iss.json")
-    GeneExp = np.load(dir_path + '/../data_preprocessed/GeneExp.npy')
-    eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/eGeneGamma.csv')]
-    eGeneGamma = [float(i) for i in eGeneGamma]
-    genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/genes.csv')]
+
+    if dataset_name == 'DEFAULT':
+        df = pd.read_json("https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/default/json/iss.json")
+        GeneExp = np.load(dir_path + '/../data_preprocessed/default/GeneExp.npy')
+        eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default/eGeneGamma.csv')]
+        eGeneGamma = [float(i) for i in eGeneGamma]
+        genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default/genes.csv')]
+    elif dataset_name == 'DEFAULT_42GENES':
+        df = pd.read_json("D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\default_42genes\json\iss.json")
+        GeneExp = np.load(dir_path + '/../data_preprocessed/default_42genes/GeneExp.npy')
+        eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_42genes/eGeneGamma.csv')]
+        eGeneGamma = [float(i) for i in eGeneGamma]
+        genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_42genes/genes.csv')]
+    else:
+        dataset_name == ''
+
+
     ctc = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/cell_to_class_map.csv')]
 
     # Rename PC.CA2 to PC.Other1 and PC.CA3 to PC.Other2
@@ -206,16 +218,18 @@ def post_process(df1, df2):
 
 if __name__ == "__main__":
     # _seed = np.int(time.time())
-    # _seed = 123456
+    _seed = 123456
     # _seed = 1549392942
-    _seed = 1549455337
+    # _seed = 1549455337
     # _seed = 1549473190
     # _seed = 1549473240
     # _seed = 1549473273
     np.random.seed(_seed)
 
     # Fetch the data
-    raw_data, gene_expression, eGeneGamma = fetch_data()
+    # dataset_name = 'DEFAULT'
+    dataset_name = 'DEFAULT_42GENES'
+    raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
     # for each cell find its most likely cell class
     bc = best_class(raw_data)
@@ -231,7 +245,7 @@ if __name__ == "__main__":
     sample = thinner(sample, eGeneGamma)
     spots = position_genes(sample)
 
-    pd.DataFrame(spots).to_csv('spots_' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
+    pd.DataFrame(spots).to_csv('spots_' + dataset_name + '_' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
 
     print(spots[-3:, :])
     print('Done!')

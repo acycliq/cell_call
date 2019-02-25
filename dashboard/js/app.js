@@ -71,14 +71,10 @@ function landingPoint(name){
 //create ramp
 function getLandingCellNum(str) {
     return str === 'default' ? 2279 :
-        str === 'Simulation_1' ? 2279 :
-            str === 'Simulation_2' ? 2279 :
-                str === 'Simulation_3' ? 2279 :
-                    str === 'Simulation_4' ? 2279 :
-                        str === 'Simulation_5' ? 2279 :
-                            str === 'Simulation_6' ? 2279 :
-                                str === 'Simulation_7' ? 2279 :
-                1;
+        str === 'default_42genes' ? 2279 :
+            str === 'Simulation_1' ? 2279 :
+                str === 'Simulation_2' ? 2279 :
+                    1;
 }
 
 
