@@ -114,15 +114,22 @@ function heatmap(dataset) {
     // }
 
     // text label for the x axis
-    svg.append("text")
-      .attr("transform",
-            "translate(" + (width/2) + " ," +
-                           (height + margin.bottom) + ")")
-      .style("text-anchor", "middle")
-      .text("Predicted");
+    var textGroup = svg.append('g')
+        .attr('id', 'axesLabels')
+
+    textGroup
+        .append('g')
+        .attr('id', 'xAxisLabel')
+        .append('text')
+        .attr("transform", "translate(" + (width/2) + " ," + (height + margin.bottom) + ")")
+        .style("text-anchor", "middle")
+        .text("Predicted");
 
     // text label for the y axis
-    svg.append("text")
+    textGroup
+        .append('g')
+        .attr('id', 'yAxisLabel')
+        .append('text')
         .attr("transform", "rotate(-90)")
         .attr("y",0 - margin.left)
         .attr("x",0 - (height / 2))
@@ -143,6 +150,7 @@ function heatmap(dataset) {
     chartData.height = height;
     chartData.margin = margin;
     chartData.zoom = zoom;
+    chartData.textGroup = textGroup;
 
     return chartData;
 
@@ -274,5 +282,16 @@ function renderHeatmap(dataset) {
         .attr("fill", function (d) { return chartData.colorScale(d.val);} );
 
     update.exit().remove();
+
+    if (document.getElementById('genes42').checked){
+        xAxisLabel = 'Predicted (Filtered genes)'
+        yAxisLabel = 'Actual (Filtered genes)'
+    }
+    else {
+        xAxisLabel = 'Predicted (Full gene panel)'
+        yAxisLabel = 'Actual (Full gene panel)'
+    }
+
+    var tx = chartData.textGroup.select('xAxisLabel')
 
 }
