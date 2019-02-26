@@ -4,7 +4,7 @@ var cookie = sessionStorage['myvariable']
 
 if (!cookie){ // if you dont have cookie, run the default selection
     console.log('No cookie, starting with default dataset')
-    var configSettings = config().get('default')
+    var configSettings = config().get('Default')
 }
 else {
     console.log('Found cookie: ' + cookie)
@@ -70,10 +70,10 @@ function landingPoint(name){
 
 //create ramp
 function getLandingCellNum(str) {
-    return str === 'default' ? 2279 :
-        str === 'default_42genes' ? 2279 :
-            str === 'Simulation_1' ? 2279 :
-                str === 'Simulation_2' ? 2279 :
+    return str === 'Default' ? 2279 :
+        str === 'Default (42 gene panel)' ? 2279 :
+            str === 'Simulation (Full gene panel)' ? 2279 :
+                str === 'Simulation (42 gene panel)' ? 2279 :
                     1;
 }
 
