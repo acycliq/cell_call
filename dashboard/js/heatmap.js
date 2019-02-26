@@ -16,9 +16,10 @@ function heatmap(dataset) {
     var bluecolors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'],
         redcolors  = ['#fff5f0','#fee0d2','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15','#67000d'];
 
-    var colorScale = d3.scaleQuantile()
+    var colorScale = d3.scaleLinear()
         .domain(valRange)
-        .range(bluecolors);
+        .range(['#f7fbff', '#08306b'])
+        .interpolate(d3.interpolateHcl);
 
     // the scale
     // var scale = {
