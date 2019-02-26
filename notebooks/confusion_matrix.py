@@ -4,13 +4,6 @@ import matplotlib.pyplot as plt
 from scipy.stats import gmean
 
 
-VIEWER_PATH = 'https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/'
-SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/master/dashboard/data/img/'
-MODEL_DATA = VIEWER_PATH + '/default/json/iss.json'
-SIM_DATA = SIM_PATH + '/sim_123456/json/iss.json'  # Simulation 1
-# SIM_DATA = SIM_PATH + '/sim_123456_excludedClasses/json/iss.json'  # Simulation 1
-
-
 def best_class(df):
     '''
     Returns a list with the names of all the optimal/best classes
@@ -147,8 +140,16 @@ def pool(df):
 
 
 if __name__ == "__main__":
-    # norm = 'median'
-    norm = 'mean'
+
+    # VIEWER_PATH = 'https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/'
+    SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/rectHeatmap/dashboard/data/img/'
+    MODEL_DATA = SIM_PATH + '/default_42genes/json/iss.json'
+    SIM_DATA = SIM_PATH + '/sim_123456_42genes/json/iss.json'  # Simulation 1
+    # SIM_DATA = SIM_PATH + '/sim_123456_42genes_excludedClasses/json/iss.json'  # Simulation 1
+
+
+    norm = 'median'
+    # norm = 'mean'
 
     use_pool = False
 
@@ -162,6 +163,11 @@ if __name__ == "__main__":
     cm = confusion_matrix(model_data, sim_data, norm)
     print(cm.sum(axis=0))
     plot_confusion_matrix(cm, norm)
+
+    unmatched = [x for x in cm.index.values if x not in cm.columns.values]
+    if len(unmatched) > 0:
+        print('The following cell exist in predicted but not in actual')
+        print(unmatched)
 
     cm.to_json('confusionMatrix.json', orient='split')
 
