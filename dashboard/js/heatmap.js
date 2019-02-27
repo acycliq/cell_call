@@ -5,7 +5,7 @@ function heatmap(dataset) {
 
     var tsn = d3.transition().duration(1000);
 
-    var margin = {top: 10, right: 10, bottom: 130, left: 160};
+    var margin = {top: 10, right: 70, bottom: 130, left: 160};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -334,7 +334,7 @@ function renderHeatmap(dataset) {
 // Color Legend container
     var legendsvg = svg.append("g")
         .attr("class", "legendWrapper")
-        .attr("transform", "translate(" + (chartData.width + 0.8*chartData.margin.left) + "," + (chartData.height/2 -legend.height/2) + ")" )
+        .attr("transform", "translate(" + (chartData.width + chartData.margin.left + chartData.margin.right/2) + "," + (chartData.height/2 -legend.height/2) + ")" )
 
 // Draw the Rectangle
     legendsvg.append("rect")
