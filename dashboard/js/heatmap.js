@@ -328,26 +328,26 @@ function renderHeatmap(dataset) {
         });
 
 
-    var legendWidth = Math.min(chartData.width * 0.8, 400);
+    var legend = {  height: Math.min(chartData.width * 0.8, 400),
+                    width: 10};
 
 // Color Legend container
     var legendsvg = svg.append("g")
         .attr("class", "legendWrapper")
-        .attr("transform", "translate(" + chartData.width + "," + (chartData.height/2 -legendWidth/2) + ")" )
-        .attr('rotate', 90)
+        .attr("transform", "translate(" + (chartData.width + 0.8*chartData.margin.left) + "," + (chartData.height/2 -legend.height/2) + ")" )
 
 // Draw the Rectangle
     legendsvg.append("rect")
         .attr("class", "legendRect")
-        .attr("x", -legendWidth / 2)
-        .attr("y", 50)
-        .attr("width", 10)
-        .attr("height", legendWidth)
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", legend.width)
+        .attr("height", legend.height)
         .style("fill", "url(#legend-traffic)");
 
 // Set scale for x-axis
     var xScaleLegend = d3.scaleLinear()
-        .range([-legendWidth / 2, legendWidth / 2])
+        .range([-legend.height / 2, legend.height / 2])
         .domain([1, 0]);
 
 // Define x-axis
@@ -358,7 +358,7 @@ function renderHeatmap(dataset) {
 // Set up X axis
     legendsvg.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(" + (10 - legendWidth/2) + "," + (legendWidth/2 + 50) + ")")
+        .attr("transform", "translate(" + (legend.width) + "," + (legend.height/2) + ")")
         .call(xAxisLegend);
 
 }
