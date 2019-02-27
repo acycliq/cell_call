@@ -10,11 +10,13 @@ function heatmap(dataset) {
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
 
-    var valRange = d3.extent(dataset, function (d) {return d.val});
+    var valRange = d3.extent(dataset, function (d) {
+        return d.val
+    });
 
     // var colors = ['#2C7BB6', '#00A6CA', '#00CCBC', '#90EB9D', '#FFFF8C', '#F9D057', '#F29E2E', '#E76818', '#D7191C'];
-    var bluecolors = ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#4292c6','#2171b5','#08519c','#08306b'],
-        redcolors  = ['#fff5f0','#fee0d2','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15','#67000d'];
+    var bluecolors = ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'],
+        redcolors = ['#fff5f0', '#fee0d2', '#fcbba1', '#fc9272', '#fb6a4a', '#ef3b2c', '#cb181d', '#a50f15', '#67000d'];
 
     var colorScale = d3.scaleLinear()
         .domain(valRange)
@@ -94,12 +96,12 @@ function heatmap(dataset) {
     //Create X axis
     var renderXAxis = svg.append("g")
         .attr("class", "x axis")
-        // .attr("transform", "translate(0," + scale.y(-0.5) + ")")
+    // .attr("transform", "translate(0," + scale.y(-0.5) + ")")
 
     //Create Y axis
     var renderYAxis = svg.append("g")
         .attr("class", "y axis")
-        // .attr("transform", "translate(0," + (-1)*dot.height + ")")
+    // .attr("transform", "translate(0," + (-1)*dot.height + ")")
 
 
     // function zoomed() {
@@ -122,7 +124,7 @@ function heatmap(dataset) {
         .append('g')
         .attr('id', 'xAxisLabel')
         .append('text')
-        .attr("transform", "translate(" + (width/2) + " ," + (height + margin.bottom) + ")")
+        .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.bottom) + ")")
         .style("text-anchor", "middle")
         .text("Predicted");
 
@@ -132,8 +134,8 @@ function heatmap(dataset) {
         .attr('id', 'yAxisLabel')
         .append('text')
         .attr("transform", "rotate(-90)")
-        .attr("y",0 - margin.left)
-        .attr("x",0 - (height / 2))
+        .attr("y", 0 - margin.left)
+        .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Actual");
@@ -157,22 +159,26 @@ function heatmap(dataset) {
 
 };
 
-function updateScales(data, scale){
+function updateScales(data, scale) {
     scale.x.domain([0, d3.max(data, d => d.xKey)]),
-    scale.y.domain([0, d3.max(data, d => d.yKey)])
+        scale.y.domain([0, d3.max(data, d => d.yKey)])
 }
 
-function updateLabels(data, labels){
-    labels.x = d3.map(data, function (d) {return d.xLabel;}).keys(),
-    labels.y = d3.map(data, function (d) {return d.yLabel;}).keys()
+function updateLabels(data, labels) {
+    labels.x = d3.map(data, function (d) {
+        return d.xLabel;
+    }).keys(),
+        labels.y = d3.map(data, function (d) {
+            return d.yLabel;
+        }).keys()
 }
 
-function updateDot(chartData){
+function updateDot(chartData) {
     chartData.dot.width = chartData.width / (1 * (chartData.labels.x.length)),
-    chartData.dot.height = chartData.height / (1 * chartData.labels.y.length)
+        chartData.dot.height = chartData.height / (1 * chartData.labels.y.length)
 }
 
-function updateAxes(data, chartData){
+function updateAxes(data, chartData) {
     var band = chartData.band,
         labels = chartData.labels;
 
@@ -190,9 +196,9 @@ function updateAxes(data, chartData){
     // seems to be just fine!!
 }
 
-function updateBands(chartData){
+function updateBands(chartData) {
     chartData.band.x = d3.scaleBand().domain(chartData.labels.x).range([0, chartData.width]),
-    chartData.band.y = d3.scaleBand().domain(chartData.labels.y).range([chartData.height, 0])
+        chartData.band.y = d3.scaleBand().domain(chartData.labels.y).range([chartData.height, 0])
 }
 
 function renderHeatmap(dataset) {
@@ -228,7 +234,8 @@ function renderHeatmap(dataset) {
 
     var zoom = chartData.zoom
         .scaleExtent([1, chartData.dot.height])
-        // .on("zoom", zoomed); // Inactivate the zoom until it is properly working
+
+    // .on("zoom", zoomed); // Inactivate the zoom until it is properly working
 
     function zoomed() {
         // I am almost there. What doesnt work:
@@ -246,11 +253,11 @@ function renderHeatmap(dataset) {
         t.x = Math.max(t.x, (1 - t.k) * chartData.width);
 
         // translate and scale the x dimension only
-        var my_transform =  "translate(" + t.x + ", " + 0 + ") scale(" + t.k + ", 1)"
+        var my_transform = "translate(" + t.x + ", " + 0 + ") scale(" + t.k + ", 1)"
 
         chartData.band.x.range([0, chartData.width * t.k]);
         chartData.heatDotsGroup.selectAll("rect")
-            .attr("transform",  my_transform);
+            .attr("transform", my_transform);
 
         svg.select('.x.axis')
             .attr("transform", "translate(" + t.x + "," + (chartData.height) + ")")
@@ -270,29 +277,88 @@ function renderHeatmap(dataset) {
             var ypos = d3.event.pageY + 20;
             $("#tooltip_heatmap").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
         }).on("mouseout", function () {
-            $("#tooltip_heatmap").animate({
-                duration: 500
-            }).css("opacity", 0);
-        })
+        $("#tooltip_heatmap").animate({
+            duration: 500
+        }).css("opacity", 0);
+    })
         .merge(update)
         .transition(chartData.tsn)
         .attr("width", chartData.dot.width)
         .attr("height", chartData.dot.height)
-        .attr("x", function (d) {return chartData.band.x(d.xLabel);})
-        .attr("y", function (d) {return chartData.band.y(d.yLabel);})
-        .attr("fill", function (d) { return chartData.colorScale(d.val);} );
+        .attr("x", function (d) {
+            return chartData.band.x(d.xLabel);
+        })
+        .attr("y", function (d) {
+            return chartData.band.y(d.yLabel);
+        })
+        .attr("fill", function (d) {
+            return chartData.colorScale(d.val);
+        });
 
     update.exit().remove();
 
-    if (document.getElementById('genes42').checked){
+    if (document.getElementById('genes42').checked) {
         xAxisLabel = 'Predicted (Filtered genes)'
         yAxisLabel = 'Actual (Filtered genes)'
-    }
-    else {
+    } else {
         xAxisLabel = 'Predicted (Full gene panel)'
         yAxisLabel = 'Actual (Full gene panel)'
     }
 
     var tx = chartData.textGroup.select('xAxisLabel')
+
+    ///////////////////////////////////////////////////////////////////////////
+////////////////////////// Draw the legend ////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+    // Create the gradient
+    svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "legend-traffic")
+        .attr("x1", "0%").attr("y1", "0%")
+        .attr("x2", "100%").attr("y2", "0%")
+        .selectAll("stop")
+        .data(d3.range(0.0, 1.0, 1/9))
+        .enter().append("stop")
+        .attr("offset", function (d, i) {
+            return i/10;
+        })
+        .attr("stop-color", function (d, i) {
+            return chartData.colorScale(d);
+        });
+
+
+    var legendWidth = Math.min(chartData.width * 0.8, 400);
+
+// Color Legend container
+    var legendsvg = svg.append("g")
+        .attr("class", "legendWrapper")
+        .attr("transform", "translate(" + chartData.height / 2 + "," + chartData.margin.left + ")" )
+        .attr('rotate', 90)
+
+// Draw the Rectangle
+    legendsvg.append("rect")
+        .attr("class", "legendRect")
+        .attr("x", -legendWidth / 2)
+        .attr("y", 50)
+        .attr("width", legendWidth)
+        .attr("height", 10)
+        .style("fill", "url(#legend-traffic)");
+
+// Set scale for x-axis
+    var xScaleLegend = d3.scaleLinear()
+        .range([-legendWidth / 2, legendWidth / 2])
+        .domain([0, 1]);
+
+// Define x-axis
+    var xAxisLegend = d3.axisBottom()
+        .ticks(5)
+        .scale(xScaleLegend);
+
+// Set up X axis
+    legendsvg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0," + (60) + ")")
+        .call(xAxisLegend);
 
 }
