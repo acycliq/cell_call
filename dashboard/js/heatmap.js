@@ -125,21 +125,26 @@ function heatmap(dataset) {
     textGroup
         .append('g')
         .attr('id', 'xAxisLabel')
+        .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.bottom - 5) + ")")
+        .attr('font-family', 'sans-serif')
+        .attr('font-size', 12)
+        .attr('text-anchor', 'middle')
+        .append('g')
+        .attr('id', 'xAxisLabelText')
         .append('text')
-        .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.bottom) + ")")
-        .style("text-anchor", "middle")
         .text("Predicted");
 
     // text label for the y axis
     textGroup
         .append('g')
         .attr('id', 'yAxisLabel')
+        .attr('transform', "translate(" + (-0.9*margin.left) + " ," + (height/2) + ") rotate(-90)")
+        .attr('font-family', 'sans-serif')
+        .attr('font-size', 12)
+        .attr('text-anchor', 'middle')
+        .append('g')
+        .attr('id', 'yAxisLabelText')
         .append('text')
-        .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left)
-        .attr("x", 0 - (height / 2))
-        .attr("dy", "1em")
-        .style("text-anchor", "middle")
         .text("Actual");
 
 
@@ -366,6 +371,17 @@ function renderHeatmap(dataset) {
     }
 
     var tx = chartData.textGroup.select('xAxisLabel')
+
+    // Now set the appropriate axes labels
+    if (document.getElementById('genes42').checked) {
+        d3.select('#xAxisLabel').html('<text>Predicted (42 gene panel)</text>');
+        d3.select('#yAxisLabel').html('<text>Actual (42 gene panel)</text>');
+    }
+    else {
+        d3.select('#xAxisLabel').html('<text>Predicted (Full gene panel)</text>');
+        d3.select('#yAxisLabel').html('<text>Actual (Full gene panel)</text>');
+    }
+
 
 
 
