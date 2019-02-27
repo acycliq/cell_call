@@ -140,6 +140,62 @@ function heatmap(dataset) {
         .style("text-anchor", "middle")
         .text("Actual");
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    ////////////////////////// Draw the legend ////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+    // Create the gradient
+    svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "legend-traffic")
+        .attr("x1", "0%").attr("y1", "100%")
+        .attr("x2", "0%").attr("y2", "0%")
+        .selectAll("stop")
+        .data(d3.range(0.0, 1.0, 1/9))
+        .enter().append("stop")
+        .attr("offset", function (d, i) {
+            return i/10;
+        })
+        .attr("stop-color", function (d, i) {
+            return colorScale(d);
+        });
+
+
+    var legend = {  height: Math.min(width * 0.8, 400),
+                    width: 10};
+
+// Color Legend container
+    var legendsvg = svg.append("g")
+        .attr("class", "legendWrapper")
+        .attr("transform", "translate(" + (width + margin.right/2) + "," + (height/2 -legend.height/2) + ")" )
+
+// Draw the Rectangle
+    legendsvg.append("rect")
+        .attr("class", "legendRect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", legend.width)
+        .attr("height", legend.height)
+        .style("fill", "url(#legend-traffic)");
+
+// Set scale for x-axis
+    var xScaleLegend = d3.scaleLinear()
+        .range([-legend.height / 2, legend.height / 2])
+        .domain([1, 0]);
+
+// Define x-axis
+    var xAxisLegend = d3.axisRight()
+        .ticks(5)
+        .scale(xScaleLegend);
+
+// Set up X axis
+    legendsvg.append("g")
+        .attr("class", "axis")
+        .attr("transform", "translate(" + (legend.width) + "," + (legend.height/2) + ")")
+        .call(xAxisLegend);
+
+
     var chartData = {};
     // chartData.scale = scale;
     chartData.labels = labels;
@@ -307,58 +363,6 @@ function renderHeatmap(dataset) {
 
     var tx = chartData.textGroup.select('xAxisLabel')
 
-    ///////////////////////////////////////////////////////////////////////////
-////////////////////////// Draw the legend ////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
 
-    // Create the gradient
-    svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "legend-traffic")
-        .attr("x1", "0%").attr("y1", "100%")
-        .attr("x2", "0%").attr("y2", "0%")
-        .selectAll("stop")
-        .data(d3.range(0.0, 1.0, 1/9))
-        .enter().append("stop")
-        .attr("offset", function (d, i) {
-            return i/10;
-        })
-        .attr("stop-color", function (d, i) {
-            return chartData.colorScale(d);
-        });
-
-
-    var legend = {  height: Math.min(chartData.width * 0.8, 400),
-                    width: 10};
-
-// Color Legend container
-    var legendsvg = svg.append("g")
-        .attr("class", "legendWrapper")
-        .attr("transform", "translate(" + (chartData.width + chartData.margin.left + chartData.margin.right/2) + "," + (chartData.height/2 -legend.height/2) + ")" )
-
-// Draw the Rectangle
-    legendsvg.append("rect")
-        .attr("class", "legendRect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", legend.width)
-        .attr("height", legend.height)
-        .style("fill", "url(#legend-traffic)");
-
-// Set scale for x-axis
-    var xScaleLegend = d3.scaleLinear()
-        .range([-legend.height / 2, legend.height / 2])
-        .domain([1, 0]);
-
-// Define x-axis
-    var xAxisLegend = d3.axisRight()
-        .ticks(5)
-        .scale(xScaleLegend);
-
-// Set up X axis
-    legendsvg.append("g")
-        .attr("class", "axis")
-        .attr("transform", "translate(" + (legend.width) + "," + (legend.height/2) + ")")
-        .call(xAxisLegend);
 
 }
