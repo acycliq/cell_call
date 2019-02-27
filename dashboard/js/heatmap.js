@@ -5,7 +5,7 @@ function heatmap(dataset) {
 
     var tsn = d3.transition().duration(1000);
 
-    var margin = {top: 10, right: 70, bottom: 130, left: 160};
+    var margin = {top: 10, right: 85, bottom: 130, left: 160};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -62,6 +62,8 @@ function heatmap(dataset) {
         .attr("id", "tooltip_heatmap")
         .attr('class', 'tooltip')
         .style("opacity", 0);
+
+    var percentFormat = d3.format('.0%') // rounded percentage
 
     // SVG canvas
     svg = d3.select("#heat-chart").select("svg")
@@ -186,12 +188,14 @@ function heatmap(dataset) {
 
 // Define x-axis
     var xAxisLegend = d3.axisRight()
+        .tickFormat(percentFormat)
         .ticks(5)
         .scale(xScaleLegend);
 
 // Set up X axis
     legendsvg.append("g")
         .attr("class", "axis")
+        .style("font-size", "8px")
         .attr("transform", "translate(" + (legend.width) + "," + (legend.height/2) + ")")
         .call(xAxisLegend);
 
