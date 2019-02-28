@@ -172,12 +172,12 @@ function heatmap(dataset) {
     var legend = {  height: Math.min(width * 0.8, 400),
                     width: 10};
 
-// Color Legend container
+    // Color Legend container
     var legendsvg = svg.append("g")
         .attr("class", "legendWrapper")
         .attr("transform", "translate(" + (width + margin.right/2) + "," + (height/2 -legend.height/2) + ")" )
 
-// Draw the Rectangle
+    // Draw the Rectangle
     legendsvg.append("rect")
         .attr("class", "legendRect")
         .attr("x", 0)
@@ -186,18 +186,18 @@ function heatmap(dataset) {
         .attr("height", legend.height)
         .style("fill", "url(#legend-traffic)");
 
-// Set scale for x-axis
+    // Set scale for x-axis
     var xScaleLegend = d3.scaleLinear()
         .range([-legend.height / 2, legend.height / 2])
         .domain([1, 0]);
 
-// Define x-axis
+    // Define x-axis
     var xAxisLegend = d3.axisRight()
         .tickFormat(percentFormat)
         .ticks(5)
         .scale(xScaleLegend);
 
-// Set up X axis
+    // Set up X axis
     legendsvg.append("g")
         .attr("class", "axis")
         .style("font-size", "8px")
@@ -362,15 +362,6 @@ function renderHeatmap(dataset) {
 
     update.exit().remove();
 
-    if (document.getElementById('genes42').checked) {
-        xAxisLabel = 'Predicted (Filtered genes)'
-        yAxisLabel = 'Actual (Filtered genes)'
-    } else {
-        xAxisLabel = 'Predicted (Full gene panel)'
-        yAxisLabel = 'Actual (Full gene panel)'
-    }
-
-    var tx = chartData.textGroup.select('xAxisLabel')
 
     // Now set the appropriate axes labels
     if (document.getElementById('genes42').checked) {
