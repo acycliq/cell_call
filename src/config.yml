@@ -1,6 +1,6 @@
 #
-#    Cached file of a:
-#    2-d array the same size as the image (in pixels) specifying
+#    Cached file of:
+#    A 2-d array the same size as the image (in pixels) specifying
 #    that pixel (i,j) belongs to cell c where c is a non-negative integer.
 #    If c = 0 it means that the associated pixel does not belong to a cell
 #
