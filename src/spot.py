@@ -135,7 +135,7 @@ class Spot(object):
             Faking it. 
             Use a preprocessed file to instantiate the SpotAttributes class.
             Eventually that will/should be replaced. SpotAttributes will be instantiated 
-            by used defined data
+            by user defined data
             '''
             logger.info('********* Getting spotattributes from %s **********', saFile)
             sa = SpotAttributes(xr.open_dataset(saFile).to_dataframe())
