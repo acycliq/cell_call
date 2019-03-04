@@ -1,21 +1,47 @@
+#
+#    Cached file of a:
+#    2-d array the same size as the image (in pixels) specifying
+#    that pixel (i,j) belongs to cell c where c is a non-negative integer.
+#    If c = 0 it means that the associated pixel does not belong to a cell
+#
 DEFAULT:
     LABEL_IMAGE: '../data/default/CellMap.mat'
 
 
-threeOneLeft:
-    LABEL_IMAGE: '../data/3-1_left/CellMap.mat'
 
-
-threeOneRight:
-    LABEL_IMAGE: '../data/3-1_right/CellMap.mat'
-
-
-fourThreeRight:
-    LABEL_IMAGE: '../data/4-3_right/CellMap.mat'
-
-
+#
+#    Cached file with:
+#     1. number of genes
+#     2. number of cells
+#     3. gene expression table (size: numGenes by numCells)
+#     4. gene names (vector of length numGenes)
+#     5. class name that each cell belongs to (vector of length numCells)
+#
 geneset: '../data/GeneSet.mat'
+
+
+
+#
+#    Parameters for the Cell calling algorithm
+#
 CellCallMaxIter: 100
+CellCallTolerance: 0.02
+Inefficiency: 0.2
+InsideCellBonus: 2
+MisreadDensity: 0.00001
+SpotReg: 0.1
+nNeighbors: 3
+rGene: 20
+rSpot: 2
+
+
+
+
+#
+#    Specify the area we are interested in. This is used as filter to ignore spots outside the area.
+#    Not the whole polygon needs to be specified in a real life example.
+#    The bottom left corner however needs to get passed in
+#
 CellCallRegionYX: !2darray
   - - 17268
     - 13751
@@ -63,12 +89,4 @@ CellCallRegionYX: !2darray
     - 13233
   - - 17268
     - 13751
-CellCallTolerance: 0.02
-CellMapFile: '\\\\basket.cortexlab.net\\data\\kenneth\\iss\\170315_161220KI_4-3\\Output\\CellMap.mat'
-Inefficiency: 0.2
-InsideCellBonus: 2
-MisreadDensity: 0.00001
-SpotReg: 0.1
-nNeighbors: 3
-rGene: 20
-rSpot: 2
+
