@@ -83,8 +83,8 @@ class Cell(object):
         ScaledExp = genes.expression * genes.expectedGamma[None, :, None]*self.areaFactor[:, None, None] + ini['SpotReg']
         pNegBin = ScaledExp / (ini['rSpot'] + ScaledExp)
         CellGeneCount = self.geneCount(spots, genes)
-        contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
-        # contr = utils.negBinLoglik(CellGeneCount[:, :, None], iss.rSpot, pNegBin)
+        # contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
+        contr = utils.negBinLoglik(CellGeneCount[:, :, None], ini['rSpot'], pNegBin)
         # assert np.all(nb_contr == contr)
         wCellClass = np.sum(contr, axis=1) + klasses.logPrior
         pCellClass = utils.softmax(wCellClass)
