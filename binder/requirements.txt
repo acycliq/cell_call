@@ -1,4 +1,12 @@
+numba==0.36.2
+pandas==0.23.4
+scipy==1.0.0
 numpy==1.14.2
-pandas==0.22.0
+matplotlib==3.0.2
+numexpr==2.6.4
+numpy_groupies==0.9.9
+ruamel.yaml==0.15.89
+scikit-image==0.14.0
+scikit_learn==0.20.3
+starfish==0.0.33
 xarray==0.10.8
-
