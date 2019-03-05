@@ -1,5 +1,5 @@
 import os
-import src.utils
+import utils
 import logging
 
 
@@ -19,7 +19,7 @@ class Iss:
         print(self.label_image)
 
     def _populate(self, pathStr):
-        mat = src.utils.loadmat(pathStr)
+        mat = utils.loadmat(pathStr)
         dictionary = mat["iss"]
         logger.info("reading iss.mat from %s", pathStr)
         toKeep = ['CellMapFile', 'CellCallRegionYX', 'InsideCellBonus',
@@ -32,13 +32,13 @@ class Iss:
 
     def _load_cellMapFile(self, ini):
         try:
-            mat = src.utils.loadmat(self.CellMapFile)
+            mat = utils.loadmat(self.CellMapFile)
             self.label_image = mat["CellMap"]
             logger.info("reading CellMap from %s", self.CellMapFile)
         except FileNotFoundError:
             matStr = ini['label_image']
             logger.info("reading CellMap from %s", matStr)
-            mat = src.utils.loadmat(matStr)
+            mat = utils.loadmat(matStr)
             self.label_image = mat["CellMap"]
 
 

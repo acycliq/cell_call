@@ -1,8 +1,9 @@
 import ruamel.yaml
 from pathlib import Path
-import src.utils
+import utils
 import numpy
-from src.geneset import GeneSet
+from geneset import GeneSet
+import os
 import logging
 
 logger = logging.getLogger()
@@ -16,6 +17,7 @@ logging.basicConfig(
 def read(filename, dataset_name):
     config_file = Path(filename)
     yaml = ruamel.yaml.YAML(typ='safe')
+    my_path = os.path.abspath(os.path.dirname(__file__))
 
     @yaml.register_class
     class Array:
@@ -29,8 +31,10 @@ def read(filename, dataset_name):
     cf = yaml.load(config_file)
 
     matStr = cf[dataset_name]['LABEL_IMAGE']
-    logger.info("reading CellMap from %s", matStr)
-    mat = src.utils.loadmat(matStr)
+    print("reading CellMap from %s" % matStr)
+    # print(os.path.abspath(os.sep))
+    # os.path.join(my_path, '..', matStr)
+    mat = utils.loadmat(os.path.join(my_path, '..', matStr))
     cf['label_image'] = mat["CellMap"]
     cf['gSet'] = GeneSet(cf)
 

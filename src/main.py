@@ -1,14 +1,13 @@
-import src.systemData
-import src.cell
-import src.klass
-import src.spot
-import src.utils
-# import src.config as cfg
-import src.config as config
+import cell
+import klass
+import spot
+import utils
+import config
+import os
 import logging
-# import ruamel.yaml
 
-CONFIG_FILE = '../src/config.yml'
+dir_path = os.path.dirname(os.path.realpath(__file__))
+CONFIG_FILE = dir_path + '/config.yml'
 # yaml = ruamel.yaml.YAML(typ='safe')
 
 logger = logging.getLogger()
@@ -19,17 +18,18 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
+    print(CONFIG_FILE)
     ini = config.read(CONFIG_FILE, 'DEFAULT')
     # ini = config.read(CONFIG_FILE, 'fourThreeRight')
 
     # make a cell object
-    cells = src.cell.Cell(ini)
+    cells = cell.Cell(ini)
 
     # make a spots object
-    spots = src.spot.Spot(ini)
+    spots = spot.Spot(ini)
 
     # make a klass object
-    klasses = src.klass.Klass(ini['gSet'])
+    klasses = klass.Klass(ini['gSet'])
 
     # calc the loglik and populate some of the object's properties
     spots.loglik(cells, ini)
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         # Update parameter
         genes.updateGamma(cells, spots, klasses, ini)
 
-        converged, delta = src.utils.isConverged(spots, p0, ini['CellCallTolerance'])
+        converged, delta = utils.isConverged(spots, p0, ini['CellCallTolerance'])
         logger.info('Iteration %d, mean prob change %f' % (i, delta))
 
         # replace p0 with the latest probabilities

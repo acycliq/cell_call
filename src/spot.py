@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
-import src.utils
+import utils
 from sklearn.neighbors import NearestNeighbors
 from time import time
-import src.gene
+import gene
 from pathlib import Path
-from starfish.types import Indices, Features, SpotAttributes
+import starfish as sf
+# from starfish.types import Indices, Features, SpotAttributes
 import logging
 
 
@@ -80,7 +81,7 @@ class Spot(object):
         # Lookup cell_map and infer which spot belongs to which cell.
         # This is kinda using the empirical....
         idx = spotyx - [y0, x0]  # First move the origin at (0, 0)
-        SpotInCell = src.utils.IndexArrayNan(ini['label_image'], idx.T)  # Now get the allocation of spots to cells
+        SpotInCell = utils.IndexArrayNan(ini['label_image'], idx.T)  # Now get the allocation of spots to cells
         sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
         assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
@@ -110,10 +111,10 @@ class Spot(object):
             allGeneNames = iss.GeneNames[iss.SpotCodeNo - 1]  # -1 is needed because Matlab is 1-based
             cond1 = ~np.isin(allGeneNames, excludeGenes)
             start_time = time()
-            cond2 = src.utils.inpolygon(iss.SpotGlobalYX, iss.CellCallRegionYX)
+            cond2 = utils.inpolygon(iss.SpotGlobalYX, iss.CellCallRegionYX)
             print('Elapsed time: ' + str(time() - start_time))
 
-            cond3 = src.utils.qualityThreshold(iss)
+            cond3 = utils.qualityThreshold(iss)
 
             includeSpot = cond1 & cond2 & cond3
             spotYX = iss.SpotGlobalYX[includeSpot, :].round()
@@ -138,7 +139,7 @@ class Spot(object):
             by user defined data
             '''
             logger.info('********* Getting spotattributes from %s **********', saFile)
-            sa = SpotAttributes(xr.open_dataset(saFile).to_dataframe())
+            sa = sf.types.SpotAttributes(xr.open_dataset(saFile).to_dataframe())
             self.attributes = sa
             self.YX = sa.data[['y', 'x']].values
             self.name = self.attributes.data['target'].values
@@ -147,7 +148,7 @@ class Spot(object):
 
     def getGenes(self):
         #make a gene object
-        g = src.gene.Gene()
+        g = gene.Gene()
         #populate it
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.name, return_inverse=True, return_counts=True)
         g.names = GeneNames
@@ -162,8 +163,8 @@ class Spot(object):
         cellGeneCount = cells.geneCount(self, genes)
         rho = ini['rSpot'] + cellGeneCount
         beta = ini['rSpot'] + scaledMean
-        self.expectedGamma = src.utils.gammaExpectation(rho[:,:,None], beta)
-        self.expectedLogGamma = src.utils.logGammaExpectation(rho[:,:,None], beta)
+        self.expectedGamma = utils.gammaExpectation(rho[:,:,None], beta)
+        self.expectedLogGamma = utils.logGammaExpectation(rho[:,:,None], beta)
 
     def cellAssignment(self, cells, genes, klasses):
         nN = self.neighbors['id'].shape[1]
@@ -176,13 +177,13 @@ class Spot(object):
             meanLogExpression = np.squeeze(genes.logExpression[:, self.geneNo, :])
             classProb = cells.classProb[c, :]
             term_1 = np.sum(classProb * meanLogExpression, axis=1)
-            expectedLog = src.utils.bi2(self.expectedLogGamma, [nS, nK], c[:, None], self.geneNo[:, None])
+            expectedLog = utils.bi2(self.expectedLogGamma, [nS, nK], c[:, None], self.geneNo[:, None])
             term_2 = np.sum(cells.classProb[c, :] * expectedLog, axis=1)
             aSpotCell[:, n] = term_1 + term_2
         wSpotCell = aSpotCell + self.D
 
         # update the prob a spot belongs to a neighboring cell
-        pSpotNeighb = src.utils.softmax(wSpotCell)
+        pSpotNeighb = utils.softmax(wSpotCell)
         self.neighbors['prob'] = pSpotNeighb
         logger.info('spot ---> cell probabilities updated')
 

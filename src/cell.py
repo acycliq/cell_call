@@ -1,5 +1,5 @@
 import numpy as np
-import src.utils
+import utils
 from skimage.measure import regionprops
 import numpy_groupies as npg
 import time
@@ -83,13 +83,14 @@ class Cell(object):
         ScaledExp = genes.expression * genes.expectedGamma[None, :, None]*self.areaFactor[:, None, None] + ini['SpotReg']
         pNegBin = ScaledExp / (ini['rSpot'] + ScaledExp)
         CellGeneCount = self.geneCount(spots, genes)
-        contr = src.utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
+        contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
         # contr = utils.negBinLoglik(CellGeneCount[:, :, None], iss.rSpot, pNegBin)
         # assert np.all(nb_contr == contr)
         wCellClass = np.sum(contr, axis=1) + klasses.logPrior
-        pCellClass = src.utils.softmax(wCellClass)
+        pCellClass = utils.softmax(wCellClass)
 
         self.classProb = pCellClass
+        logger.info('Cell 0 is classified as %s with prob %4.8f' % (klasses.name[np.argmax(wCellClass[0, :])], pCellClass[0, np.argmax(wCellClass[0, :])]))
         logger.info('cell ---> klass probabilities updated')
         return pCellClass
 
