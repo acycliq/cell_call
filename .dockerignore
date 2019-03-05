@@ -1,0 +1,17 @@
+# Virtual Environment
+venv/
+
+# Project Settings
+.idea/
+
+# git
+.git/
+
+# dashboard
+dashboard/
+lib/
+
+notebooks/
+out/
+tex/
+binder/
