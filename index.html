@@ -897,6 +897,7 @@
 
         $('#confusion-table-tab').on('shown.bs.tab', function (e) {
             console.log('Confusion matrix tab was clicked.')
+            $('#myDropdown').toggle() // hide the dropdown
             var selected = document.ConfusionMatrixRadioButton.norm.value;
             console.log('Radio button ' + selected + ' is selected')
             renderHeatmapTab(selected)
@@ -905,6 +906,12 @@
             // hide the search forms
             $('#nav-table-search').hide();
             $('#nav-place-search').hide();
+        });
+
+        // listener on the Viewer tab
+        $('#map-tab').on('shown.bs.tab', function (e) {
+            console.log('Viewer tab was clicked.')
+            $('#myDropdown').toggle() // show the dropdown
         });
     </script>
 
