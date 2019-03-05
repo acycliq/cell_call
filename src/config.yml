@@ -5,7 +5,7 @@
 #    If c = 0 it means that the associated pixel does not belong to a cell
 #
 DEFAULT:
-    LABEL_IMAGE: '../data/default/CellMap.mat'
+    LABEL_IMAGE: 'data/default/CellMap.mat'
 
 
 
