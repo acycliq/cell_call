@@ -71,10 +71,11 @@ function landingPoint(name){
 //create ramp
 function getLandingCellNum(str) {
     return str === 'Default (Full gene panel)' ? 2279 :
-        str === 'Default (42 gene panel)' ? 2279 :
-            str === 'Simulation (Full gene panel)' ? 2279 :
-                str === 'Simulation (42 gene panel)' ? 2279 :
-                    1;
+        str === 'Default (99 gene panel)' ? 2279 :
+            str === 'Default (42 gene panel)' ? 2279 :
+                str === 'Simulation (Full gene panel)' ? 2279 :
+                    str === 'Simulation (42 gene panel)' ? 2279 :
+                        1;
 }
 
 

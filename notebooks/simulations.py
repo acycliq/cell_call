@@ -22,6 +22,12 @@ def fetch_data(dataset_name):
         eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_42genes/eGeneGamma.csv')]
         eGeneGamma = [float(i) for i in eGeneGamma]
         genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_42genes/genes.csv')]
+    elif dataset_name == 'DEFAULT_99GENES':
+        df = pd.read_json("D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\default_99genes\json\iss.json")
+        GeneExp = np.load(dir_path + '/../data_preprocessed/default_99genes/GeneExp.npy')
+        eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_99genes/eGeneGamma.csv')]
+        eGeneGamma = [float(i) for i in eGeneGamma]
+        genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_99genes/genes.csv')]
     else:
         dataset_name == ''
 
@@ -228,7 +234,8 @@ if __name__ == "__main__":
 
     # Fetch the data
     # dataset_name = 'DEFAULT'
-    dataset_name = 'DEFAULT_42GENES'
+    # dataset_name = 'DEFAULT_42GENES'
+    dataset_name = 'DEFAULT_99GENES'
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
     # for each cell find its most likely cell class
