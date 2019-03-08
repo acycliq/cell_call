@@ -366,11 +366,11 @@ function renderHeatmap(dataset) {
     // Now set the appropriate axes labels
     if (document.getElementById('genes42').checked) {
         d3.select('#xAxisLabel').html('<text>Predicted (42 gene panel)</text>');
-        d3.select('#yAxisLabel').html('<text>Actual (42 gene panel)</text>');
+        d3.select('#yAxisLabel').html('<text>Actual (Gene panel as in Live)</text>');
     }
     else {
-        d3.select('#xAxisLabel').html('<text>Predicted (Full gene panel)</text>');
-        d3.select('#yAxisLabel').html('<text>Actual (Full gene panel)</text>');
+        d3.select('#xAxisLabel').html('<text>Predicted (Gene panel as in Live)</text>');
+        d3.select('#yAxisLabel').html('<text>Actual (Gene panel as in Live)</text>');
     }
 
 

@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 from scipy.stats import gmean
 
 
@@ -140,18 +141,20 @@ def pool(df):
 
 
 if __name__ == "__main__":
+    dir_path = os.path.dirname(os.path.realpath(__file__))
 
     # VIEWER_PATH = 'https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/'
-    SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/rectHeatmap/dashboard/data/img/'
-    MODEL_DATA = SIM_PATH + '/default_42genes/json/iss.json'
-    SIM_DATA = SIM_PATH + '/sim_123456_42genes/json/iss.json'  # Simulation 1
+    # SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/rectHeatmap/dashboard/data/img/'
+    PATH = os.path.join(dir_path, '..', 'dashboard/data/img')
+    MODEL_DATA = PATH + '/default/json/iss.json'
+    SIM_DATA = PATH + '/sim_123456_42genes_excludedClasses/json/iss.json'  # Simulation 1
     # SIM_DATA = SIM_PATH + '/sim_123456_42genes_excludedClasses/json/iss.json'  # Simulation 1
 
 
-    norm = 'median'
-    # norm = 'mean'
+    # norm = 'median'
+    norm = 'mean'
 
-    use_pool = False
+    use_pool = True
 
     model_data = pd.read_json(MODEL_DATA)
     sim_data = pd.read_json(SIM_DATA)

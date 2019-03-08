@@ -561,11 +561,10 @@
                                 var bb = 2;
                             </script>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Default (Full gene panel)")'>Default (Full gene panel)</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Default (42 gene panel)")'>Default (42 gene panel)</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Default (99 gene panel)")'>Default (99 gene panel)</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation (Full gene panel)")'>Simulation (Full gene panel)</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation (42 gene panel)")'>Simulation (42 gene panel)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Default (Live)")'>Default (Live)</a></li>
+                                <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("Default (99 gene panel)")'>Default (99 gene panel)</a></li>-->
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (from Live)")'>Simulated spots (from Live)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (from 42 gene panel)")'>Simulated spots (from 42 gene panel)</a></li>
 
                                 <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_3")'>Simulation_3</a></li>-->
 
@@ -595,6 +594,7 @@
         <li class="active"><a href="#map-content" data-toggle="tab" id="map-tab">Viewer</a></li>
         <!--<li><a href="#table-content" data-toggle="tab" id="table-tab">Confusion Matrix</a></li>-->
         <li><a href="#confusion-table-content" data-toggle="tab" id="confusion-table-tab">Confusion Matrix</a></li>
+        <li><a href="#workflow-content" data-toggle="tab" id="workflow-tab">Workflow</a></li>
 
     </ul>
 
@@ -856,6 +856,34 @@
                 </div>
             </div>
         </div><!-- about content tab -->
+
+        <!--Workflow tab-->
+         <div class="tab-pane fade" id="workflow-content">
+            <div class="container-fluid">
+                <div class="row" style="margin-top:5px">
+                    <!--//top row-->
+                    <div class="row" style="margin-top:5px">
+                        <div class="col-sm-12">
+                            <!-- workflow -->
+                            <div class="col-sm-4" id="workflow-img">
+                                <div class="chart-wrapper">
+                                    <div class="chart-title">
+                                        Workflow
+                                    </div>
+                                    <div class="chart-stage" id="workflow">
+                                        <svg width="600" height="750">
+                                            <image xlink:href="./notebooks/workflow.PNG" width="100%" height="100%" x="0" y="0" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Workflow -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- about content tab -->
+
 
     </div><!-- tab-content -->
 
