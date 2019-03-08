@@ -1,17 +1,17 @@
 The same spots were used (from spots_123456.csv) but the cell mapping algorithm
 was run after excluding these classes:
 {
-'Astro.1', 
-'Astro.2', 
-'Astro.5', 
-'Cck.Calca', 
-'Cck.Cxcl14.Calb1.Tac2', 
-'Cck.Lmo1.Npy',
-'Cck.Lmo1.Vip.Tac2', 
-'Eryth.1', 
-'Microglia.1', 
-'Microglia.2', 
-'Sst.Nos1', 
+'Cck.Cxcl14.Calb1.Tac2',
+'Cck.Cxcl14.Slc17a8',
+'Cck.Lmo1.Vip.Tac2',
+'Eryth.1',
+'Microglia.1',
+'Microglia.2',
+'Oligo.3',
+'Pvalb.C1ql1.Cpne5',
+'Sst.Erbb4.Th',
+'Sst.Nos1',
+'Vip.Crh.Pcp4',
 'Vsmc'
 };
 
@@ -24,8 +24,8 @@ and after line:
 in call_cells_sims.m (matlab script)
 
 *******************
-ExcludeClasses = {'Astro.1', 'Astro.2', 'Astro.5', 'Cck.Calca', 'Cck.Cxcl14.Calb1.Tac2', 'Cck.Lmo1.Npy', ... 
-                  'Cck.Lmo1.Vip.Tac2', 'Eryth.1', 'Microglia.1', 'Microglia.2', 'Sst.Nos1', 'Vsmc'};       
+ExcludeClasses = {'Cck.Cxcl14.Calb1.Tac2', 'Cck.Cxcl14.Slc17a8', 'Cck.Lmo1.Vip.Tac2', 'Eryth.1', 'Microglia.1', ...
+                  'Microglia.2', 'Oligo.3', 'Pvalb.C1ql1.Cpne5', 'Sst.Erbb4.Th', 'Sst.Nos1', 'Vip.Crh.Pcp4', 'Vsmc'};
 IncludeClass = ~ismember(ClassNames, ExcludeClasses);             
 ClassNames = ClassNames(IncludeClass);
 *******************
