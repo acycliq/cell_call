@@ -1048,6 +1048,7 @@ function dapiChart(cellData, geneData, config) {
                 opts = this.options;
             if (pos) {
                 //pos = pos.wrap(); // Remove that instruction.
+                // Get the mouse location in actual coordinates and then express it as a latLng object
                 var coords = dapiData.t.untransform(L.point([pos.lng, pos.lat])),
                     pos = L.latLng(coords.y, coords.x)
                 this._currentPos = pos;
