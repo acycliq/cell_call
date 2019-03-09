@@ -814,7 +814,9 @@ function dapiChart(cellData, geneData, config) {
     }
 
     function voronoiHighlight(e) {
-        console.log("Current position: x: " + e.latlng.lng + ", y: " + e.latlng.lat);
+        var myMouseCoords = dapiData.t.untransform(L.point([e.latlng.lng, e.latlng.lat]))
+        // console.log("Current position: x: " + e.latlng.lng + ", y: " + e.latlng.lat);
+        console.log("Current_position: x: " + myMouseCoords.x + ", y: " + myMouseCoords.y);
         var idx = delaunay.find(e.latlng.lng, e.latlng.lat);
         point = cellFeatures[idx];
 
@@ -1011,6 +1013,7 @@ function dapiChart(cellData, geneData, config) {
         createCorner('verticalcenter', 'left');
         createCorner('verticalcenter', 'right');
         createCorner('verticalcenter', 'horizontalcenter');
+        createCorner('bottom', 'horizontalcenter');
 
     }
 
@@ -1036,6 +1039,40 @@ function dapiChart(cellData, geneData, config) {
         }
     });
     map.addControl(new spinnerControl());
+
+
+    // Patch first to avoid longitude wrapping.
+    L.Control.Coordinates.include({
+        _update: function (evt) {
+            var pos = evt.latlng,
+                opts = this.options;
+            if (pos) {
+                //pos = pos.wrap(); // Remove that instruction.
+                var coords = dapiData.t.untransform(L.point([pos.lng, pos.lat])),
+                    pos = L.latLng(coords.y, coords.x)
+                this._currentPos = pos;
+                this._inputY.value = L.NumberFormatter.round(pos.lng, opts.decimals, opts.decimalSeperator);
+                this._inputX.value = L.NumberFormatter.round(pos.lat, opts.decimals, opts.decimalSeperator);
+                this._label.innerHTML = this._createCoordinateLabel(pos);
+            }
+        }
+    });
+
+    L.control.coordinates({
+	position:"bottomhorizontalcenter", //optional default "bootomright"
+	decimals:0, //optional default 4
+	decimalSeperator:".", //optional default "."
+	labelTemplateLat:"y: {y}", //optional default "Lat: {y}"
+	labelTemplateLng:"x: {x}", //optional default "Lng: {x}"
+	enableUserInput:true, //optional default true
+	useDMS:false, //optional default false
+	useLatLngOrder: false, //ordering of labels, default false-> lng-lat
+	markerType: L.marker, //optional default L.marker
+	markerProps: {}, //optional default {},
+	// labelFormatterLng : function(lng){return lng+" lng"}, //optional default none,
+	// labelFormatterLat : function(lat){return lat+" lat"}, //optional default none
+	// customLabelFcn: function(latLonObj, opts) { "Geohash: " + encodeGeoHash(latLonObj.lat, latLonObj.lng)} //optional default none
+    }).addTo(map);
 
 
 }
