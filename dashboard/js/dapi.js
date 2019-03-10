@@ -538,6 +538,9 @@ function dapiChart(cellData, geneData, config) {
         console.log("updating info control");
         // 4. Highlight the rect on the section chart
         rectHighlight(e)
+
+        // 5. Show the coordinates control
+        $('.uiElement.label').show()
     }
 
     function glyphMouseOut(e){
@@ -811,6 +814,9 @@ function dapiChart(cellData, geneData, config) {
         rectHighlight(e)
         // 4. Draw the lines connecting the cell to the spots
         drawLines(e)
+
+        // 5. Show the coordinates control
+        $('.uiElement.label').show()
     }
 
     function voronoiHighlight(e) {
@@ -877,6 +883,9 @@ function dapiChart(cellData, geneData, config) {
             if (lineStrings){
                 map.removeLayer(lineStrings);
             }
+
+            // 5. hide the coordinates control
+            $('.uiElement.label').hide()
 
             //just a blank line
             console.log('')
@@ -1075,6 +1084,7 @@ function dapiChart(cellData, geneData, config) {
 	// customLabelFcn: function(latLonObj, opts) { "Geohash: " + encodeGeoHash(latLonObj.lat, latLonObj.lng)} //optional default none
     }).addTo(map);
 
-
+    // Hide the coordinates control when the chart first loads up
+    $('.uiElement.label').hide()
 }
 
