@@ -448,6 +448,38 @@
             /**border-collapse: expression('separate', cellSpacing = '10px');*/
         }
 
+
+        table.sectionChartControls {
+            border:0px;
+            border-collapse:collapse;
+            border-spacing:0px;
+            /*font-family: sans-serif;*/
+            /*font-size: 10px;*/
+            /*margin: 1em 1em 0 1em;*/
+        }
+        table.sectionChartControls td {
+            font-family: sans-serif;
+            font-size: 8px;
+            padding-left: 0px;
+            padding-right: 0px;
+            border-width:0px;
+            margin:0px;
+        }
+
+        .checkBoxLabel {
+            padding-left: 10px;
+            padding-right: 0px;
+        }
+
+        table.no-spacing {
+          border-spacing:0; /* Removes the cell spacing via CSS */
+          border-collapse: collapse;  /* Optional - if you don't want to have double border where cells touch */
+        }
+        table.no-spacing td {
+            font-family: sans-serif;
+            font-size: 10px;
+        }
+
     </style>
 
 </head>
@@ -630,20 +662,104 @@
 
                             <div class="col-sm-5">
                                 <div class="row">
-                                    <!-- Scatter Plot -->
-                                    <div class="chart-wrapper">
-                                        <div class="chart-title">
-                                            Section Overview
-                                        </div>
-                                        <div class="chart-stage">
-                                            <div id="scatter-plot" class="display compact custom" ; width=100%>
-                                                <svg></svg>
+                                    <div class="col-sm-12">
+                                        <div class="chart-wrapper">
+                                            <div class="chart-title">
+                                                Section Overview
+                                            </div>
+                                            <div class="chart-stage">
+                                                <!-- Scatter Plot -->
+                                                <div class="col-sm-8">
+                                                    <div id="scatter-plot" class="display compact custom" ; width=100%>
+                                                        <svg></svg>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <table  class="no-spacing" id="section-chart-controls" width="100%">
+                                                    <!--<div id = "section-chart-controls">-->
+                                                    <!--<label>-->
+                                                        <tbody>
+                                                        <tr>
+                                                            <td>Select All</td>
+                                                            <td><input type="checkbox" name="cb:select-all" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Axo-axonic</td>
+                                                            <td><input type="checkbox" name="Axo-axonic" /></td>
+                                                            <td class="checkBoxLabel">Backprojection</td>
+                                                            <td><input type="checkbox" name="Backprojection" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Basket</td>
+                                                            <td><input type="checkbox" name="Basket" /></td>
+                                                            <td class="checkBoxLabel">Bistratified</td>
+                                                            <td><input type="checkbox" name="Bistratified" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td >Cck</td>
+                                                            <td><input type="checkbox" name="Cck" /></td>
+                                                            <td class="checkBoxLabel">CGE NGF</td>
+                                                            <td><input type="checkbox" name="CGE NGF" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Hippocamposeptal</td>
+                                                            <td><input type="checkbox" name="Hippocamposeptal" /></td>
+                                                            <td class="checkBoxLabel">IS1</td>
+                                                            <td><input type="checkbox" name="IS1" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>IS2</td>
+                                                            <td><input type="checkbox" name="IS2" /></td>
+                                                            <td class="checkBoxLabel">IS3</td>
+                                                            <td><input type="checkbox" name="IS3" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Ivy</td>
+                                                            <td><input type="checkbox" name="Ivy" /></td>
+                                                            <td class="checkBoxLabel">MGE NGF</td>
+                                                            <td><input type="checkbox" name="MGE NGF" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>NGF/I-S transition</td>
+                                                            <td><input type="checkbox" name="NGF/I-S transition" /></td>
+                                                            <td class="checkBoxLabel">Non Neuron</td>
+                                                            <td><input type="checkbox" name="Non Neuron" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>O/LM</td>
+                                                            <td><input type="checkbox" name="O/LM" /></td>
+                                                            <td class="checkBoxLabel">O-Bi</td>
+                                                            <td><input type="checkbox" name="O-Bi" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>PC</td>
+                                                            <td><input type="checkbox" name="PC" /></td>
+                                                            <td class="checkBoxLabel">PC Other</td>
+                                                            <td><input type="checkbox" name="PC Other" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Radiatum retrohip</td>
+                                                            <td><input type="checkbox" name="Radiatum retrohip" /></td>
+                                                            <td class="checkBoxLabel">Trilaminar</td>
+                                                            <td><input type="checkbox" name="Trilaminar" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Unidentified</td>
+                                                            <td><input type="checkbox" name="Unidentified" /></td>
+                                                            <td class="checkBoxLabel">Zero</td>
+                                                            <td><input type="checkbox" name="Zero" /></td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                        <!--<input type="checkbox" id="cb:Axo-axonic"><span> Axo-axonic </span>-->
+                                                        <!--<input type="checkbox" id="cb:Backprojection"><span> Backprojection </span>-->
+                                                    <!--</label>-->
+                                                    </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row">
+                                    <div class="row">
                                     <!-- Bar and Pie Chart -->
                                     <div class="chart-wrapper">
                                         <div class="chart-title">
@@ -680,7 +796,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
+                                    <div class="row">
                                     <div class="chart-wrapper">
                                         <div class="chart-title" id="dtTitle">
                                             Title
@@ -701,7 +817,7 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                </div>
                             </div>
 
                         </div>
@@ -946,6 +1062,67 @@
             console.log('Viewer tab was clicked.')
             $('#myDropdown').show() // show the dropdown
         });
+    </script>
+
+    <script>
+        //
+        var sectionChartFilters = document.getElementById('section-chart-controls');
+        var checkItAll = sectionChartFilters.querySelector('input[name="cb:select-all"]');
+        var inputs = sectionChartFilters.querySelectorAll('tbody>tr>td>input');
+
+
+
+        inputs.forEach(function(input) {
+          input.addEventListener('change', function() {
+            if (!this.checked) {
+              checkItAll.checked = false;
+            }
+            else if (!checkItAll.checked) {
+              var allChecked = true;
+              for (var i=1; i<inputs.length; i++) {
+                if (!inputs[i].checked) {
+                  allChecked = false;
+                }
+              }
+
+              if (allChecked) {
+                checkItAll.checked = true;
+              }
+            }
+
+            var selected = getSelected(inputs);
+          });
+
+        });
+
+        checkItAll.addEventListener('change', function() {
+          inputs.forEach(function(input) {
+            input.checked = checkItAll.checked;
+          });
+
+          var selected = getSelected(inputs);
+        });
+
+        function getSelected(inputs){
+            //Loop over all selected
+            var selected = [];
+            for (var i=1; i<inputs.length; i++) {
+                if (inputs[i].checked) {
+                    if (inputs[i].name === 'Cck')
+                    {
+                         selected.push('Cck Calb1/Slc17a8*', 'Cck Cxcl14-', 'Cck Cxcl14+', 'Cck Vip Cxcl14-', 'Cck Vip Cxcl14+');
+                    }
+                    else if (inputs[i] === 'PC')
+                    {
+                        selected.push('PC', 'PC Other1', 'PC Other2')
+                    }
+                    else{
+                        selected.push(inputs[i].name);
+                    }
+                }
+            }
+            return selected
+        }
     </script>
 
 

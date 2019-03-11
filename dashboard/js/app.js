@@ -1,6 +1,7 @@
 
 
-var cookie = sessionStorage['myvariable']
+var cookie = sessionStorage['myvariable'],
+    cellData;
 
 if (!cookie){ // if you dont have cookie, run the default selection
     console.log('No cookie, starting with default dataset')
@@ -38,13 +39,26 @@ function run(c){
 function splitCharts(myParam) {
     return (err, ...args) => {
 
-        var cellData = args[0];
+        cellData = args[0];
         var geneData = args[1];
 
+        var colorMap = d3.map(classColorsCodes(), function (d) {
+            return d.className;
+        });
+
         for (i = 0; i < cellData.length; ++i) {
-            cellData[i].Cell_Num = +cellData[i].Cell_Num
-            cellData[i].x = +cellData[i].X
-            cellData[i].y = +cellData[i].Y
+            // make sure Prob and ClassName are arrays
+            cellData[i].myProb = Array.isArray(cellData[i].Prob)? cellData[i].Prob: [cellData[i].Prob];
+            cellData[i].myClassName = Array.isArray(cellData[i].ClassName)? cellData[i].ClassName: [cellData[i].ClassName];
+
+            cellData[i].Cell_Num = +cellData[i].Cell_Num;
+            cellData[i].x = +cellData[i].X;
+            cellData[i].y = +cellData[i].Y;
+
+            // useful to know these:
+            cellData[i].topClass = cellData[i].myClassName[argMax(cellData[i].myProb)];
+            cellData[i].IdentifiedType = colorMap.get(cellData[i].topClass).IdentifiedType;
+            console.log('Most likely class in Cell_Num:' + cellData[i].Cell_Num + ' is: ' + cellData[i].topClass)
         }
 
         //render now the charts
