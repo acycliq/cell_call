@@ -66,6 +66,11 @@ function section() {
         .attr("width", width)
         .attr("height", height);
 
+    var dotsGroup = svg.append("g")
+        .attr("clip-path", "url(#clip)")
+        .attr("transform", "translate(4, 0)") // no idea why!
+        .append("g");
+
     //Create X axis
     var renderXAxis = svg.append("g")
         .attr("class", "x axis")
@@ -130,6 +135,7 @@ function section() {
 
     var chartData = {};
     chartData.svg = svg;
+    chartData.dotsGroup = dotsGroup;
     chartData.width = width;
     chartData.height = height;
     chartData.renderXAxis = renderXAxis;
@@ -204,13 +210,14 @@ function dataManager(sectionFeatures, data) {
     return chartData
 }
 
+var sectionFeatures;
 function sectionChart(data) {
 
     console.log('Doing Section Overview plot')
 
     var svg = d3.select('#scatter-plot').select("svg")
     if (svg.select('.dotOnScatter').empty()) {
-        var sectionFeatures = section()
+        sectionFeatures = section()
     }
 
     svg = sectionFeatures.svg;
@@ -260,10 +267,12 @@ function sectionChart(data) {
         .attr("class", "grid")
         .call(sectionFeatures.gridlines.y);
 
-    var dotsGroup = svg.append("g")
-        .attr("clip-path", "url(#clip)")
-        .attr("transform", "translate(4, 0)") // no idea why!
-        .append("g");
+    // var dotsGroup = svg.append("g")
+    //     .attr("clip-path", "url(#clip)")
+    //     .attr("transform", "translate(4, 0)") // no idea why!
+    //     .append("g");
+
+    var dotsGroup = sectionFeatures.dotsGroup;
 
     //Do the chart
     var update = dotsGroup.selectAll("circle").data(data)
@@ -271,6 +280,8 @@ function sectionChart(data) {
     update
         .enter()
         .append('circle')
+        .merge(update)
+        .transition(dotsGroup.tsn)
         .attr('class', 'dotOnScatter')
         .attr('id', d => 'Cell_Num_' + d.Cell_Num)
         .attr('r', d => Math.sqrt(d.managedData.GeneCountTotal))
@@ -279,6 +290,7 @@ function sectionChart(data) {
         .attr('fill', d => d.managedData.color)
         .attr('fill-opacity', 0.85)
 
+    update.exit().remove();
 
     voronoiDiagram = d3.voronoi()
         .x(d => sectionFeatures.scale.x(d.x))
