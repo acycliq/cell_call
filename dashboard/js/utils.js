@@ -65,3 +65,15 @@ function dispachCustomEvent(layer) {
 }
 
 
+/**
+ * Retrieve the array key corresponding to the largest element in the array.
+ *
+ * @param {Array.<number>} array Input array
+ * @return {number} Index of array element with largest value
+ *
+ * From https://gist.github.com/engelen/fbce4476c9e68c52ff7e5c2da5c24a28
+ */
+function argMax(array) {
+  return array.map((x, i) => [x, i]).reduce((r, a) => (a[0] > r[0] ? a : r))[1];
+}
+

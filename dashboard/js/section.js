@@ -1,6 +1,6 @@
 function section() {
 
-    var totalWidth = 700,
+    var totalWidth = 450,
         totalHeight = 275;
 
     var margin = {
