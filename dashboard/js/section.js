@@ -13,7 +13,7 @@ function section() {
     var width = totalWidth - margin.left - margin.right,
         height = totalHeight - margin.top - margin.bottom;
 
-    var tsn = d3.transition().duration(200);
+    var tsn = d3.transition().duration(1000);
 
     // radius of points in the scatterplot
     var pointRadius = 2;
@@ -59,6 +59,16 @@ function section() {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    // grid lines group must be before the dotsGroup group so that the
+    /// gridlines are rendered under the circles not above!
+    var xGrid = svg.append("g")
+        .attr("class", "grid")
+        // .call(sectionFeatures.gridlines.x);
+
+    var yGrid = svg.append("g")
+        .attr("class", "grid")
+        // .call(sectionFeatures.gridlines.y);
+
     // Clip path
     svg.append("clipPath")
         .attr("id", "clip")
@@ -99,6 +109,9 @@ function section() {
     function onlyUnique(value, index, self) {
         return self.indexOf(value) === index;
     }
+
+    // voronoi
+    var voronoi = d3.voronoi()
 
     function renderOrder(y) {
         return y === 'Zero' ? 1 :
@@ -152,6 +165,9 @@ function section() {
     chartData.colorMap = colorMap;
     chartData.zoom = zoom;
     chartData.tooltip = tooltip;
+    chartData.xGrid = xGrid;
+    chartData.yGrid = yGrid;
+    chartData.voronoi = voronoi;
 
     return chartData
 }
@@ -243,12 +259,25 @@ function sectionChart(data) {
         }),
     };
 
-    function updateScales(data) {
+    function updateScales() {
         sectionFeatures.scale.x.domain([extent.x[0] * 0.99, extent.x[1] * 1.01]).nice()
         sectionFeatures.scale.y.domain([extent.y[0] * 0.99, extent.y[1] * 1.01]).nice()
     }
 
-    updateScales(data);
+    function updateGridlines() {
+        sectionFeatures.xGrid.call(sectionFeatures.gridlines.x);
+        sectionFeatures.yGrid.call(sectionFeatures.gridlines.y);
+    }
+
+    function updateVoronoi(data){
+        return sectionFeatures.voronoi
+        .x(d => sectionFeatures.scale.x(d.x))
+        .y(d => sectionFeatures.scale.y(d.y))
+        .size([sectionFeatures.width, sectionFeatures.height])(data);
+    }
+
+    updateScales();
+    updateGridlines();
 
     svg.select('.y.axis')
         .attr("transform", "translate(" + sectionFeatures.pointRadius + " 0)")
@@ -259,13 +288,13 @@ function sectionChart(data) {
         .attr("transform", "translate(0, " + h + ")")
         .call(sectionFeatures.axis.x);
 
-    var xGrid = svg.append("g")
-        .attr("class", "grid")
-        .call(sectionFeatures.gridlines.x);
-
-    var yGrid = svg.append("g")
-        .attr("class", "grid")
-        .call(sectionFeatures.gridlines.y);
+    // var xGrid = svg.append("g")
+    //     .attr("class", "grid")
+    //     .call(sectionFeatures.gridlines.x);
+    //
+    // var yGrid = svg.append("g")
+    //     .attr("class", "grid")
+    //     .call(sectionFeatures.gridlines.y);
 
     // var dotsGroup = svg.append("g")
     //     .attr("clip-path", "url(#clip)")
@@ -292,10 +321,11 @@ function sectionChart(data) {
 
     update.exit().remove();
 
-    voronoiDiagram = d3.voronoi()
-        .x(d => sectionFeatures.scale.x(d.x))
-        .y(d => sectionFeatures.scale.y(d.y))
-        .size([sectionFeatures.width, sectionFeatures.height])(data);
+    var voronoiDiagram = updateVoronoi(data);
+    // voronoiDiagram = d3.voronoi()
+    //     .x(d => sectionFeatures.scale.x(d.x))
+    //     .y(d => sectionFeatures.scale.y(d.y))
+    //     .size([sectionFeatures.width, sectionFeatures.height])(data);
 
     // add a circle for indicating the highlighted point
     dotsGroup.append('circle')
@@ -349,8 +379,8 @@ function sectionChart(data) {
         sectionFeatures.renderXAxis.call(sectionFeatures.axis.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
         sectionFeatures.renderYAxis.call(sectionFeatures.axis.y.scale(d3.event.transform.rescaleY(sectionFeatures.scale.y)));
 
-        xGrid.call(sectionFeatures.gridlines.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
-        yGrid.call(sectionFeatures.gridlines.y.scale(d3.event.transform.rescaleY(sectionFeatures.scale.y)));
+        sectionFeatures.xGrid.call(sectionFeatures.gridlines.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
+        sectionFeatures.yGrid.call(sectionFeatures.gridlines.y.scale(d3.event.transform.rescaleY(sectionFeatures.scale.y)));
 
         dotsGroup.attr("transform", d3.event.transform);
         // xGrid.attr("transform", d3.event.transform);
