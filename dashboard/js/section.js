@@ -79,7 +79,8 @@ function section() {
     var dotsGroup = svg.append("g")
         .attr("clip-path", "url(#clip)")
         .attr("transform", "translate(4, 0)") // no idea why!
-        .append("g");
+        .append("g")
+        .attr('id', 'dotsGroup');
 
     //Create X axis
     var renderXAxis = svg.append("g")
@@ -270,10 +271,54 @@ function sectionChart(data) {
     }
 
     function updateVoronoi(data){
-        return sectionFeatures.voronoi
-        .x(d => sectionFeatures.scale.x(d.x))
-        .y(d => sectionFeatures.scale.y(d.y))
-        .size([sectionFeatures.width, sectionFeatures.height])(data);
+        var v =  sectionFeatures.voronoi
+                    .x(d => sectionFeatures.scale.x(d.x))
+                    .y(d => sectionFeatures.scale.y(d.y))
+                    .size([sectionFeatures.width, sectionFeatures.height])(data);
+
+        // Is this how it should be done? Do I have to remove them each time?
+        // highlight circle and sectionOverlay must be on top of everything else. Hence they
+        // should be rendered last. Especially when using filters on the section chart you need to guarantee
+        // that these are drawn at very end, otherwise they wont work properly.
+        // Draw the highlight circle
+        d3.select('#dotsGroup').select('.highlight-circle').remove()
+        if (d3.select('#dotsGroup').select('.highlight-circle').empty()){
+            sectionFeatures.dotsGroup
+                            .append('circle')
+                            .attr('class', 'highlight-circle')
+                            // .style('fill', '#FFCE00')
+                            .style('display', 'none')
+        }
+        d3.select('#dotsGroup')
+            .select('.highlight-circle')
+            .attr('r', sectionFeatures.pointRadius * 2);
+
+        // Now draw the overlay on top of everything to take the mouse events
+        d3.select('#dotsGroup').select('#sectionOverlay').remove()
+        if (d3.select('#dotsGroup').select('#sectionOverlay').empty()){
+            sectionFeatures.dotsGroup
+                            .append('rect')
+                            .attr('class', 'overlay')
+                            .attr('id', 'sectionOverlay')
+                            // .style('fill', '#FFCE00')
+                            .style('opacity', 0)
+                            .on('click', mouseClickHandler)
+                            .on('mousemove', mouseMoveHandler)
+                            .on('mouseleave', () => {
+                                // hide the highlight circle when the mouse leaves the chart
+                                console.log('mouse leave');
+                                dapiConfig.map.removeLayer(voronoiMarker);
+                                highlight(null);
+                            });
+
+        }
+        d3.select('#dotsGroup')
+            .select('#sectionOverlay')
+            .attr('width', sectionFeatures.width)
+            .attr('height', sectionFeatures.height)
+
+        //Finally return the voronoi
+        return v
     }
 
     updateScales();
@@ -327,34 +372,34 @@ function sectionChart(data) {
     //     .y(d => sectionFeatures.scale.y(d.y))
     //     .size([sectionFeatures.width, sectionFeatures.height])(data);
 
-    // add a circle for indicating the highlighted point
-    dotsGroup.append('circle')
-        .attr('class', 'highlight-circle')
-        .attr('r', sectionFeatures.pointRadius * 2) // increase the size if highlighted
-        //.style('fill', '#FFCE00')
-        .style('display', 'none');
+    // // add a circle for indicating the highlighted point
+    // dotsGroup.append('circle')
+    //     .attr('class', 'highlight-circle')
+    //     .attr('r', sectionFeatures.pointRadius * 2) // increase the size if highlighted
+    //     //.style('fill', '#FFCE00')
+    //     .style('display', 'none');
 
     // add a rect for indicating the highlighted point when you mouseover on the dapi chart
     dotsGroup.append('rect')
         .attr('class', 'highlight-rect')
 
 
-    // add the overlay on top of everything to take the mouse events
-    dotsGroup.append('rect')
-        .attr('class', 'overlay')
-        .attr('id', 'sectionOverlay')
-        .attr('width', sectionFeatures.width)
-        .attr('height', sectionFeatures.height)
-        // .style('fill', '#FFCE00')
-        .style('opacity', 0)
-        .on('click', mouseClickHandler)
-        .on('mousemove', mouseMoveHandler)
-        .on('mouseleave', () => {
-            // hide the highlight circle when the mouse leaves the chart
-            console.log('mouse leave');
-            dapiConfig.map.removeLayer(voronoiMarker);
-            highlight(null);
-        });
+    // // add the overlay on top of everything to take the mouse events
+    // dotsGroup.append('rect')
+    //     .attr('class', 'overlay')
+    //     .attr('id', 'sectionOverlay')
+    //     .attr('width', sectionFeatures.width)
+    //     .attr('height', sectionFeatures.height)
+    //     // .style('fill', '#FFCE00')
+    //     .style('opacity', 0)
+    //     .on('click', mouseClickHandler)
+    //     .on('mousemove', mouseMoveHandler)
+    //     .on('mouseleave', () => {
+    //         // hide the highlight circle when the mouse leaves the chart
+    //         console.log('mouse leave');
+    //         dapiConfig.map.removeLayer(voronoiMarker);
+    //         highlight(null);
+    //     });
 
     // Manually dispach a mouse click event. That will kick-off rendering of the other charts on the dashboard.
     // d3.select('.overlay').dispatch('click')
