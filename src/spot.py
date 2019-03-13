@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -102,7 +103,10 @@ class Spot(object):
 
     def _filter_spots(self, iss):
 
-        saFile = '../data_preprocessed/spot_attributes.nc'
+        cf = os.path.dirname(os.path.abspath(__file__))  # current folder
+        saFile = os.path.join(cf, '..', 'data_preprocessed/spot_attributes.nc')
+
+        # saFile = '../data_preprocessed/spot_attributes.nc'
         try:
             Path(saFile).resolve(strict=True)
         except FileNotFoundError:
