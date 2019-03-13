@@ -241,7 +241,7 @@ if __name__ == "__main__":
     # Fetch the data
     # dataset_name = 'DEFAULT'
     # dataset_name = 'DEFAULT_42GENES'
-    dataset_name = 'DEFAULT_98GENES'
+    dataset_name = 'DEFAULT_99GENES'
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
     # for each cell find its most likely cell class
