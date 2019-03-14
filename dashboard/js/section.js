@@ -29,8 +29,8 @@ function section() {
     };
 
     var gridlines = {
-        x: d3.axisBottom(scale.x).tickFormat("").tickSize(height),
-        y: d3.axisLeft(scale.y).tickFormat("").tickSize(-width),
+        x: null,
+        y: null,
     }
 
     // var colorScale = d3.scaleLinear().domain([0, 1]).range(['tomato', 'tomato']);
@@ -161,6 +161,8 @@ function section() {
     chartData.pointRadius = pointRadius;
     chartData.scale = scale;
     chartData.axis = axis;
+    chartData.xTicks = xTicks;
+    chartData.yTicks = yTicks;
     chartData.gridlines = gridlines;
     chartData.colorRamp = colorRamp;
     chartData.colorMap = colorMap;
@@ -251,23 +253,52 @@ function sectionChart(data) {
         return d3.ascending(x.managedData.renderOrder, y.managedData.renderOrder);
     })
 
-    var extent = {
-        x: d3.extent(data, function (d) {
-            return d.x
-        }),
-        y: d3.extent(data, function (d) {
-            return d.y
-        }),
-    };
+    // var extent = {
+    //     x: d3.extent(data, function (d) {
+    //         return d.x
+    //     }),
+    //     y: d3.extent(data, function (d) {
+    //         return d.y
+    //     }),
+    // };
+
+    function getExtent(){
+        var out = {};
+
+        out.x = d3.extent(data, function (d) {return d.x});
+        out.y = d3.extent(data, function (d) {return d.y});
+
+
+        if (typeof (out.x[0] || out.x[1]) == 'undefined') {
+            out.x = [0, 1];
+        }
+         if (typeof (out.y[0] || out.y[1]) == 'undefined') {
+            out.y = [0, 1];
+        }
+        return out
+    }
+
 
     function updateScales() {
+        var extent = getExtent();
+
         sectionFeatures.scale.x.domain([extent.x[0] * 0.99, extent.x[1] * 1.01]).nice()
         sectionFeatures.scale.y.domain([extent.y[0] * 0.99, extent.y[1] * 1.01]).nice()
     }
 
+    var gridlines = {
+        x: d3.axisBottom(sectionFeatures.scale.x).tickFormat("").tickSize(sectionFeatures.height),
+        y: d3.axisLeft(sectionFeatures.scale.y).tickFormat("").tickSize(-sectionFeatures.width),
+    }
+
     function updateGridlines() {
-        sectionFeatures.xGrid.call(sectionFeatures.gridlines.x);
-        sectionFeatures.yGrid.call(sectionFeatures.gridlines.y);
+        sectionFeatures.xGrid.call(gridlines.x);
+        sectionFeatures.yGrid.call(gridlines.y);
+    }
+
+    function updateAxes(){
+        sectionFeatures.axis.x = d3.axisBottom(sectionFeatures.scale.x).ticks(sectionFeatures.xTicks).tickSizeOuter(0);
+        sectionFeatures.axis.y = d3.axisLeft(sectionFeatures.scale.y).ticks(sectionFeatures.yTicks).tickSizeOuter(0);
     }
 
     function updateVoronoi(data){
@@ -322,6 +353,7 @@ function sectionChart(data) {
     }
 
     updateScales();
+    updateAxes();
     updateGridlines();
 
     svg.select('.y.axis')
@@ -379,9 +411,9 @@ function sectionChart(data) {
     //     //.style('fill', '#FFCE00')
     //     .style('display', 'none');
 
-    // add a rect for indicating the highlighted point when you mouseover on the dapi chart
-    dotsGroup.append('rect')
-        .attr('class', 'highlight-rect')
+    // // add a rect for indicating the highlighted point when you mouseover on the dapi chart
+    // dotsGroup.append('rect')
+    //     .attr('class', 'highlight-rect')
 
 
     // // add the overlay on top of everything to take the mouse events
@@ -424,8 +456,8 @@ function sectionChart(data) {
         sectionFeatures.renderXAxis.call(sectionFeatures.axis.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
         sectionFeatures.renderYAxis.call(sectionFeatures.axis.y.scale(d3.event.transform.rescaleY(sectionFeatures.scale.y)));
 
-        sectionFeatures.xGrid.call(sectionFeatures.gridlines.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
-        sectionFeatures.yGrid.call(sectionFeatures.gridlines.y.scale(d3.event.transform.rescaleY(sectionFeatures.scale.y)));
+        sectionFeatures.xGrid.call(gridlines.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
+        sectionFeatures.yGrid.call(gridlines.y.scale(d3.event.transform.rescaleY(sectionFeatures.scale.y)));
 
         dotsGroup.attr("transform", d3.event.transform);
         // xGrid.attr("transform", d3.event.transform);
