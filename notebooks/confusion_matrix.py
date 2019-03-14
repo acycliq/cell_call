@@ -1,9 +1,17 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 import os
+import errno
 from scipy.stats import gmean
+import logging
 
+logger = logging.getLogger()
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s:%(levelname)s:%(message)s"
+    )
 
 def best_class(df):
     '''
@@ -30,6 +38,8 @@ def plot_confusion_matrix(cm,
                           cmap=plt.cm.Blues):
 
     title = 'Confusion matrix' + ' (Norm: ' + norm + ')'
+    mpl.rcParams['font.family'] = 'sans-serif'
+    mpl.rcParams['font.sans-serif'] = 'DejaVu Sans'
     fntSize = 7
     xClasses = cm.columns
     yClasses = cm.index
@@ -140,6 +150,57 @@ def pool(df):
     return df
 
 
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else: raise
+
+
+def makeOutput(SIM_DATA, norm, use_pool):
+
+    root = 'jsonFiles' # All generated files are going to sit within this folder
+
+    if '99genes' in SIM_DATA:
+        level0 = '99genes'
+    elif '98genes' in SIM_DATA:
+        level0 = '98genes'
+    elif '62genes' in SIM_DATA:
+        level0 = '62genes'
+    elif '42genes' in SIM_DATA:
+        level0 = '42genes'
+    else:
+        print('ERROR')
+
+
+    # first check if you exclude some classes
+    if '_excludedClasses' in SIM_DATA:
+        level1 = 'rangeDomainOn'
+    else:
+        level1 = 'rangeDomainOff'
+
+    # now check if you are taking mean or median
+    if norm not in ['mean', 'median']:
+        print('ERROR')
+    level2 = norm
+
+    if use_pool:
+        level3 = 'nonNeuronsOn'
+    else:
+        level3 = 'nonNeuronsOff'
+
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    outPath = os.path.join(dir_path, root, level0, level1, level2, level3)
+
+    # make now the directory
+    mkdir_p(outPath)
+
+    return outPath
+
+
+
 if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -147,14 +208,21 @@ if __name__ == "__main__":
     # SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/rectHeatmap/dashboard/data/img/'
     PATH = os.path.join(dir_path, '..', 'dashboard/data/img')
     MODEL_DATA = PATH + '/default_98genes/json/iss.json'
-    SIM_DATA = PATH + '/sim_123456_62genes/json/iss.json'  # Simulation 1
-    # SIM_DATA = SIM_PATH + '/sim_123456_42genes_excludedClasses/json/iss.json'  # Simulation 1
+    # SIM_DATA = PATH + '/sim_123456_42genes/json/iss.json'  # Simulation 1
+    SIM_DATA = PATH + '/sim_123456_42genes_excludedClasses/json/iss.json'  # Simulation 1
 
+
+    # norm = 'mean'
+    # use_pool = False
 
     # norm = 'median'
-    norm = 'mean'
-
-    use_pool = False
+    # use_pool = False
+    # #
+    # norm = 'mean'
+    # use_pool = True
+    #
+    norm = 'median'
+    use_pool = True
 
     model_data = pd.read_json(MODEL_DATA)
     sim_data = pd.read_json(SIM_DATA)
@@ -163,15 +231,19 @@ if __name__ == "__main__":
         model_data = pool(model_data)
         sim_data = pool(sim_data)
 
+
+
     cm = confusion_matrix(model_data, sim_data, norm)
     print(cm.sum(axis=0))
     plot_confusion_matrix(cm, norm)
 
     unmatched = [x for x in cm.index.values if x not in cm.columns.values]
     if len(unmatched) > 0:
-        print('The following cell exist in predicted but not in actual')
+        logger.info('The following cell class(es) exist in predicted but not in actual')
         print(unmatched)
 
-    cm.to_json('confusionMatrix.json', orient='split')
-
-    print('Done')
+    outDir = makeOutput(SIM_DATA, norm, use_pool)
+    target_file = os.path.join(outDir, 'confusionMatrix.json')
+    cm.to_json(target_file, orient='split')
+    logger.info('Saved to %s ' % target_file)
+    logger.info('Done')
