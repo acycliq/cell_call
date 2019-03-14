@@ -57,6 +57,7 @@ function section() {
         .attr("height", height + margin.top + margin.bottom)
         .call(zoom)
         .append("g")
+        .attr('id', 'sectionChartGroup')
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // grid lines group must be before the dotsGroup group so that the
@@ -235,7 +236,7 @@ function sectionChart(data) {
     console.log('Doing Section Overview plot')
 
     var svg = d3.select('#scatter-plot').select("svg")
-    if (svg.select('.dotOnScatter').empty()) {
+    if (svg.select('#sectionChartGroup').empty()) {
         sectionFeatures = section()
     }
 
