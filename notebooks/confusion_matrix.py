@@ -147,7 +147,7 @@ if __name__ == "__main__":
     # SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/rectHeatmap/dashboard/data/img/'
     PATH = os.path.join(dir_path, '..', 'dashboard/data/img')
     MODEL_DATA = PATH + '/default_98genes/json/iss.json'
-    SIM_DATA = PATH + '/sim_123456_98genes/json/iss.json'  # Simulation 1
+    SIM_DATA = PATH + '/sim_123456_62genes/json/iss.json'  # Simulation 1
     # SIM_DATA = SIM_PATH + '/sim_123456_42genes_excludedClasses/json/iss.json'  # Simulation 1
 
 
