@@ -43,6 +43,7 @@ function renderHeatmapTab(selected) {
                             '\\' + radioButton +
                             '\\' + checkBox1 +
                             '\\' + 'confusionMatrix.json';
+    console.log('Pushing ' + confMatrixjson + ' in confusion matrix')
     d3.json(confMatrixjson, function (data) {
         dataset = []
         for (var i = 0; i < data.index.length; i++) {
