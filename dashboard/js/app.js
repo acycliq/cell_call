@@ -63,7 +63,7 @@ function splitCharts(myParam) {
 
         //render now the charts
         var issData = sectionChart(cellData);
-        dapiChart(issData, geneData, myParam)
+        dapiChart(issData, geneData, myParam);
         landingPoint(configSettings.name)
     }
 }
@@ -92,6 +92,7 @@ function getLandingCellNum(str) {
 
 
 function getLandingCoords(str){
+    console.log('Getting the landing cell')
     var cn = getLandingCellNum(str);
     var x,
         y;

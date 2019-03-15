@@ -230,7 +230,7 @@ function dataManager(sectionFeatures, data) {
     return chartData
 }
 
-var sectionFeatures;
+var sectionFeatures; // This is now a global variable!
 function sectionChart(data) {
 
     console.log('Doing Section Overview plot')
@@ -384,11 +384,18 @@ function sectionChart(data) {
     //Do the chart
     var update = dotsGroup.selectAll("circle").data(data)
 
+    // Note: Setting the transition here messes up the landing cell
+    // The DOM has the circles but without id, r, cx, cy and opacity.
+    // Not why, I think the function that sets the landing cell, grabs
+    // section chart too early, before it has been populated properly
+    // and that happens because of the transition (I think!!)
+    // Solution: set the transition in the CSS
     update
         .enter()
         .append('circle')
         .merge(update)
-        .transition(dotsGroup.tsn)
+        // .transition(d3.transition().duration(500))
+        // .transition().duration(500)
         .attr('class', 'dotOnScatter')
         .attr('id', d => 'Cell_Num_' + d.Cell_Num)
         .attr('r', d => Math.sqrt(d.managedData.GeneCountTotal))
