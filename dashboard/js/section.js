@@ -406,6 +406,11 @@ function sectionChart(data) {
 
     update.exit().remove();
 
+    //
+    // if (d3.select('#dotsGroup').select('.highlight-rect').empty()){
+    //     dotsGroup.append('rect').attr('class', 'highlight-rect')
+    // };
+
     var voronoiDiagram = updateVoronoi(data);
     // voronoiDiagram = d3.voronoi()
     //     .x(d => sectionFeatures.scale.x(d.x))
