@@ -42,10 +42,6 @@ function splitCharts(myParam) {
         cellData = args[0];
         var geneData = args[1];
 
-        var colorMap = d3.map(classColorsCodes(), function (d) {
-            return d.className;
-        });
-
         for (i = 0; i < cellData.length; ++i) {
             // make sure Prob and ClassName are arrays
             cellData[i].myProb = Array.isArray(cellData[i].Prob)? cellData[i].Prob: [cellData[i].Prob];
@@ -54,12 +50,6 @@ function splitCharts(myParam) {
             cellData[i].Cell_Num = +cellData[i].Cell_Num;
             cellData[i].x = +cellData[i].X;
             cellData[i].y = +cellData[i].Y;
-
-            // // useful to know these:
-            // Update: 16-Mar-2019. remove this, not getting used anymore
-            // cellData[i].topClass = cellData[i].myClassName[argMax(cellData[i].myProb)];
-            // cellData[i].IdentifiedType = colorMap.get(cellData[i].topClass).IdentifiedType;
-            // console.log('Most likely class in Cell_Num:' + cellData[i].Cell_Num + ' is: ' + cellData[i].topClass)
         }
 
         //render now the charts
