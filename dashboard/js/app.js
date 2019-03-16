@@ -55,10 +55,11 @@ function splitCharts(myParam) {
             cellData[i].x = +cellData[i].X;
             cellData[i].y = +cellData[i].Y;
 
-            // useful to know these:
-            cellData[i].topClass = cellData[i].myClassName[argMax(cellData[i].myProb)];
-            cellData[i].IdentifiedType = colorMap.get(cellData[i].topClass).IdentifiedType;
-            console.log('Most likely class in Cell_Num:' + cellData[i].Cell_Num + ' is: ' + cellData[i].topClass)
+            // // useful to know these:
+            // Update: 16-Mar-2019. remove this, not getting used anymore
+            // cellData[i].topClass = cellData[i].myClassName[argMax(cellData[i].myProb)];
+            // cellData[i].IdentifiedType = colorMap.get(cellData[i].topClass).IdentifiedType;
+            // console.log('Most likely class in Cell_Num:' + cellData[i].Cell_Num + ' is: ' + cellData[i].topClass)
         }
 
         //render now the charts

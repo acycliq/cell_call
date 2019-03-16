@@ -80,7 +80,9 @@ inputs.forEach(function (input) {
 
         var selected = getSelected(inputs);
         var filteredSectionData = cellData.filter(function (el) {
-            return selected.includes(el.IdentifiedType)
+            // var it = selected.includes(el.IdentifiedType)
+            var it = selected.includes(el.managedData.IdentifiedType);
+            return it
         })
         sectionChart(filteredSectionData)
 
