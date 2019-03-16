@@ -840,16 +840,18 @@ function dapiChart(cellData, geneData, config) {
 
     function rectHighlight(e){
         // Look up and interact with section chart
-        var cn = point.properties.Cell_Num ;
-        if ( !d3.select('#Cell_Num_' + cn).empty() ){
-            var xVal = +d3.select('#Cell_Num_' + cn).attr('cx');
-            var yVal = +d3.select('#Cell_Num_' + cn).attr('cy');
+        // var cn = point.properties.Cell_Num ;
+        if ( sectionFeatures.scale ){
+            var xVal = sectionFeatures.scale.x(point.properties.x)
+            var yVal = sectionFeatures.scale.y(point.properties.y)
+            // var xVal = +d3.select('#Cell_Num_' + cn).attr('cx');
+            // var yVal = +d3.select('#Cell_Num_' + cn).attr('cy');
 
             console.log("Styling rect on section chart");
             styleSectionRect(xVal, yVal)
         }
         else{
-            console.log('Cannot find Cell_Num_' + cn + ' on the section chart')
+            console.log('Cannot find coordinates on the section chart')
         }
     };
 
