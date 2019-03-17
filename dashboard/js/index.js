@@ -72,6 +72,9 @@ var other = sectionChartFilters.querySelector('input[name="cb:other"]');
 
 inputs.forEach(function (input) {
     input.addEventListener('change', function () {
+        // first of all, hide the existing tooltip
+        d3.select('#tooltip').style('opacity', 0);
+
         if (!this.checked) {
             checkItAll.checked = false;
             checkItAll.disabled = false;
@@ -113,6 +116,9 @@ inputs.forEach(function (input) {
 
 
 checkItAll.addEventListener('change', function () {
+    // first of all, hide the existing tooltip
+    d3.select('#tooltip').style('opacity', 0);
+
     inputs.forEach(function (input) {
         input.checked = checkItAll.checked;
     });
@@ -129,6 +135,9 @@ checkItAll.addEventListener('change', function () {
 
 
 clearItAll.addEventListener('change', function () {
+    // first of all, hide the existing tooltip
+    d3.select('#tooltip').style('opacity', 0);
+
     inputs.forEach(function (input) {
         input.checked = !clearItAll.checked;
     });
