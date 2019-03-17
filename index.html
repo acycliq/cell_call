@@ -115,7 +115,7 @@
         }
 
         html {
-            overflow-y:scroll;
+            overflow-y: scroll;
         }
 
         /*Bar colors. Overiders bar colors in the barchart*/
@@ -137,7 +137,9 @@
             font-size: 11px;
         }
 
-        .dataTables_wrapper { font-size: 10px }
+        .dataTables_wrapper {
+            font-size: 10px
+        }
 
         .dataTables {
         "pageLength": 5
@@ -160,17 +162,42 @@
             text-align: center;
         }
 
-        .grid line {stroke: #ddd;}
+        .grid line {
+            stroke: #ddd;
+        }
 
-        .leaflet-container {background: #000000;}
+        .leaflet-container {
+            background: #000000;
+        }
 
         /* Controls transition of the toggle switch on the leaflet map */
-        .slow .toggle-group { transition: left 1.0s; -webkit-transition: left 1.0s; }
-        .fast .toggle-group { transition: left 0.1s; -webkit-transition: left 0.1s; }
-        .quick .toggle-group { transition: none; -webkit-transition: none; }
+        .slow .toggle-group {
+            transition: left 1.0s;
+            -webkit-transition: left 1.0s;
+        }
+
+        .fast .toggle-group {
+            transition: left 0.1s;
+            -webkit-transition: left 0.1s;
+        }
+
+        .quick .toggle-group {
+            transition: none;
+            -webkit-transition: none;
+        }
 
         /* Pleasewait spinner gif */
-        #pleasewait { position:absolute; top:50%; left:50%; margin-left:-30px; margin-top:-30px; padding: 5px 5px 0 5px; border-radius: 5px; background-color:white; z-index:1000000; }
+        #pleasewait {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -30px;
+            margin-top: -30px;
+            padding: 5px 5px 0 5px;
+            border-radius: 5px;
+            background-color: white;
+            z-index: 1000000;
+        }
 
         .leaflet-verticalcenter {
             /********************************************/
@@ -210,15 +237,17 @@
             padding: 6px 8px;
             font: 14px/16px Verdana, Geneva, sans-serif;
             background: white;
-            background: rgba(255,255,255,0.8);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
         }
+
         .info h4 {
             font-family: Verdana, Geneva, sans-serif;
             margin: 0 0 5px;
             color: #065581;
         }
+
         /*Info popup settings*/
 
         /*Donut chart settings*/
@@ -263,6 +292,7 @@
             padding: 5px;
             text-align: center;
         }
+
         /*Donut chart settings*/
 
 
@@ -291,10 +321,10 @@
             margin: 0px 0px;
         }
 
-        .popupCustom .leaflet-popup-content-wrapper, .leaflet-popup-tip  {
+        .popupCustom .leaflet-popup-content-wrapper, .leaflet-popup-tip {
             background: none;
             color: #333;
-            box-shadow: 0 0px 0px rgba(0,0,0,0.0);
+            box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0);
         }
 
         .popupCustom {
@@ -303,13 +333,13 @@
 
         /*.popupCustom .leaflet-popup-tip,*/
         /*.popupCustom .leaflet-popup-content-wrapper {*/
-            /*background: green;*/
-            /*color: #234c5e;*/
+        /*background: green;*/
+        /*color: #234c5e;*/
 
 
         .myCSSClass {
             font-size: 15px;
-            font-weight:bold;
+            font-weight: bold;
             padding: 20px !important;
             background: none;
             border: none;
@@ -318,18 +348,25 @@
             box-shadow: #888888;
             outline: none;
         }
+
         .leaflet-tooltip-left.myCSSClass::before {
             border-left-color: cyan;
         }
+
         .leaflet-tooltip-right.myCSSClass::before {
             border-right-color: cyan;
         }
 
-        .leaflet-tooltip-left.myCSSClass::before {border-left-color: transparent;}
-        .leaflet-tooltip-right.myCSSClass::before {border-right-color: transparent;}
+        .leaflet-tooltip-left.myCSSClass::before {
+            border-left-color: transparent;
+        }
+
+        .leaflet-tooltip-right.myCSSClass::before {
+            border-right-color: transparent;
+        }
 
         /*Show/hide dropdown menu on mouse hover*/
-        .dropdown:hover>.dropdown-menu {
+        .dropdown:hover > .dropdown-menu {
             display: block;
         }
 
@@ -364,9 +401,11 @@
         #alignleft {
             float: left;
         }
+
         #alignright {
             float: right;
         }
+
         .chromeIcon {
             position: relative; /* Declared position allows for location changes */
             top: -2px; /* Moves the image 2px closer to the top of the page */
@@ -450,20 +489,21 @@
 
 
         table.sectionChartControls {
-            border:0px;
-            border-collapse:collapse;
-            border-spacing:0px;
+            border: 0px;
+            border-collapse: collapse;
+            border-spacing: 0px;
             /*font-family: sans-serif;*/
             /*font-size: 10px;*/
             /*margin: 1em 1em 0 1em;*/
         }
+
         table.sectionChartControls td {
             font-family: sans-serif;
             font-size: 8px;
             padding-left: 0px;
             padding-right: 0px;
-            border-width:0px;
-            margin:0px;
+            border-width: 0px;
+            margin: 0px;
         }
 
         .checkBoxLabel {
@@ -472,17 +512,18 @@
         }
 
         table.no-spacing {
-          border-spacing:0; /* Removes the cell spacing via CSS */
-          border-collapse: collapse;  /* Optional - if you don't want to have double border where cells touch */
+            border-spacing: 0; /* Removes the cell spacing via CSS */
+            border-collapse: collapse; /* Optional - if you don't want to have double border where cells touch */
         }
+
         table.no-spacing td {
             font-family: sans-serif;
             font-size: 10px;
         }
 
         /*transition for the circles on the section chart*/
-        .dotOnScatter{
-            transition:all 0.75s ease;
+        .dotOnScatter {
+            transition: all 0.75s ease;
         }
 
     </style>
@@ -686,142 +727,136 @@
                                                         <tbody>
                                                         <tr>
                                                             <td>Select All</td>
-                                                            <td><input type="checkbox" name="cb:select-all" /></td>
+                                                            <td><input type="checkbox" name="cb:select-all"/></td>
                                                         </tr>
                                                         <tr>
                                                             <td>Axo-axonic</td>
-                                                            <td><input type="checkbox" name="Axo-axonic" /></td>
-                                                            <td class="checkBoxLabel">Backprojection</td>
-                                                            <td><input type="checkbox" name="Backprojection" /></td>
+                                                            <td><input type="checkbox" name="Axo-axonic"/></td>
+                                                            <td class="checkBoxLabel">NGF/I-S transition</td>
+                                                            <td><input type="checkbox" name="NGF/I-S transition"/></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Backprojection</td>
+                                                            <td><input type="checkbox" name="Backprojection"/></td>
+                                                            <td class="checkBoxLabel">Non Neuron</td>
+                                                            <td><input type="checkbox" name="Non Neuron"/></td>
                                                         </tr>
                                                         <tr>
                                                             <td>Basket</td>
-                                                            <td><input type="checkbox" name="Basket" /></td>
-                                                            <td class="checkBoxLabel">Bistratified</td>
-                                                            <td><input type="checkbox" name="Bistratified" /></td>
+                                                            <td><input type="checkbox" name="Basket"/></td>
+                                                            <td class="checkBoxLabel">O/LM</td>
+                                                            <td><input type="checkbox" name="O/LM"/></td>
                                                         </tr>
                                                         <tr>
-                                                            <td >Cck</td>
-                                                            <td><input type="checkbox" name="Cck" /></td>
-                                                            <td class="checkBoxLabel">CGE NGF</td>
-                                                            <td><input type="checkbox" name="CGE NGF" /></td>
+                                                            <td>Bistratified</td>
+                                                            <td><input type="checkbox" name="Bistratified"/></td>
+                                                            <td class="checkBoxLabel">O-Bi</td>
+                                                            <td><input type="checkbox" name="O-Bi"/></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Cck</td>
+                                                            <td><input type="checkbox" name="Cck"/></td>
+                                                            <td class="checkBoxLabel">PC</td>
+                                                            <td><input type="checkbox" name="PC"/></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>CGE NGF</td>
+                                                            <td><input type="checkbox" name="CGE NGF"/></td>
+                                                            <td class="checkBoxLabel">Radiatum retrohip</td>
+                                                            <td><input type="checkbox" name="Radiatum retrohip"/></td>
                                                         </tr>
                                                         <tr>
                                                             <td>Hippocamposeptal</td>
-                                                            <td><input type="checkbox" name="Hippocamposeptal" /></td>
-                                                            <td class="checkBoxLabel">IS1</td>
-                                                            <td><input type="checkbox" name="IS1" /></td>
+                                                            <td><input type="checkbox" name="Hippocamposeptal"/></td>
+                                                            <td class="checkBoxLabel">Trilaminar</td>
+                                                            <td><input type="checkbox" name="Trilaminar"/></td>
                                                         </tr>
                                                         <tr>
-                                                            <td>IS2</td>
-                                                            <td><input type="checkbox" name="IS2" /></td>
-                                                            <td class="checkBoxLabel">IS3</td>
-                                                            <td><input type="checkbox" name="IS3" /></td>
+                                                            <td>IS</td>
+                                                            <td><input type="checkbox" name="IS"/></td>
+                                                            <td class="checkBoxLabel">Unidentified</td>
+                                                            <td><input type="checkbox" name="Unidentified"/></td>
                                                         </tr>
                                                         <tr>
                                                             <td>Ivy</td>
-                                                            <td><input type="checkbox" name="Ivy" /></td>
-                                                            <td class="checkBoxLabel">MGE NGF</td>
-                                                            <td><input type="checkbox" name="MGE NGF" /></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>NGF/I-S transition</td>
-                                                            <td><input type="checkbox" name="NGF/I-S transition" /></td>
-                                                            <td class="checkBoxLabel">Non Neuron</td>
-                                                            <td><input type="checkbox" name="Non Neuron" /></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>O/LM</td>
-                                                            <td><input type="checkbox" name="O/LM" /></td>
-                                                            <td class="checkBoxLabel">O-Bi</td>
-                                                            <td><input type="checkbox" name="O-Bi" /></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>PC</td>
-                                                            <td><input type="checkbox" name="PC" /></td>
-                                                            <td class="checkBoxLabel">PC Other</td>
-                                                            <td><input type="checkbox" name="PC Other" /></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Radiatum retrohip</td>
-                                                            <td><input type="checkbox" name="Radiatum retrohip" /></td>
-                                                            <td class="checkBoxLabel">Trilaminar</td>
-                                                            <td><input type="checkbox" name="Trilaminar" /></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Unidentified</td>
-                                                            <td><input type="checkbox" name="Unidentified" /></td>
+                                                            <td><input type="checkbox" name="Ivy"/></td>
                                                             <td class="checkBoxLabel">Zero</td>
-                                                            <td><input type="checkbox" name="Zero" /></td>
+                                                            <td><input type="checkbox" name="Zero"/></td>
                                                         </tr>
+                                                        <tr>
+                                                            <td>MGE NGF</td>
+                                                            <td><input type="checkbox" name="MGE NGF"/></td
+
+                                                        </tr>
+
                                                         </tbody>
                                                     </table>
-                                                        <!--<input type="checkbox" id="cb:Axo-axonic"><span> Axo-axonic </span>-->
-                                                        <!--<input type="checkbox" id="cb:Backprojection"><span> Backprojection </span>-->
+                                                    <!--<input type="checkbox" id="cb:Axo-axonic"><span> Axo-axonic </span>-->
+                                                    <!--<input type="checkbox" id="cb:Backprojection"><span> Backprojection </span>-->
                                                     <!--</label>-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- Bar and Pie Chart -->
+                                        <div class="chart-wrapper">
+                                            <div class="chart-title">
+                                                Cell Type Probabilities
+                                            </div>
+                                            <div class="chart-stage">
+                                                <div class="col-sm-7">
+                                                    <div class="chart-stage" id="bar-chart">
+                                                        <svg width="400" height="200">
+                                                            <!-- Add a clip path -->
+                                                            <defs>
+                                                                <clipPath id="my-clip-path">
+                                                                    <rect></rect>
+                                                                </clipPath>
+                                                            </defs>
+                                                            <g class="focus">
+                                                                <g class="axis"></g>
+                                                                <g class="axis axis--y"></g>
+                                                            </g>
+                                                            <g class="context">
+                                                                <g class="axis2"></g>
+                                                                <g class="brush"></g>
+                                                            </g>
+                                                        </svg>
                                                     </div>
+                                                </div>
+
+                                                <div class="col-sm-5">
+                                                    <div class="chart-stage" id="pie">
+                                                        <svg width="280" height="200"></svg>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="row">
-                                    <!-- Bar and Pie Chart -->
-                                    <div class="chart-wrapper">
-                                        <div class="chart-title">
-                                            Cell Type Probabilities
-                                        </div>
-                                        <div class="chart-stage">
-                                            <div class="col-sm-7">
-                                                <div class="chart-stage" id="bar-chart">
-                                                    <svg width="400" height="200">
-                                                        <!-- Add a clip path -->
-                                                        <defs>
-                                                            <clipPath id="my-clip-path">
-                                                                <rect></rect>
-                                                            </clipPath>
-                                                        </defs>
-                                                        <g class="focus">
-                                                            <g class="axis"></g>
-                                                            <g class="axis axis--y"></g>
-                                                        </g>
-                                                        <g class="context">
-                                                            <g class="axis2"></g>
-                                                            <g class="brush"></g>
-                                                        </g>
-                                                    </svg>
-                                                </div>
+                                        <div class="chart-wrapper">
+                                            <div class="chart-title" id="dtTitle">
+                                                Title
                                             </div>
-
-                                            <div class="col-sm-5">
-                                                <div class="chart-stage" id="pie">
-                                                    <svg width="280" height="200"></svg>
+                                            <div class="chart-stage">
+                                                <div class="col-sm-6">
+                                                    <div class="chart-stage">
+                                                        <table id="dtTable" class="display compact custom"
+                                                               data-page-length='5' width=100%></table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="chart-stage">
+                                                        <table id="dtTable2" class="display compact custom"
+                                                               data-page-length='5' width=100%></table>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                    <div class="row">
-                                    <div class="chart-wrapper">
-                                        <div class="chart-title" id="dtTitle">
-                                            Title
-                                        </div>
-                                        <div class="chart-stage">
-                                            <div class="col-sm-6">
-                                                <div class="chart-stage">
-                                                    <table id="dtTable" class="display compact custom"
-                                                           data-page-length='5' width=100%></table>
-                                                </div>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <div class="chart-stage">
-                                                    <table id="dtTable2" class="display compact custom"
-                                                           data-page-length='5' width=100%></table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 </div>
                             </div>
 
@@ -830,7 +865,6 @@
                 </div>
             </div>
         </div>
-
 
 
         <!-- Confusion table tab -->

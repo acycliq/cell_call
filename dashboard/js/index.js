@@ -59,6 +59,7 @@ function renderHeatmapTab(selected) {
 var sectionChartFilters = document.getElementById('section-chart-controls');
 var checkItAll = sectionChartFilters.querySelector('input[name="cb:select-all"]');
 var inputs = sectionChartFilters.querySelectorAll('tbody>tr>td>input');
+var other = sectionChartFilters.querySelector('input[name="cb:other"]');
 
 
 inputs.forEach(function (input) {
@@ -78,17 +79,35 @@ inputs.forEach(function (input) {
             }
         }
 
-        var selected = getSelected(inputs);
-        var filteredSectionData = cellData.filter(function (el) {
-            // var it = selected.includes(el.IdentifiedType)
+        var selected = getSelected(inputs),
+            filteredSectionData = cellData.filter(function (el) {
             var it = selected.includes(el.managedData.IdentifiedType);
-            return it
-        })
+            if (input.name === 'Other'){
+                return !it
+            }
+            else {
+                return it
+            }
+        });
         sectionChart(filteredSectionData)
-
     });
 
 });
+//
+// other.addEventListener('change', function () {
+//     var selected = ['Backprojection', 'Basket', 'Bistratified','Cck Calb1/Slc17a8*',
+//                     'Cck Cxcl14-','Cck Cxcl14+','Cck Vip Cxcl14-','Cck Vip Cxcl14+','CGE NGF',
+//                     'Hippocamposeptal','IS1','IS2','IS3','Ivy','MGE NGF','NGF/I-S transition',
+//                     'Non Neuron','O/LM','O-Bi','PC','PC Other1','PC Other2','Radiatum retrohip',
+//                     'Sst/Reln/NPY','Trilaminar','Unidentified','Zero'];
+//
+//     var filteredSectionData = cellData.filter(function (el) {
+//         // var it = selected.includes(el.IdentifiedType)
+//         var it = !selected.includes(el.managedData.IdentifiedType);
+//         return it
+//     });
+//     sectionChart(filteredSectionData)
+// });
 
 checkItAll.addEventListener('change', function () {
     inputs.forEach(function (input) {
@@ -105,9 +124,12 @@ function getSelected(inputs) {
         if (inputs[i].checked) {
             if (inputs[i].name === 'Cck') {
                 selected.push('Cck Calb1/Slc17a8*', 'Cck Cxcl14-', 'Cck Cxcl14+', 'Cck Vip Cxcl14-', 'Cck Vip Cxcl14+');
-            } else if (inputs[i] === 'PC') {
+            } else if (inputs[i].name === 'PC') {
                 selected.push('PC', 'PC Other1', 'PC Other2')
-            } else {
+            } else if (inputs[i].name === 'IS') {
+                selected.push('IS1', 'IS2', 'IS3')
+            }
+            else {
                 selected.push(inputs[i].name);
             }
         }
