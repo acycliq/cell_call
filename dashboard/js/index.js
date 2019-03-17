@@ -69,11 +69,11 @@ inputs.forEach(function (input) {
             checkItAll.checked = false;
             checkItAll.disabled = false;
         }
-        else if (this.checked) {
+        if (this.checked) {
             clearItAll.checked = false;
             clearItAll.disabled = false;
         }
-        else if (!checkItAll.checked) {
+        if (!checkItAll.checked) {
             var allChecked = true;
             for (var i = 0; i < inputs.length; i++) {
                 if (!inputs[i].checked) {
