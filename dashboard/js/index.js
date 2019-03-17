@@ -9,13 +9,18 @@ function renderHeatmapTab(selected) {
         checkBox2,
         json;
 
-    radioButton = selected;
+    radioButton = selected; // mean or median?
     json = "./notebooks/confusionMatrixData.json"
 
     if (document.getElementById('genes42').checked) {
         checkBox0 = '42genes'
-    } else {
-        checkBox0 = 'allGenes'
+    }
+    else if (document.getElementById('genes62').checked)
+    {
+        checkBox0 = '62genes'
+    }
+    else {
+        checkBox0 = '98genes'
     }
 
     if (document.getElementById('nonNeurons').checked) {
@@ -31,10 +36,11 @@ function renderHeatmapTab(selected) {
         checkBox2 = 'rangeDomainOff'
     }
 
-    var confMatrixjson = '.\\notebooks\\out\\' + checkBox0 + '\\' + radioButton +
-        '\\' + checkBox1 +
-        '\\' + checkBox2 +
-        '\\' + 'confusionMatrix.json';
+    var confMatrixjson =    '.\\notebooks\\jsonFiles\\' + checkBox0 +
+                            '\\' + checkBox2 +
+                            '\\' + radioButton +
+                            '\\' + checkBox1 +
+                            '\\' + 'confusionMatrix.json';
     d3.json(confMatrixjson, function (data) {
         dataset = []
         for (var i = 0; i < data.index.length; i++) {

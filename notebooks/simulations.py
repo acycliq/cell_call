@@ -28,6 +28,12 @@ def fetch_data(dataset_name):
         eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_99genes/eGeneGamma.csv')]
         eGeneGamma = [float(i) for i in eGeneGamma]
         genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_99genes/genes.csv')]
+    elif dataset_name == 'DEFAULT_98GENES':
+        df = pd.read_json("D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\default_98genes\json\iss.json")
+        GeneExp = np.load(dir_path + '/../data_preprocessed/default_98genes/GeneExp.npy')
+        eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_98genes/eGeneGamma.csv')]
+        eGeneGamma = [float(i) for i in eGeneGamma]
+        genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_98genes/genes.csv')]
     else:
         dataset_name == ''
 
@@ -256,6 +262,7 @@ if __name__ == "__main__":
 
     print(spots[-3:, :])
     print('Done!')
+
 
 
 

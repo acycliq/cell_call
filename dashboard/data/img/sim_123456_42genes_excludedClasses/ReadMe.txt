@@ -1,19 +1,16 @@
-The same spots were used (from spots_123456.csv) but the cell mapping algorithm
+The same spots were used (from spots_DEFAULT_99GENES_123456.csv) but the cell mapping algorithm
 was run after excluding these classes:
 {
-'Cck.Cxcl14.Calb1.Tac2',
-'Cck.Cxcl14.Slc17a8',
-'Cck.Lmo1.Vip.Tac2',
+'Calb2.Vip.Nos1', 
+'Cck.Cxcl14.Calb1.Tac2', 
+'Cck.Cxcl14.Slc17a8', 
+'Cck.Lmo1.Vip.Tac2', 
 'Eryth.1',
-'Microglia.1',
-'Microglia.2',
-'Oligo.3',
-'Pvalb.C1ql1.Cpne5',
-'Sst.Erbb4.Th',
-'Sst.Nos1',
-'Vip.Crh.Pcp4',
-'Vsmc'
-};
+'Microglia.2', 
+'Oligo.3', 
+'Sst.Nos1', 
+'Vip.Crh.C1ql1', 
+'Vip.Crh.Pcp4'};
 
 These classes never come up as best (most probable) class in the cell calling algo
 
@@ -24,8 +21,8 @@ and after line:
 in call_cells_sims.m (matlab script)
 
 *******************
-ExcludeClasses = {'Cck.Cxcl14.Calb1.Tac2', 'Cck.Cxcl14.Slc17a8', 'Cck.Lmo1.Vip.Tac2', 'Eryth.1', 'Microglia.1', ...
-                  'Microglia.2', 'Oligo.3', 'Pvalb.C1ql1.Cpne5', 'Sst.Erbb4.Th', 'Sst.Nos1', 'Vip.Crh.Pcp4', 'Vsmc'};
+ExcludeClasses = {'Calb2.Vip.Nos1', 'Cck.Cxcl14.Calb1.Tac2', 'Cck.Cxcl14.Slc17a8', 'Cck.Lmo1.Vip.Tac2', 'Eryth.1', ...
+                    'Microglia.2', 'Oligo.3', 'Sst.Nos1', 'Vip.Crh.C1ql1', 'Vip.Crh.Pcp4'};
 IncludeClass = ~ismember(ClassNames, ExcludeClasses);             
 ClassNames = ClassNames(IncludeClass);
 *******************

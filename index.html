@@ -643,9 +643,10 @@
                                 var bb = 2;
                             </script>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Default (Live)")'>Default (Live)</a></li>
-                                <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("Default (99 gene panel)")'>Default (99 gene panel)</a></li>-->
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (from Live)")'>Simulated spots (from Live)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("98 gene panel")'>98 gene panel</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("99 gene panel")'>99 gene panel</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (from 98 gene panel)")'>Simulated spots (from 98 gene panel)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (from 62 gene panel)")'>Simulated spots (from 62 gene panel)</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (from 42 gene panel)")'>Simulated spots (from 42 gene panel)</a></li>
 
                                 <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_3")'>Simulation_3</a></li>-->
@@ -886,7 +887,7 @@
                                             <!-- basemaps: radio buttons, see initMapLayerControl() -->
                                             <div id="layers-base">
                                                 <form name="ConfusionMatrixRadioButton">
-                                                    <input value="arithmetic_mean" type="radio" name="norm" checked/>
+                                                    <input value="mean" type="radio" name="norm" checked/>
                                                     <span> Mean &nbsp &nbsp</span>
                                                     <input value="median" type="radio" name="norm"/>
                                                     <span> Median </span>
@@ -987,6 +988,34 @@
                                                     </div>
                                                 </label>
                                             </div>
+                                            <hr>
+                                            <div id="layers-base-5">
+                                                <label>
+                                                    <input type="checkbox" id="genes62">
+                                                    <span> Use only the 62 genes below: </span>
+                                                    <br>
+                                                    <div class="table-responsive">
+                                                        <table class="genes42 table-bordered table-hover">
+                                                            <tbody>
+                                                            <tr>
+                                                                <td>6330403K07Rik
+                                                                <td>Bcl11b
+                                                                <td>Cadps2
+                                                                <td>Calb2
+                                                                <td>Cck
+                                                            </tr>
+                                                            <tr>
+                                                                <td>6330403K07Rik
+                                                                <td>Bcl11b
+                                                                <td>Cadps2
+                                                                <td>Calb2
+                                                                <td>Cck
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </label>
+                                            </div>
 
                                             <div>
                                                 <button class="btn" onclick="saveSvg()"><i class="fa fa-download"></i>
@@ -1079,6 +1108,16 @@
         });
 
         $('#layers-base-4 input').change(function () {
+            // uncheck the other checkbox
+            $("#genes62").prop("checked", false)
+            var selected = document.ConfusionMatrixRadioButton.norm.value;
+            console.log('check box clicked')
+            renderHeatmapTab(selected)
+        });
+
+        $('#layers-base-5 input').change(function () {
+            // uncheck the other checkbox
+            $("#genes42").prop("checked", false)
             var selected = document.ConfusionMatrixRadioButton.norm.value;
             console.log('check box clicked')
             renderHeatmapTab(selected)
