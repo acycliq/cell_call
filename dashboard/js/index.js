@@ -58,6 +58,7 @@ function renderHeatmapTab(selected) {
 
 var sectionChartFilters = document.getElementById('section-chart-controls');
 var checkItAll = sectionChartFilters.querySelector('input[name="cb:select-all"]');
+var clearItAll = sectionChartFilters.querySelector('input[name="cb:clear-all"]');
 var inputs = sectionChartFilters.querySelectorAll('tbody>tr>td>input:not([name="cb:select-all"]):not([name="cb:clear-all"])');
 var other = sectionChartFilters.querySelector('input[name="cb:other"]');
 
@@ -66,7 +67,11 @@ inputs.forEach(function (input) {
     input.addEventListener('change', function () {
         if (!this.checked) {
             checkItAll.checked = false;
-            checkItAll.disabled = false
+            checkItAll.disabled = false;
+        }
+        else if (this.checked) {
+            clearItAll.checked = false;
+            clearItAll.disabled = false;
         }
         else if (!checkItAll.checked) {
             var allChecked = true;
@@ -78,7 +83,9 @@ inputs.forEach(function (input) {
 
             if (allChecked) {
                 checkItAll.checked = true;
-                checkItAll.disabled = true
+                checkItAll.disabled = true;
+                clearItAll.disabled = false;
+                clearItAll.checked = false;
             }
         }
 
@@ -102,7 +109,25 @@ checkItAll.addEventListener('change', function () {
     inputs.forEach(function (input) {
         input.checked = checkItAll.checked;
     });
-    checkItAll.disabled = true
+    checkItAll.disabled = true;
+    clearItAll.disabled = false;
+    clearItAll.checked = false;
+
+    var selected = getSelected(inputs),
+        filteredSectionData = cellData.filter(function (el) {
+            return selected.includes(el.managedData.IdentifiedType);
+        });
+    sectionChart(filteredSectionData)
+});
+
+
+clearItAll.addEventListener('change', function () {
+    inputs.forEach(function (input) {
+        input.checked = !clearItAll.checked;
+    });
+    checkItAll.checked = false;
+    checkItAll.disabled = false;
+    clearItAll.disabled = true;
 
     var selected = getSelected(inputs),
         filteredSectionData = cellData.filter(function (el) {
