@@ -58,7 +58,7 @@ function renderHeatmapTab(selected) {
 
 var sectionChartFilters = document.getElementById('section-chart-controls');
 var checkItAll = sectionChartFilters.querySelector('input[name="cb:select-all"]');
-var inputs = sectionChartFilters.querySelectorAll('tbody>tr>td>input:not([name="cb:select-all"])');
+var inputs = sectionChartFilters.querySelectorAll('tbody>tr>td>input:not([name="cb:select-all"]):not([name="cb:clear-all"])');
 var other = sectionChartFilters.querySelector('input[name="cb:other"]');
 
 
@@ -66,7 +66,9 @@ inputs.forEach(function (input) {
     input.addEventListener('change', function () {
         if (!this.checked) {
             checkItAll.checked = false;
-        } else if (!checkItAll.checked) {
+            checkItAll.disabled = false
+        }
+        else if (!checkItAll.checked) {
             var allChecked = true;
             for (var i = 0; i < inputs.length; i++) {
                 if (!inputs[i].checked) {
@@ -76,6 +78,7 @@ inputs.forEach(function (input) {
 
             if (allChecked) {
                 checkItAll.checked = true;
+                checkItAll.disabled = true
             }
         }
 
@@ -99,6 +102,7 @@ checkItAll.addEventListener('change', function () {
     inputs.forEach(function (input) {
         input.checked = checkItAll.checked;
     });
+    checkItAll.disabled = true
 
     var selected = getSelected(inputs),
         filteredSectionData = cellData.filter(function (el) {
