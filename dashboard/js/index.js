@@ -58,7 +58,7 @@ function renderHeatmapTab(selected) {
 
 var sectionChartFilters = document.getElementById('section-chart-controls');
 var checkItAll = sectionChartFilters.querySelector('input[name="cb:select-all"]');
-var inputs = sectionChartFilters.querySelectorAll('tbody>tr>td>input');
+var inputs = sectionChartFilters.querySelectorAll('tbody>tr>td>input:not([name="cb:select-all"])');
 var other = sectionChartFilters.querySelector('input[name="cb:other"]');
 
 
@@ -68,7 +68,7 @@ inputs.forEach(function (input) {
             checkItAll.checked = false;
         } else if (!checkItAll.checked) {
             var allChecked = true;
-            for (var i = 1; i < inputs.length; i++) {
+            for (var i = 0; i < inputs.length; i++) {
                 if (!inputs[i].checked) {
                     allChecked = false;
                 }
@@ -93,34 +93,24 @@ inputs.forEach(function (input) {
     });
 
 });
-//
-// other.addEventListener('change', function () {
-//     var selected = ['Backprojection', 'Basket', 'Bistratified','Cck Calb1/Slc17a8*',
-//                     'Cck Cxcl14-','Cck Cxcl14+','Cck Vip Cxcl14-','Cck Vip Cxcl14+','CGE NGF',
-//                     'Hippocamposeptal','IS1','IS2','IS3','Ivy','MGE NGF','NGF/I-S transition',
-//                     'Non Neuron','O/LM','O-Bi','PC','PC Other1','PC Other2','Radiatum retrohip',
-//                     'Sst/Reln/NPY','Trilaminar','Unidentified','Zero'];
-//
-//     var filteredSectionData = cellData.filter(function (el) {
-//         // var it = selected.includes(el.IdentifiedType)
-//         var it = !selected.includes(el.managedData.IdentifiedType);
-//         return it
-//     });
-//     sectionChart(filteredSectionData)
-// });
+
 
 checkItAll.addEventListener('change', function () {
     inputs.forEach(function (input) {
         input.checked = checkItAll.checked;
     });
 
-    var selected = getSelected(inputs);
+    var selected = getSelected(inputs),
+        filteredSectionData = cellData.filter(function (el) {
+            return selected.includes(el.managedData.IdentifiedType);
+        });
+    sectionChart(filteredSectionData)
 });
 
 function getSelected(inputs) {
     //Loop over all selected
     var selected = [];
-    for (var i = 1; i < inputs.length; i++) {
+    for (var i = 0; i < inputs.length; i++) {
         if (inputs[i].checked) {
             if (inputs[i].name === 'Cck') {
                 selected.push('Cck Calb1/Slc17a8*', 'Cck Cxcl14-', 'Cck Cxcl14+', 'Cck Vip Cxcl14-', 'Cck Vip Cxcl14+');
