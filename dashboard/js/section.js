@@ -413,43 +413,6 @@ function sectionChart(data) {
     };
 
     var voronoiDiagram = updateVoronoi(data);
-    // voronoiDiagram = d3.voronoi()
-    //     .x(d => sectionFeatures.scale.x(d.x))
-    //     .y(d => sectionFeatures.scale.y(d.y))
-    //     .size([sectionFeatures.width, sectionFeatures.height])(data);
-
-    // // add a circle for indicating the highlighted point
-    // dotsGroup.append('circle')
-    //     .attr('class', 'highlight-circle')
-    //     .attr('r', sectionFeatures.pointRadius * 2) // increase the size if highlighted
-    //     //.style('fill', '#FFCE00')
-    //     .style('display', 'none');
-
-    // // add a rect for indicating the highlighted point when you mouseover on the dapi chart
-    // dotsGroup.append('rect')
-    //     .attr('class', 'highlight-rect')
-
-
-    // // add the overlay on top of everything to take the mouse events
-    // dotsGroup.append('rect')
-    //     .attr('class', 'overlay')
-    //     .attr('id', 'sectionOverlay')
-    //     .attr('width', sectionFeatures.width)
-    //     .attr('height', sectionFeatures.height)
-    //     // .style('fill', '#FFCE00')
-    //     .style('opacity', 0)
-    //     .on('click', mouseClickHandler)
-    //     .on('mousemove', mouseMoveHandler)
-    //     .on('mouseleave', () => {
-    //         // hide the highlight circle when the mouse leaves the chart
-    //         console.log('mouse leave');
-    //         dapiConfig.map.removeLayer(voronoiMarker);
-    //         highlight(null);
-    //     });
-
-    // Manually dispach a mouse click event. That will kick-off rendering of the other charts on the dashboard.
-    // d3.select('.overlay').dispatch('click')
-
 
     //collect the coordinates of the circles and push the to the data object
     var nodes = d3.selectAll('circle').nodes();
