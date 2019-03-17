@@ -14,12 +14,9 @@ function renderHeatmapTab(selected) {
 
     if (document.getElementById('genes42').checked) {
         checkBox0 = '42genes'
-    }
-    else if (document.getElementById('genes62').checked)
-    {
+    } else if (document.getElementById('genes62').checked) {
         checkBox0 = '62genes'
-    }
-    else {
+    } else {
         checkBox0 = '98genes'
     }
 
@@ -36,11 +33,11 @@ function renderHeatmapTab(selected) {
         checkBox2 = 'rangeDomainOff'
     }
 
-    var confMatrixjson =    '.\\notebooks\\jsonFiles\\' + checkBox0 +
-                            '\\' + checkBox2 +
-                            '\\' + radioButton +
-                            '\\' + checkBox1 +
-                            '\\' + 'confusionMatrix.json';
+    var confMatrixjson = '.\\notebooks\\jsonFiles\\' + checkBox0 +
+        '\\' + checkBox2 +
+        '\\' + radioButton +
+        '\\' + checkBox1 +
+        '\\' + 'confusionMatrix.json';
     console.log('Pushing ' + confMatrixjson + ' in confusion matrix')
     d3.json(confMatrixjson, function (data) {
         dataset = []
@@ -101,14 +98,13 @@ inputs.forEach(function (input) {
 
         var selected = getSelected(inputs),
             filteredSectionData = cellData.filter(function (el) {
-            var it = selected.includes(el.managedData.IdentifiedType);
-            if (input.name === 'Other'){
-                return !it
-            }
-            else {
-                return it
-            }
-        });
+                var it = selected.includes(el.managedData.IdentifiedType);
+                if (input.name === 'Other') {
+                    return !it
+                } else {
+                    return it
+                }
+            });
         sectionChart(filteredSectionData)
     });
 
@@ -163,11 +159,74 @@ function getSelected(inputs) {
                 selected.push('PC', 'PC Other1', 'PC Other2')
             } else if (inputs[i].name === 'IS') {
                 selected.push('IS1', 'IS2', 'IS3')
-            }
-            else {
+            } else {
                 selected.push(inputs[i].name);
             }
         }
     }
     return selected
 }
+
+
+// listener on the Confusion matrix tab
+$('#layers-base input').change(function () {
+    var selected = document.ConfusionMatrixRadioButton.norm.value;
+    console.log('radio button: ' + selected + ' was selected');
+    renderHeatmapTab(selected)
+});
+
+$('#layers-base-2 input').change(function () {
+    var selected = document.ConfusionMatrixRadioButton.norm.value;
+    console.log('check box clicked');
+    renderHeatmapTab(selected)
+});
+
+$('#layers-base-3 input').change(function () {
+    var selected = document.ConfusionMatrixRadioButton.norm.value;
+    console.log('check box clicked');
+    renderHeatmapTab(selected)
+});
+
+$('#layers-base-4 input').change(function () {
+    // uncheck the other checkbox
+    $("#genes62").prop("checked", false);
+    var selected = document.ConfusionMatrixRadioButton.norm.value;
+    console.log('check box clicked');
+    renderHeatmapTab(selected)
+});
+
+$('#layers-base-5 input').change(function () {
+    // uncheck the other checkbox
+    $("#genes42").prop("checked", false);
+    var selected = document.ConfusionMatrixRadioButton.norm.value;
+    console.log('check box clicked');
+    renderHeatmapTab(selected)
+});
+
+$('#confusion-table-tab').on('shown.bs.tab', function (e) {
+    console.log('Confusion matrix tab was clicked.');
+    $('#myDropdown').hide(); // hide the dropdown
+    var selected = document.ConfusionMatrixRadioButton.norm.value;
+    console.log('Radio button ' + selected + ' is selected');
+    renderHeatmapTab(selected);
+
+
+    // hide the search forms
+    $('#nav-table-search').hide();
+    $('#nav-place-search').hide();
+});
+
+// listener on the Viewer tab
+$('#map-tab').on('shown.bs.tab', function (e) {
+    console.log('Viewer tab was clicked.');
+    $('#myDropdown').show() // show the dropdown
+});
+
+// listener on the Worlflow tab
+$('#workflow-tab').on('shown.bs.tab', function (e) {
+    console.log('Workflow tab was clicked.');
+    $('#myDropdown').hide(); // show the dropdown
+
+    // hide the toolip raised by the section chart
+    d3.select('#tooltip').style('opacity', 0)
+});

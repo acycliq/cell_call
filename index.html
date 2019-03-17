@@ -216,26 +216,12 @@
                                 Select Data
                                 <span class="caret"></span>
                             </a>
-                            <script>
-                                var aa = "abc";
-                                var bb = 2;
-                            </script>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("98 gene panel")'>98 gene panel</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("99 gene panel")'>99 gene panel</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (98 gene panel)")'>Simulated spots (98 gene panel)</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (62 gene panel)")'>Simulated spots (62 gene panel)</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (42 gene panel)")'>Simulated spots (42 gene panel)</a></li>
-
-                                <!--<li><a class="dropdown-item" href="#" onclick='dispatcher("Simulation_3")'>Simulation_3</a></li>-->
-
-                                <!--<li class="dropdown-submenu">-->
-                                <!--<a class="dropdown-item" tabindex="-1" href="#">161220KI_3-1</a>-->
-                                <!--<ul class="dropdown-menu">-->
-                                <!--<li><a class="dropdown-item" tabindex="-1" href="#">level 2</a></li>-->
-                                <!--<li><a class="dropdown-item" tabindex="-1" href="#">level 2</a></li>-->
-                                <!--</ul>-->
-                                <!--</li>-->
                             </ul>
                         </li>
                     </ul>
@@ -737,75 +723,9 @@
     </div>
     <!--<div style="clear: both;"></div>-->
 
-    <script>
-        // listener on the Confusion matrix tab
-        $('#layers-base input').change(function () {
-            var selected = document.ConfusionMatrixRadioButton.norm.value;
-            console.log('radio button: ' + selected + ' was selected');
-            renderHeatmapTab(selected)
-        });
 
-        $('#layers-base-2 input').change(function () {
-            var selected = document.ConfusionMatrixRadioButton.norm.value;
-            console.log('check box clicked');
-            renderHeatmapTab(selected)
-        });
-
-        $('#layers-base-3 input').change(function () {
-            var selected = document.ConfusionMatrixRadioButton.norm.value;
-            console.log('check box clicked');
-            renderHeatmapTab(selected)
-        });
-
-        $('#layers-base-4 input').change(function () {
-            // uncheck the other checkbox
-            $("#genes62").prop("checked", false);
-            var selected = document.ConfusionMatrixRadioButton.norm.value;
-            console.log('check box clicked');
-            renderHeatmapTab(selected)
-        });
-
-        $('#layers-base-5 input').change(function () {
-            // uncheck the other checkbox
-            $("#genes42").prop("checked", false);
-            var selected = document.ConfusionMatrixRadioButton.norm.value;
-            console.log('check box clicked');
-            renderHeatmapTab(selected)
-        });
-
-
-        $('#confusion-table-tab').on('shown.bs.tab', function (e) {
-            console.log('Confusion matrix tab was clicked.');
-            $('#myDropdown').hide(); // hide the dropdown
-            var selected = document.ConfusionMatrixRadioButton.norm.value;
-            console.log('Radio button ' + selected + ' is selected');
-            renderHeatmapTab(selected);
-
-
-            // hide the search forms
-            $('#nav-table-search').hide();
-            $('#nav-place-search').hide();
-        });
-
-        // listener on the Viewer tab
-        $('#map-tab').on('shown.bs.tab', function (e) {
-            console.log('Viewer tab was clicked.');
-            $('#myDropdown').show() // show the dropdown
-        });
-
-        // listener on the Worlflow tab
-        $('#workflow-tab').on('shown.bs.tab', function (e) {
-            console.log('Workflow tab was clicked.');
-            $('#myDropdown').hide(); // show the dropdown
-
-            // hide the toolip raised by the section chart
-            d3.select('#tooltip').style('opacity', 0)
-        });
-    </script>
-
-    <script src='dashboard/js/index.js'>
-
-    </script>
+    <!--Another user script. Needs to be here, after all the divs have been read-->
+    <script src='dashboard/js/index.js'></script>
 
 
     <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
