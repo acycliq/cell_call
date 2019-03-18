@@ -31,7 +31,7 @@ function run(c){
 
     d3.queue()
         .defer(d3.json, cellJson)
-        .defer(d3.csv, geneJson)
+        .defer(d3.json, geneJson)
         .await(splitCharts(c))
 }
 
