@@ -4,8 +4,6 @@ function spotPopup(dataset) {
     var width = 400;
     var height = 150;
     var margin = {left: 40, right: 15, top: 40, bottom: 40};
-    var parse = d3.timeParse("%m");
-    var format = d3.timeFormat("%b");
 
     var svg = d3.select("#bar-chart").select("svg")
         .attr("width", width + margin.left + margin.right)
