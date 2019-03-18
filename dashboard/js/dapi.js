@@ -346,7 +346,7 @@ function dapi(config) {
                 '<table style="width:110px;">' +
                 '<tbody><tr style="width:110px; border-bottom:1px solid Black; font-weight: bold"><td><div><b>Class </b></div></td><td><div> Prob' +
                 msg +
-                '<tbody><tr style="width:110px; border-top:1px solid black;"><td><div><b>Marker: </b></div></td><td><div>' + cellFeatures.Cell_Num +
+                '<tbody><tr style="width:110px; border-top:1px solid black;"><td><div><b>Cell Num: </b></div></td><td><div>' + cellFeatures.Cell_Num +
                 '</div></td></tr></tbody></table>' :
                 '<b>Hover around  a cell</b>'
 
