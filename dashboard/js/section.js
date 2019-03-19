@@ -61,7 +61,7 @@ function section() {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // grid lines group must be before the dotsGroup group so that the
-    /// gridlines are rendered under the circles not above!
+    /// gridlines are rendered under the circles and not above!
     var xGrid = svg.append("g")
         .attr("class", "grid")
         // .call(sectionFeatures.gridlines.x);
