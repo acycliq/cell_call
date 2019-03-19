@@ -1,7 +1,8 @@
 
-
+// THESE ARE NOW IN THE GLOBAL SCOPE
 var cookie = sessionStorage['myvariable'],
-    cellData;
+    cellData,
+    geneData;
 
 if (!cookie){ // if you dont have cookie, run the default selection
     console.log('No cookie, starting with default dataset')
@@ -40,7 +41,7 @@ function splitCharts(myParam) {
     return (err, ...args) => {
 
         cellData = args[0];
-        var geneData = args[1];
+        geneData = args[1];
 
         for (i = 0; i < cellData.length; ++i) {
             // make sure Prob and ClassName are arrays
