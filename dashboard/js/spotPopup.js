@@ -42,9 +42,7 @@ function spotPopup(datapoint) {
     x.domain(data.map(function (d) {
         return d.labels;
     }));
-    y.domain([0, d3.max(data, function (d) {
-        return d.Prob;
-    })]);
+    y.domain([0, 1]);
 
     // append the rectangles for the bar chart
     svg.selectAll(".bar")
