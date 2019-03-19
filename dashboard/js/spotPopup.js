@@ -59,7 +59,8 @@ function spotPopup(d) {
     // add the x Axis
     svg.append("g")
         .attr("transform", "translate(0," + height + ")")
-        .call(xAxis);
+        .call(xAxis)
+        // .style("stroke", "black");
 
     // add the y Axis
     svg.append("g")
