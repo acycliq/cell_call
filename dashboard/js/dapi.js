@@ -577,6 +577,8 @@ function dapiChart(cellData, geneData, config) {
             layer.bringToFront();
         }
 
+        console.log('Current zoom level is: ' + dapiConfig.map.getZoom())
+
     }
 
     function fitBounds(e){
