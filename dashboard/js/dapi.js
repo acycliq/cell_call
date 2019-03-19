@@ -120,6 +120,11 @@ function dapi(config) {
     //Add fullscreen button
     map.addControl(new L.Control.Fullscreen());
 
+
+    // Looks a bit confusing this one. Why am I using nest?
+    // I think I did this for future use.
+    // For now, it is not getting used whatsoever, I could have equally
+    // used a flat array, not a nested one.
     function make_dots(data) {
         var arr = [];
         var nest = d3.nest()
@@ -129,12 +134,36 @@ function dapi(config) {
             .entries(data);
 
         for (var k = 0; k < nest.length; ++k) {
-            arr[k] = helper(nest[k].values, "Gene");
+            arr[k] = helper(nest[k].values);
         }
         return arr;
     }
 
-    function helper(data, label) {
+    function getNeighbours(neighbour_array, neighbour_prob) {
+        var data = [];
+        if (neighbour_array) {
+            for (var i = 0; i < neighbour_array.length; i++) {
+                data.push({
+                    Cell_Num: +neighbour_array[i],
+                    Prob: +neighbour_prob[i],
+                })
+            }
+
+            // Sort now in decreasing order.
+            data.sort(function(x, y){return d3.ascending(y.Prob, x.Prob)})
+        }
+        else {
+            data.push({
+                Cell_Num: null, // null or NaN ?
+                Prob: null,
+                }
+            )
+        }
+
+        return data
+    }
+
+    function helper(data) {
         var dots = {
             type: "FeatureCollection",
             features: []
@@ -159,10 +188,11 @@ function dapi(config) {
                 "taxonomy": glyphMap.get(gene).taxonomy,
                 "glyphName": glyphMap.get(gene).glyphName,
                 "glyphColor": getColor(glyphMap.get(gene).taxonomy),
-                "popup": label + " " + i,
+                //"popup": label + " " + i,
                 "size": 30,
                 "type": 'gene',
-                "neighbour": parseFloat(data[i].neighbour),
+                "neighbour": parseFloat(data[i].neighbour), // why you are using parseFloat?? Cant remember why I did this!
+                "neighbours": getNeighbours(data[i].neighbour_array,  data[i].neighbour_prob),
             };
 
             //create features with proper geojson structure
@@ -520,12 +550,21 @@ function dapiChart(cellData, geneData, config) {
         });
     }
 
+    // specify popup options
+    var customOptions = {
+            'className' : 'popupCustom'
+    };
+
     function onEachDot(feature, layer) {
         layer.on({
             mouseover: glyphMouseOver, // highlightDot,
             mouseout: glyphMouseOut, //resetDotHighlight,
             click: clickGlyph,
         });
+        if (feature.properties.neighbour){
+            layer.bindPopup(spotPopup, customOptions)
+        }
+
     }
 
     function glyphMouseOver(e){
