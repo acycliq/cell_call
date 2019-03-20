@@ -381,8 +381,14 @@ function sectionChart(data) {
 
     var dotsGroup = sectionFeatures.dotsGroup;
 
-    //Do the chart
-    var update = dotsGroup.selectAll("circle").data(data)
+
+    // Do the chart
+    // Note: DO NOT do the usual selectAll('circle'). As new data are
+    // pushed in, you will end-up with one circle not being shown
+    // because it will carry the styling from the highlight-circle
+    // That styling is set to:
+    // style="stroke: tomato; display: none;"
+    var update = dotsGroup.selectAll(".dotOnScatter").data(data);
 
     // Note: Setting the transition here messes up the landing cell
     // The DOM has the circles but without id, r, cx, cy and opacity.
