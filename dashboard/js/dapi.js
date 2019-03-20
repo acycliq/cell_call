@@ -486,6 +486,7 @@ function dapiChart(cellData, geneData, config) {
 
     dapiConfig = dapi(config)
     var map = dapiConfig.map;
+    var zoomLevel;
     // mapOnDapi = dapiConfig.map;
 
     map.on('mouseout', outsideMap)
@@ -562,11 +563,19 @@ function dapiChart(cellData, geneData, config) {
             mouseover: glyphMouseOver, // highlightDot,
             mouseout: glyphMouseOut, //resetDotHighlight,
             click: clickGlyph,
+            popupopen: onPopupOpen,
         });
         if (feature.properties.neighbour){
             layer.bindPopup(spotPopup, customOptions)
         }
 
+    }
+
+    function onPopupOpen(e) {
+        // show the popup only at the deepest zoom level
+        if ( zoomLevel < dapiConfig.map.getMaxZoom() ) {
+        this.closePopup();
+      }
     }
 
     function glyphMouseOver(e){
@@ -606,10 +615,11 @@ function dapiChart(cellData, geneData, config) {
 
     function clickGlyph(e) {
         console.log('glyph clicked')
+        zoomLevel = dapiConfig.map.getZoom()
         // 1.
-        if (dapiConfig.map.getZoom() < 7){
+        if (zoomLevel < dapiConfig.map.getMaxZoom()){
+            // do not fit the bounds if you are in the deepest zoom level
             fitBounds(e)
-            $('.leaflet-popup-content-wrapper').hide()
         }
 
         // 2.
