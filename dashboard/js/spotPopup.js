@@ -4,17 +4,22 @@ function spotPopup(d) {
 
     var data = d.feature.properties.neighbours;
 
+    for (var i = 0; i < data.length; i++){
+        if (!(data[i].Cell_Num in d3.range(cellData.length))){
+            data[i].Cell_Num = 'Misread'
+        }
+    }
 
 // set the dimensions and margins of the graph
-    var width = 100;
-    var height = 50;
-    var margin = {left:40,right:15,top:20,bottom:40};
+    var width = 135;
+    var height = 60;
+    var margin = {left:30,right:9,top:17,bottom:35};
 
 // set the ranges
     var x = d3.scaleBand().range([0, width]).padding(0.1);
 
     var xAxis = d3.axisBottom()
-                .scale(x);
+                .scale(x)
 
     var y = d3.scaleLinear().range([height, 0]);
 
@@ -58,13 +63,47 @@ function spotPopup(d) {
 
     // add the x Axis
     svg.append("g")
+        .attr('class', 'x axis')
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis)
-        // .style("stroke", "black");
+        .selectAll("text")
+        .style("font-size","10px")
+        // // .style("stroke", "black")
+        // .style("text-anchor", "end")
+        // .attr("dx", "-.8em")
+        // .attr("dy", ".15em")
+        // .attr("transform", "rotate(-30)");
 
     // add the y Axis
     svg.append("g")
-        .call(yAxis);
+        .attr('class', 'y axis')
+        .call(yAxis)
+        .selectAll("text")
+        .style("font-size","10px");
+
+    svg.append("g")
+        .attr('id', 'xLabelPopup')
+                .attr("transform", "translate(0," + height +")")
+                .append("text")
+                .attr("x", width / 2)
+                .attr("y", height/2) //set your y attribute here
+                .style("text-anchor", "middle")
+                .style("font-size", "11px")
+                .style("font-weight", "bold")
+                .style('fill', '#707070')
+                .text("Cell Num");
+
+    svg.append("g")
+                .attr('id', 'titlePopup')
+                .attr("transform", "translate(0," + 0 +")")
+                .append("text")
+                .attr("x", width / 2)
+                .attr("y", -5) //set your y attribute here
+                .style("text-anchor", "middle")
+                .style("font-size", "11px")
+                .style("font-weight", "bold")
+                .style('fill', '#707070')
+                .text("Assignment Prob");
 
     return div.node();
 

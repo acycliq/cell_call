@@ -208,6 +208,7 @@ polyline {
 /*text-align: center;*/
 /*}*/
 
+/***** Styling for the leaflet popup *****/
 .popupCustom .leaflet-popup-tip-container {
     display: none;
 }
@@ -217,14 +218,21 @@ polyline {
 }
 
 .popupCustom .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-    background: none;
+    background: #d7d7d7;
     color: #333;
+    opacity: 1.0;
     box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0);
 }
 
 .popupCustom {
-    margin-bottom: -10px;
+    margin-bottom: 20px;
 }
+
+.popupCustom a.leaflet-popup-close-button {
+    color: #777777;
+}
+/*******************************************/
+
 
 /*.popupCustom .leaflet-popup-tip,*/
 /*.popupCustom .leaflet-popup-content-wrapper {*/
@@ -232,6 +240,7 @@ polyline {
 /*color: #234c5e;*/
 
 
+/***** Styling for the leaflet tooltip *****/
 .myCSSClass {
     font-size: 15px;
     font-weight: bold;
@@ -264,7 +273,7 @@ polyline {
 .dropdown:hover > .dropdown-menu {
     display: block;
 }
-
+/*******************************************/
 
 /*bootstrap multilevel dropdown*/
 /*.dropdown-submenu {*/

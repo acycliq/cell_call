@@ -540,20 +540,22 @@ function dapiChart(cellData, geneData, config) {
     // Define an array to keep layers
     var dotlayer = [];
 
+    // specify popup options
+    var customOptions = {
+            'className' : 'popupCustom'
+    };
+
     //create marker layer and display it on the map
     for (var i = 0; i < myDots.length; i += 1) {
         dotlayer[i] = L.geoJson(myDots[i], {
             pointToLayer: function (feature, latlng) {
-                return new svgGlyph(latlng, dapiConfig.style(feature, 'gene')).bindTooltip(feature.properties.Gene, {className: 'myCSSClass'});
+                return new svgGlyph(latlng, dapiConfig.style(feature, 'gene'))
+                                .bindTooltip(feature.properties.Gene, {className: 'myCSSClass'})
             },
             onEachFeature: onEachDot
         });
     }
 
-    // specify popup options
-    var customOptions = {
-            'className' : 'popupCustom'
-    };
 
     function onEachDot(feature, layer) {
         layer.on({
@@ -605,7 +607,10 @@ function dapiChart(cellData, geneData, config) {
     function clickGlyph(e) {
         console.log('glyph clicked')
         // 1.
-        fitBounds(e)
+        if (dapiConfig.map.getZoom() < 7){
+            fitBounds(e)
+            $('.leaflet-popup-content-wrapper').hide()
+        }
 
         // 2.
         updateDashboard(point.properties)
