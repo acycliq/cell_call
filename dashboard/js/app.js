@@ -30,7 +30,7 @@ function run(c){
     var cellJson = c.cellData;
     var geneJson = c.geneData;
 
-    if (cookie === '98 gene panel'){
+    if (configSettings.name === '98 gene panel'){
         d3.queue()
         .defer(d3.json, cellJson)
         .defer(d3.json, geneJson)
