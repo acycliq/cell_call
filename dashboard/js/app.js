@@ -30,10 +30,19 @@ function run(c){
     var cellJson = c.cellData;
     var geneJson = c.geneData;
 
-    d3.queue()
+    if (cookie === '98 gene panel'){
+        d3.queue()
         .defer(d3.json, cellJson)
         .defer(d3.json, geneJson)
         .await(splitCharts(c))
+    }
+    else {
+        d3.queue()
+        .defer(d3.json, cellJson)
+        .defer(d3.csv, geneJson)
+        .await(splitCharts(c))
+    }
+
 }
 
 
