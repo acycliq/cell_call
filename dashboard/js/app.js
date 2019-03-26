@@ -25,6 +25,11 @@ function dispatcher(x){
 
 }
 
+function set_inefficiency(x){
+    d3.select('.dropdown-inefficiency').node().text = 'Inefficiency: ' + x
+    $('.dropdown-inefficiency').append("<span class='caret'></span>");
+    $('.dropdown-inefficiency').dropdown('toggle')
+}
 
 function run(c){
     var cellJson = c.cellData;

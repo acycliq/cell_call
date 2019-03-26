@@ -199,8 +199,26 @@
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
+                        <li class="dropdown" id="inefficiency_dropdown">
+                            <a href="#" class="dropdown-inefficiency dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">
+                                Inefficiency Factor
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("1.0")'>1.0</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.5")'>0.5</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.25")'>0.25</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.12")'>0.12</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.06")'>0.06</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.03")'>0.03</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
                         <li class="dropdown" id="myDropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                            <a href="#" id="dropdown-select-data" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-haspopup="true" aria-expanded="false">
                                 Select Data
                                 <span class="caret"></span>
@@ -214,6 +232,7 @@
                             </ul>
                         </li>
                     </ul>
+
                     <ul class="nav navbar-nav navbar-right">
                         <li><a data-target="#myModal" data-toggle="modal" href="#myModal">About</a></li>
                     </ul>
@@ -723,8 +742,8 @@
         // when document ready, show selected on dropdown
         $(function () {
             if (cookie) {
-                d3.select('.dropdown-toggle').node().text = cookie + '  ';
-                $('.dropdown-toggle').append("<span class='caret'></span>");
+                d3.select('#dropdown-select-data').node().text = cookie + '  ';
+                $('#dropdown-select-data').append("<span class='caret'></span>");
             }
         });
 
