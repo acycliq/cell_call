@@ -425,7 +425,7 @@ table.no-spacing td {
     font-size: 10px;
 }
 
-/*transition for the circles on the section chart*/
-.dotOnScatter {
-    transition: all 0.75s ease;
-}
+/*!*transition for the circles on the section chart*!*/
+/*.dotOnScatter {*/
+    /*transition: all 0.75s ease;*/
+/*}*/
