@@ -4,6 +4,7 @@ var cookie = sessionStorage['myvariable'],
     cellData,
     geneData;
 
+
 if (!cookie){ // if you dont have cookie, run the default selection
     console.log('No cookie, starting with default dataset')
     var configSettings = config().get('98 gene panel')
@@ -13,6 +14,16 @@ else {
     var configSettings = config().get(cookie)
 }
 run(configSettings)
+
+function inefficiencySelector(x){
+    // 1. Show the dropdown to select the inefficiency
+    $('#dropdown-inefficiency').show()
+
+    // 2.
+    d3.select('.myDropdown').node().text = x + '  ';
+    $('.myDropdown').append("<span class='caret'></span>");
+
+}
 
 function dispatcher(x){
     console.log('you clicked '+ x)

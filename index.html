@@ -198,8 +198,26 @@
                     <a class="navbar-brand" href="#">Cell Mapping Visualization</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
+
                     <ul class="nav navbar-nav">
-                        <li class="dropdown" id="inefficiency_dropdown">
+                        <li class="dropdown" id="myDropdown">
+                            <a href="#" class="myDropdown dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">
+                                Select Data
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("98 gene panel")'>98 gene panel</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("99 gene panel")'>99 gene panel</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='inefficiencySelector("Simulated spots (98 gene panel)")'>Simulated spots (98 gene panel)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (62 gene panel)")'>Simulated spots (62 gene panel)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (42 gene panel)")'>Simulated spots (42 gene panel)</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown" id="dropdown-inefficiency">
                             <a href="#" class="dropdown-inefficiency dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-haspopup="true" aria-expanded="false">
                                 Inefficiency Factor
@@ -215,23 +233,10 @@
                             </ul>
                         </li>
                     </ul>
-
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown" id="myDropdown">
-                            <a href="#" id="dropdown-select-data" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                               aria-haspopup="true" aria-expanded="false">
-                                Select Data
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("98 gene panel")'>98 gene panel</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("99 gene panel")'>99 gene panel</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (98 gene panel)")'>Simulated spots (98 gene panel)</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (62 gene panel)")'>Simulated spots (62 gene panel)</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (42 gene panel)")'>Simulated spots (42 gene panel)</a></li>
-                            </ul>
-                        </li>
-                    </ul>
+                    <script>
+                        // start with the inefficiency dropdown hidden
+                        $('#dropdown-inefficiency').hide()
+                    </script>
 
                     <ul class="nav navbar-nav navbar-right">
                         <li><a data-target="#myModal" data-toggle="modal" href="#myModal">About</a></li>
