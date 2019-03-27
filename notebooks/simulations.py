@@ -3,6 +3,14 @@ import pandas as pd
 import xarray as xr
 import time
 import os
+import errno
+import logging
+
+logger = logging.getLogger()
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s:%(levelname)s:%(message)s"
+    )
 
 
 
@@ -26,13 +34,13 @@ def fetch_data(dataset_name):
         df = pd.read_json("D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\default_99genes\json\iss.json")
         GeneExp = np.load(dir_path + '/../data_preprocessed/default_99genes/GeneExp.npy')
         eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_99genes/eGeneGamma.csv')]
-        eGeneGamma = [float(i) for i in eGeneGamma]
+        eGeneGamma = np.array([float(i) for i in eGeneGamma])
         genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_99genes/genes.csv')]
     elif dataset_name == 'DEFAULT_98GENES':
         df = pd.read_json("D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\default_98genes\json\iss.json")
         GeneExp = np.load(dir_path + '/../data_preprocessed/default_98genes/GeneExp.npy')
         eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_98genes/eGeneGamma.csv')]
-        eGeneGamma = [float(i) for i in eGeneGamma]
+        eGeneGamma = np.array([float(i) for i in eGeneGamma])
         genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_98genes/genes.csv')]
     else:
         dataset_name == ''
@@ -228,6 +236,25 @@ def post_process(df1, df2):
     return out
 
 
+def checkFile(filename_out):
+    # remove the file if it exists
+    try:
+        os.remove(filename_out)
+        logger.info(' File %s exists. DELETED! ' % filename_out)
+    except OSError:
+        pass
+
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc: # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
+
 if __name__ == "__main__":
     # _seed = np.int(time.time())
     _seed = 123456
@@ -242,6 +269,9 @@ if __name__ == "__main__":
     # dataset_name = 'DEFAULT'
     # dataset_name = 'DEFAULT_42GENES'
     dataset_name = 'DEFAULT_99GENES'
+    inefficiency = 0.06
+
+
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
     # for each cell find its most likely cell class
@@ -255,10 +285,18 @@ if __name__ == "__main__":
     raw_data = raw_data[nonZero]
 
     sample = draw_gene_expression(raw_data, gene_expression)
-    sample = thinner(sample, eGeneGamma)
+    sample = thinner(sample, inefficiency * eGeneGamma)
     spots = position_genes(sample)
 
-    pd.DataFrame(spots).to_csv('spots_' + dataset_name + '_' + str(_seed) + '.csv', header=['name', 'x', 'y'], index=None)
+    fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    outPath = os.path.join(dir_path, 'Simulated spots', 'inefficiency_' + str(inefficiency))
+    outFile = os.path.join(outPath, fName)
+
+    # make now the directory
+    mkdir_p(outPath)
+
+    pd.DataFrame(spots).to_csv(outFile, header=['name', 'x', 'y'], index=None)
 
     print(spots[-3:, :])
     print('Done!')
