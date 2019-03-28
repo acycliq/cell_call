@@ -432,8 +432,8 @@ function sectionChart(data) {
     sectionFeatures.zoom.on("zoom", zoomed);
 
     function zoomed() {
-        d3.event.transform.x = d3.event.transform.x;
-        d3.event.transform.y = d3.event.transform.y;
+        // d3.event.transform.x = d3.event.transform.x;
+        // d3.event.transform.y = d3.event.transform.y;
 
         // update: rescale x and y axes
         sectionFeatures.renderXAxis.call(sectionFeatures.axis.x.scale(d3.event.transform.rescaleX(sectionFeatures.scale.x)));
