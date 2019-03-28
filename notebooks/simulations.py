@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import time
+import random
 import os
 import errno
 import logging
@@ -264,6 +265,21 @@ def inject(sample):
 
     gc = gc * perc
 
+    # how many for each cell you are going to inject
+    numPoints = [random.randint(0, int(x)) for x in gc]
+
+    aliens = sample['alien_genes']
+    for i in range(sample['GenExp'].shape[1]):
+        num = numPoints[i]
+        alien = aliens[:, i]
+        np.where(alien)
+
+    return 1
+
+def gene_basket(gene_expression):
+    for i, cell_type in enumerate(gene_expression.Class):
+        pass
+        # temp = gene_expression[]
 
 if __name__ == "__main__":
     # _seed = np.int(time.time())
@@ -279,7 +295,7 @@ if __name__ == "__main__":
     # dataset_name = 'DEFAULT'
     # dataset_name = 'DEFAULT_42GENES'
     dataset_name = 'DEFAULT_99GENES'
-    inefficiency = 0.06
+    inefficiency = 1.0
 
 
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
@@ -297,6 +313,7 @@ if __name__ == "__main__":
     sample = draw_gene_expression(raw_data, gene_expression)
     sample['alien_genes'] = sample['GenExp'] == 0
     sample = thinner(sample, inefficiency * eGeneGamma)
+    inject(sample)
     spots = position_genes(sample)
 
     fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
