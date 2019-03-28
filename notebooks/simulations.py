@@ -79,7 +79,8 @@ def draw_gene_expression(df, ge):
            'class_name': [],
            'gene_name': ge.Genes.values.tolist(),
            'col': [],
-           'GenExp': np.empty([M, N], dtype=np.int32)
+           'GenExp': np.empty([M, N], dtype=np.int32),
+           'alien_genes': np.empty([M, N], dtype=np.bool_)
            }
     for i in range(N):  # loop over the cells
         # select a class
@@ -254,6 +255,15 @@ def mkdir_p(path):
         else:
             raise
 
+def inject(sample):
+    # take the totao gene count for each gene
+    gc = sample['GenExp'].sum(axis=0)
+
+    # percentage of total gene counts we want to inject
+    perc = 0.05
+
+    gc = gc * perc
+
 
 if __name__ == "__main__":
     # _seed = np.int(time.time())
@@ -285,6 +295,7 @@ if __name__ == "__main__":
     raw_data = raw_data[nonZero]
 
     sample = draw_gene_expression(raw_data, gene_expression)
+    sample['alien_genes'] = sample['GenExp'] == 0
     sample = thinner(sample, inefficiency * eGeneGamma)
     spots = position_genes(sample)
 
@@ -296,7 +307,7 @@ if __name__ == "__main__":
     # make now the directory
     mkdir_p(outPath)
 
-    pd.DataFrame(spots).to_csv(outFile, header=['name', 'x', 'y'], index=None)
+    # pd.DataFrame(spots).to_csv(outFile, header=['name', 'x', 'y'], index=None)
 
     print(spots[-3:, :])
     print('Done!')
