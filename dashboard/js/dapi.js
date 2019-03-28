@@ -36,7 +36,27 @@ function dapi(config) {
                                             y === 'cnr1' ? '#FF0000' :          //hsv: [ 1 1 1]);
                                                 y === 'vip' ? '#FFC700' :           //hsv: [.13 1 1]);
                                                     y === 'cxcl14' ? '#995C00' :        //hsv: [.1 1 .6]);
-                                                        '#D04030';
+                                                        '#FD6A02';
+    }
+
+    function getTaxonomy(gene){
+        if(glyphMap.get(gene)){
+            out = glyphMap.get(gene).taxonomy
+        }
+        else {
+            out = glyphMap.get('Generic').taxonomy
+        }
+        return out
+    }
+
+    function getGlyphName(gene){
+        if(glyphMap.get(gene)){
+            out = glyphMap.get(gene).glyphName
+        }
+        else {
+            out = glyphMap.get('Generic').glyphName
+        }
+        return out
     }
 
     // get the svg markers
@@ -185,9 +205,9 @@ function dapi(config) {
                 "x": x,
                 "y": y,
                 "Gene": gene,
-                "taxonomy": glyphMap.get(gene).taxonomy,
-                "glyphName": glyphMap.get(gene).glyphName,
-                "glyphColor": getColor(glyphMap.get(gene).taxonomy),
+                "taxonomy": getTaxonomy(gene),
+                "glyphName": getGlyphName(gene),
+                "glyphColor": getColor(gene),
                 //"popup": label + " " + i,
                 "size": 30,
                 "type": 'gene',

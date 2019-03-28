@@ -116,6 +116,8 @@ function glyphAssignment()
         {gene: 'Actb', taxonomy: 'non_neuron', glyphSymbol:   'v', glyphName: 'triangleDown', glyphColor:  '#00FF00' },
         {gene: 'Sulf2', taxonomy: 'non_neuron', glyphSymbol:   'p', glyphName: 'star5', glyphColor:  '#00FF00' },
 
+        {gene: 'Generic', taxonomy: 'generic', glyphSymbol:   'o', glyphName: 'circle', glyphColor:  '#FD6A02' },
+
         ];
     
     return out
