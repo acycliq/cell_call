@@ -206,6 +206,7 @@ $('#layers-base-5 input').change(function () {
 $('#confusion-table-tab').on('shown.bs.tab', function (e) {
     console.log('Confusion matrix tab was clicked.');
     $('#myDropdown').hide(); // hide the dropdown
+    $('#dropdown-inefficiency').hide();
     var selected = document.ConfusionMatrixRadioButton.norm.value;
     console.log('Radio button ' + selected + ' is selected');
     renderHeatmapTab(selected);
@@ -225,7 +226,8 @@ $('#map-tab').on('shown.bs.tab', function (e) {
 // listener on the Worlflow tab
 $('#workflow-tab').on('shown.bs.tab', function (e) {
     console.log('Workflow tab was clicked.');
-    $('#myDropdown').hide(); // show the dropdown
+    $('#myDropdown').hide(); // hide the dropdown
+    $('#dropdown-inefficiency').hide();
 
     // hide the toolip raised by the section chart
     d3.select('#tooltip').style('opacity', 0)
