@@ -106,7 +106,7 @@ function getLandingCellNum(str) {
             str === 'Simulated spots (98 gene panel)' ? 2279 :
                 str === 'Simulated spots (62 gene panel)' ? 2279 :
                     str === 'Simulated spots (42 gene panel)' ? 2279 :
-                            1;
+                            2279;
 }
 
 
