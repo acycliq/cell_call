@@ -15,15 +15,15 @@ else {
 }
 run(configSettings)
 
-function inefficiencySelector(x){
-    // 1. Show the dropdown to select the inefficiency
-    $('#dropdown-inefficiency').show()
-
-    // 2.
-    d3.select('.myDropdown').node().text = x + '  ';
-    $('.myDropdown').append("<span class='caret'></span>");
-
-}
+// function inefficiencySelector(x){
+//     // 1. Show the dropdown to select the inefficiency
+//     $('#dropdown-inefficiency').show()
+//
+//     // 2.
+//     d3.select('.myDropdown').node().text = x + '  ';
+//     $('.myDropdown').append("<span class='caret'></span>");
+//
+// }
 
 function dispatcher(x){
     console.log('you clicked '+ x)
@@ -36,11 +36,11 @@ function dispatcher(x){
 
 }
 
-function set_inefficiency(x){
-    d3.select('.dropdown-inefficiency').node().text = 'Inefficiency: ' + x
-    $('.dropdown-inefficiency').append("<span class='caret'></span>");
-    $('.dropdown-inefficiency').dropdown('toggle')
-}
+// function set_inefficiency(x){
+//     d3.select('.dropdown-inefficiency').node().text = 'Inefficiency: ' + x
+//     $('.dropdown-inefficiency').append("<span class='caret'></span>");
+//     $('.dropdown-inefficiency').dropdown('toggle')
+// }
 
 function run(c){
     var cellJson = c.cellData;

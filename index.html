@@ -200,16 +200,16 @@
                 <div id="navbar" class="navbar-collapse collapse">
 
                     <ul class="nav navbar-nav">
-                        <li class="dropdown" id="myDropdown">
-                            <a href="#" class="myDropdown dropdown-toggle" data-toggle="dropdown" role="button"
+                        <li class="dropdown">
+                            <a href="#" id="myDropdown" class="myDropdown dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-haspopup="true" aria-expanded="false">
                                 Select Data
                                 <span class="caret"></span>
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu" id="myDropdown-menu">
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("98 gene panel")'>98 gene panel</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("99 gene panel")'>99 gene panel</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='inefficiencySelector("Simulated spots (98 gene panel)")'>Simulated spots (98 gene panel)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='datasetSelector("Simulated spots (98 gene panel)")'>Simulated spots (98 gene panel)</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (62 gene panel)")'>Simulated spots (62 gene panel)</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (42 gene panel)")'>Simulated spots (42 gene panel)</a></li>
                             </ul>
@@ -217,13 +217,13 @@
                     </ul>
 
                     <ul class="nav navbar-nav">
-                        <li class="dropdown" id="dropdown-inefficiency">
-                            <a href="#" class="dropdown-inefficiency dropdown-toggle" data-toggle="dropdown" role="button"
+                        <li class="dropdown">
+                            <a href="#" id="dropdown-inefficiency" class="dropdown-inefficiency dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-haspopup="true" aria-expanded="false">
                                 Inefficiency Factor
                                 <span class="caret"></span>
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu" id="dropdown-inefficiency-menu">
                                 <li><a class="dropdown-item" href="#" onclick='set_inefficiency("1.0")'>1.0</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.5")'>0.5</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.25")'>0.25</a></li>
@@ -747,9 +747,56 @@
         // when document ready, show selected on dropdown
         $(function () {
             if (cookie) {
-                d3.select('#dropdown-select-data').node().text = cookie + '  ';
-                $('#dropdown-select-data').append("<span class='caret'></span>");
+                d3.select('#myDropdown').node().text = cookie + '  ';
+                $('#myDropdown').append("<span class='caret'></span>");
             }
+        });
+
+
+        function datasetSelector(x){
+            // 1. Show the dropdown to select the inefficiency
+            $('#dropdown-inefficiency').show()
+
+            // 2.
+            d3.select('.myDropdown').node().text = x + '  ';
+            $('.myDropdown').append("<span class='caret'></span>");
+
+        }
+
+        function set_inefficiency(x){
+            d3.select('.dropdown-inefficiency').node().text = 'Inefficiency: ' + x
+            $('.dropdown-inefficiency').append("<span class='caret'></span>");
+            // $('.dropdown-inefficiency').dropdown('toggle')
+
+            // get the value from the dropdown that selects the dataset
+            var target = d3.select('#myDropdown').node().text + $('.dropdown-inefficiency').text()
+
+
+        }
+
+        //Rather use jQuery DOM ready function to execute DOM manipulation over regular JavaScript
+        $(document).ready(function() {
+            $(".nav.navbar-nav .dropdown-menu").on("click", ".dropdown-item", function() {
+            $(".dropdown-menu").hide();
+          });
+          $(".nav.navbar-nav .dropdown > a#dropdown-inefficiency").hover(function() {
+            $(".dropdown-menu#dropdown-inefficiency-menu").show();
+            $(".dropdown-menu#myDropdown-menu").hide();
+
+          });
+          $(".nav.navbar-nav .dropdown > a#myDropdown").hover(function() {
+            $(".dropdown-menu#myDropdown-menu").show();
+            $(".dropdown-menu#dropdown-inefficiency-menu").hide();
+          });
+
+          $(".dropdown-menu#myDropdown-menu").mouseleave(function(){
+              $(".dropdown-menu#myDropdown-menu").hide();
+          });
+
+          $(".dropdown-menu#dropdown-inefficiency-menu").mouseleave(function(){
+              $(".dropdown-menu#dropdown-inefficiency-menu").hide();
+          });
+
         });
 
 
