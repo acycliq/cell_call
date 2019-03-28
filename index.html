@@ -209,7 +209,7 @@
                             <ul class="dropdown-menu" id="myDropdown-menu">
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("98 gene panel")'>98 gene panel</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("99 gene panel")'>99 gene panel</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='datasetSelector("Simulated spots (98 gene panel)")'>Simulated spots (98 gene panel)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='datasetSelector("Simulated spots (98 gene panel)");'>Simulated spots (98 gene panel)</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (62 gene panel)")'>Simulated spots (62 gene panel)</a></li>
                                 <li><a class="dropdown-item" href="#" onclick='dispatcher("Simulated spots (42 gene panel)")'>Simulated spots (42 gene panel)</a></li>
                             </ul>
@@ -224,12 +224,12 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu" id="dropdown-inefficiency-menu">
-                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("1.0")'>1.0</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.5")'>0.5</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.25")'>0.25</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.12")'>0.12</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.06")'>0.06</a></li>
-                                <li><a class="dropdown-item" href="#" onclick='set_inefficiency("0.03")'>0.03</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='target = set_inefficiency("1.0"); dispatcher(target);'>1.0</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher(set_inefficiency("0.5"))'>0.5</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher(set_inefficiency("0.25"))'>0.25</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher(set_inefficiency("0.12"))'>0.12</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher(set_inefficiency("0.06"))'>0.06</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher(set_inefficiency("0.03"))'>0.03</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -764,14 +764,13 @@
         }
 
         function set_inefficiency(x){
-            d3.select('.dropdown-inefficiency').node().text = 'Inefficiency: ' + x
+            d3.select('.dropdown-inefficiency').node().text = 'Inefficiency: ' + x; // How you do the same with jquery??
             $('.dropdown-inefficiency').append("<span class='caret'></span>");
-            // $('.dropdown-inefficiency').dropdown('toggle')
 
             // get the value from the dropdown that selects the dataset
-            var target = d3.select('#myDropdown').node().text + $('.dropdown-inefficiency').text()
+            var target = $('.myDropdown').text().trim() + ' (' + $('.dropdown-inefficiency').text().trim() + ')';
 
-
+            return target
         }
 
         //Rather use jQuery DOM ready function to execute DOM manipulation over regular JavaScript
