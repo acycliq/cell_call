@@ -81,7 +81,6 @@ def draw_gene_expression(df, ge):
            'gene_name': ge.Genes.values.tolist(),
            'col': [],
            'GenExp': np.empty([M, N], dtype=np.int32),
-           'alien_genes': np.empty([M, N], dtype=np.bool_)
            }
     for i in range(N):  # loop over the cells
         # select a class
@@ -256,39 +255,64 @@ def mkdir_p(path):
         else:
             raise
 
-def inject(sample):
-    # take the totao gene count for each gene
+
+def inject(sample, univ, selectFrom = 'Complement'):
+    '''
+    :param sample:
+    :param univ:
+    :param selectFrom:
+    :return: an array the same size as sample['GenExp'] which defines how many extra spots per cell we can sample.
+            For example x_ij means that for class j we will draw x_ij more spots of gene i.
+            Note also that sample['GenExp'] is a resampled gene expression matrix, of dimension numGenes-by-numCells
+    '''
+    allGenes = sample['gene_name']
+
+    # take the total gene count for each cell type
     gc = sample['GenExp'].sum(axis=0)
 
     # percentage of total gene counts we want to inject
-    perc = 0.05
+    perc = 0.10
+    newSpotsCounts = [int(x * perc) for x in gc]
 
-    gc = gc * perc
+    out = np.zeros(sample['GenExp'].shape)
+    assert out.shape[1] == len(sample['class_name'])
+    for i, cn in enumerate(sample['class_name']):
+        numSpots = newSpotsCounts[i]
+        genesInClass = univ[cn]
+        if selectFrom == 'Complement':
+            domain = sorted(list(set(allGenes) - set(genesInClass)))
+        elif selectFrom == 'All':
+            domain = allGenes
+        else:
+            raise ValueError('selectFrom must either be "All" or "Complement".')
 
-    # how many for each cell you are going to inject
-    numPoints = [random.randint(0, int(x)) for x in gc]
+        newGenes = sorted(np.random.choice(domain, numSpots, replace=True))
+        binNames, binCounts = np.unique(newGenes, return_counts=True)
+        idx = [allGenes.index(x) for x in binNames]
+        out[idx, i] = binCounts
 
-    aliens = sample['alien_genes']
-    for i in range(sample['GenExp'].shape[1]):
-        num = numPoints[i]
-        alien = aliens[:, i]
-        np.where(alien)
+    return out
 
-    return 1
 
-def gene_basket(gene_expression):
-    for i, cell_type in enumerate(gene_expression.Class):
-        pass
-        # temp = gene_expression[]
+def gene_universe(gene_expression):
+    '''
+    :param gene_expression: The (Full) gene expression matrix (xarray)
+    :return: a dictionary where the keys are the cell types and values the genes that can that particular cell type can contain
+    '''
+    out = {}
+    cellTypes = np.unique(gene_expression.Class.values)
+    for i, cellType in enumerate(cellTypes):
+        print(cellType)
+        temp = gene_expression[:, gene_expression.Class == cellType]
+        inCellType = temp.sum(axis=1) > 0
+        val = temp.Genes[inCellType].values
+        out[cellType] = val
+    return out
+
 
 if __name__ == "__main__":
     # _seed = np.int(time.time())
     _seed = 123456
-    # _seed = 1549392942
-    # _seed = 1549455337
-    # _seed = 1549473190
-    # _seed = 1549473240
-    # _seed = 1549473273
     np.random.seed(_seed)
 
     # Fetch the data
@@ -296,7 +320,6 @@ if __name__ == "__main__":
     # dataset_name = 'DEFAULT_42GENES'
     dataset_name = 'DEFAULT_99GENES'
     inefficiency = 1.0
-
 
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
@@ -311,9 +334,9 @@ if __name__ == "__main__":
     raw_data = raw_data[nonZero]
 
     sample = draw_gene_expression(raw_data, gene_expression)
-    sample['alien_genes'] = sample['GenExp'] == 0
     sample = thinner(sample, inefficiency * eGeneGamma)
-    inject(sample)
+    univ = gene_universe(gene_expression)
+    injected = inject(sample, univ)
     spots = position_genes(sample)
 
     fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
