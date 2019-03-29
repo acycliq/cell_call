@@ -26,19 +26,19 @@ def fetch_data(dataset_name):
         eGeneGamma = [float(i) for i in eGeneGamma]
         genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default/genes.csv')]
     elif dataset_name == 'DEFAULT_42GENES':
-        df = pd.read_json("D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\default_42genes\json\iss.json")
+        df = pd.read_json(dir_path + '/../dashboard/data/img/default_42genes/json/iss.json')
         GeneExp = np.load(dir_path + '/../data_preprocessed/default_42genes/GeneExp.npy')
         eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_42genes/eGeneGamma.csv')]
         eGeneGamma = [float(i) for i in eGeneGamma]
         genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_42genes/genes.csv')]
     elif dataset_name == 'DEFAULT_99GENES':
-        df = pd.read_json("D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\default_99genes\json\iss.json")
+        df = pd.read_json(dir_path + '/../dashboard/data/img/default_99genes/json/iss.json')
         GeneExp = np.load(dir_path + '/../data_preprocessed/default_99genes/GeneExp.npy')
         eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_99genes/eGeneGamma.csv')]
         eGeneGamma = np.array([float(i) for i in eGeneGamma])
         genes = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_99genes/genes.csv')]
     elif dataset_name == 'DEFAULT_98GENES':
-        df = pd.read_json("D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\default_98genes\json\iss.json")
+        df = pd.read_json(dir_path + '/../dashboard/data/img/default_98genes/json/iss.json')
         GeneExp = np.load(dir_path + '/../data_preprocessed/default_98genes/GeneExp.npy')
         eGeneGamma = [line.rstrip("\n''") for line in open(dir_path + '/../data_preprocessed/default_98genes/eGeneGamma.csv')]
         eGeneGamma = np.array([float(i) for i in eGeneGamma])
@@ -335,8 +335,8 @@ if __name__ == "__main__":
 
     sample = draw_gene_expression(raw_data, gene_expression)
     sample = thinner(sample, inefficiency * eGeneGamma)
-    univ = gene_universe(gene_expression)
-    injected = inject(sample, univ)
+    # univ = gene_universe(gene_expression)
+    # injected = inject(sample, univ)
     spots = position_genes(sample)
 
     fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
