@@ -80,7 +80,12 @@ function dapi(config) {
     var minZoom = getMinZoom(config.name),
         maxZoom = 7;
 
-    // The transformation in this CRS maps the the bottom left corner to (0,0) and the top right to (256, 256)
+    // The transformation in this CRS maps the bottom left corner to (0,0) and the top right to (256, 256)
+    // The longest side (ie from left to right) of the image is 16384px. The transformation works as explained below:
+    // Top left corner    : In d3 this is at (0, 0).         This is mapped to (0, 256)   because X = 1/64*0     + 0 and Y = -1/64*0     + 256
+    // Bottom left corner : In d3 this is at (0, 16384).     This is mapped to (0, 0)     because X = 1/64*0     + 0 and Y = -1/64*16384 + 256
+    // Bottom right corner: In d3 this is at (16384, 16384). This is mapped to (256, 0)   because X = 1/64*16384 + 0 and Y = -1/64*16384 + 256
+    // Top right corner   : In d3 this is at (16384, 0).     This is mapped to (256, 256) because X = 1/64*16384 + 0 and Y = -1/64*0     + 256
     L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
         transformation: new L.Transformation(1 / 64, 0, -1 / 64, 256),
     });
