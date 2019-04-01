@@ -294,7 +294,7 @@ def inject(sample, univ, selectFrom = 'Complement'):
     return out
 
 
-def gene_universe(gene_expression):
+def cellType_geneUniverse(gene_expression):
     '''
     :param gene_expression: The (Full) gene expression matrix (xarray)
     :return: a dictionary where the keys are the cell types and values the genes that can that particular cell type can contain
