@@ -10,3 +10,8 @@ gene not getting picked up by the simulator, hence now spots are simulated from 
 
 Therefore in theory I am excluding only Vsnl1 but in practice, Chodl is ignored too.
 
+Update: 02-Apr-2019
+Under the new scheme, where I sample the same number of counts as in the original cell, 
+it looks like that one more gene is dropped. Havent investigated any further. Also note, 
+that the thinning/shrinkage stage mentioned above is not part of the process now
+

@@ -3,15 +3,13 @@ was run after
 excluding Gene: Vsnl1
 AND
 excluding these classes:
-{
-'Calb2.Vip.Nos1', 
+{'Calb2.Vip.Nos1', 
 'Cck.Cxcl14.Calb1.Tac2', 
 'Cck.Cxcl14.Slc17a8', 
 'Cck.Lmo1.Vip.Tac2', 
-'Eryth.1',              
+'Eryth.1',
 'Microglia.2', 
 'Oligo.3', 
-'Sst.Nos1', 
 'Vip.Crh.C1ql1', 
 'Vip.Crh.Pcp4'
 };
@@ -25,8 +23,8 @@ and after line:
 in call_cells_sims.m (matlab script)
 
 *******************
-ExcludeClasses = {'Calb2.Vip.Nos1', 'Cck.Cxcl14.Calb1.Tac2', 'Cck.Cxcl14.Slc17a8', 'Cck.Lmo1.Vip.Tac2', 'Eryth.1', ...
-                    'Microglia.2', 'Oligo.3', 'Sst.Nos1', 'Vip.Crh.C1ql1', 'Vip.Crh.Pcp4'}
+ExcludeClasses = {'Calb2.Vip.Nos1', 'Cck.Cxcl14.Calb1.Tac2', 'Cck.Cxcl14.Slc17a8', 'Cck.Lmo1.Vip.Tac2', 'Eryth.1', ....
+                      'Microglia.2', 'Oligo.3', 'Vip.Crh.C1ql1', 'Vip.Crh.Pcp4'};
 IncludeClass = ~ismember(ClassNames, ExcludeClasses);             
 ClassNames = ClassNames(IncludeClass);
 *******************
