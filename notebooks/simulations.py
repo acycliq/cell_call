@@ -79,12 +79,13 @@ def draw_gene_expression(df, ge):
            'Y': [],
            'class_name': [],
            'gene_name': ge.Genes.values.tolist(),
-           'col': [],
+           'colNum': [],
            'GenExp': np.empty([M, N], dtype=np.int32),
            }
     for i in range(N):  # loop over the cells
         # select a class
         bc = df['best_class'].iloc[i]
+        totalCounts = df['totalGeneCounts'].iloc[i]
         _cell_num = df['Cell_Num'].iloc[i]
         _x = df['X'].iloc[i]
         _y = df['Y'].iloc[i]
@@ -106,9 +107,22 @@ def draw_gene_expression(df, ge):
         # start = time.time()
         mask = [i for i in range(len(class_list)) if class_list[i] == bc]
         # print(time.time() - start)
-        col = np.random.choice(mask)
-        out['col'].append(col)
-        out['GenExp'][:, i] = ge[:, col]
+
+        # select a column randomly
+        colNum = np.random.choice(mask)
+        out['colNum'].append(colNum)
+        col = ge[:, colNum].values
+        # draw N counts with prob p
+
+        # derive the relative weights of each cell
+        p = [x/sum(col) for x in col]
+
+        # draw now a random sample genes. How many? as many as you have in the original
+        # cell.
+        temp = np.random.multinomial(totalCounts, p)
+
+        # append and make a gene expression matrix for you simulated spots
+        out['GenExp'][:, i] = temp
 
     return out
 
@@ -310,6 +324,63 @@ def cellType_geneUniverse(gene_expression):
     return out
 
 
+def cell_reads(df):
+    p = []
+    total = []
+    # loop over the cells
+    for i in range(df.shape[0]):
+        geneName = df['Genenames'].iloc[i]
+        geneCounts = df['CellGeneCount'].iloc[i]
+        N = sum(geneCounts)
+        temp = [x/N for x in geneCounts]
+        p.append(temp)
+        total.append(N)
+
+    return p, total
+
+
+def getTotalGeneCounts(df):
+    p = []
+    out = []
+    # loop over the cells
+    for i in range(df.shape[0]):
+        geneCounts = df['CellGeneCount'].iloc[i]
+        N = sum(geneCounts)
+        out.append(N)
+
+    return out
+
+
+def adjust(raw_data, sample):
+    '''
+    adjust the expression matrix. Draw gene expressions using the proportions of the original cell
+    but using the total gene counts (ie sum of gene expressions) from the randomly selected cell
+    :param raw_data:
+    :param sample:
+    :return:
+    '''
+    #Get the grand total for each column (ie for each cell get the total gene count)
+    grandTotal = sample['GenExp'].sum(axis=0)
+
+    out = np.zeros(sample['GenExp'].shape, dtype=np.int_)
+    # loop over the cells
+    for i in range(raw_data.shape[0]):
+        p = raw_data['genesProb'].iloc[i]
+        N = grandTotal[i]
+
+        #draw N counts with prob p
+        temp = np.random.multinomial(N, p)
+
+        idx = [sample['gene_name'].index(x) for x in raw_data['Genenames'].iloc[i]]
+        out[idx, i] = temp
+
+    #sanity check
+    assert np.all(out.sum(axis=0) == grandTotal)
+    return out
+
+
+
+
 if __name__ == "__main__":
     # _seed = np.int(time.time())
     _seed = 123456
@@ -319,7 +390,7 @@ if __name__ == "__main__":
     # dataset_name = 'DEFAULT'
     # dataset_name = 'DEFAULT_42GENES'
     dataset_name = 'DEFAULT_99GENES'
-    inefficiency = 1.0
+    inefficiency = 0.25
 
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
@@ -333,21 +404,26 @@ if __name__ == "__main__":
     nonZero = raw_data['best_class'] != 'Zero'
     raw_data = raw_data[nonZero]
 
+    grandTotal = getTotalGeneCounts(raw_data)
+    raw_data['totalGeneCounts'] = grandTotal
+
     sample = draw_gene_expression(raw_data, gene_expression)
-    sample = thinner(sample, inefficiency * eGeneGamma)
+    # sample['GenExp'] = adjust(raw_data, sample)
+    # sample = thinner(sample, inefficiency * eGeneGamma)
     # univ = gene_universe(gene_expression)
     # injected = inject(sample, univ)
     spots = position_genes(sample)
 
-    fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
+    fName = 'spots_ADJ_' + dataset_name + '_' + str(_seed) + '.csv'
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    outPath = os.path.join(dir_path, 'Simulated spots', 'inefficiency_' + str(inefficiency))
+    # outPath = os.path.join(dir_path, 'Simulated spots', 'inefficiency_' + str(inefficiency))
+    outPath = os.path.join(dir_path, 'Simulated spots', 'NoShrink')
     outFile = os.path.join(outPath, fName)
 
     # make now the directory
     mkdir_p(outPath)
 
-    # pd.DataFrame(spots).to_csv(outFile, header=['name', 'x', 'y'], index=None)
+    pd.DataFrame(spots).to_csv(outFile, header=['name', 'x', 'y'], index=None)
 
     print(spots[-3:, :])
     print('Done!')
