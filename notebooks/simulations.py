@@ -270,10 +270,11 @@ def mkdir_p(path):
             raise
 
 
-def inject(sample, univ, selectFrom = 'Complement'):
+def inject(sample, univ, perc, selectFrom = 'Complement'):
     '''
     :param sample:
     :param univ:
+    :param perc:
     :param selectFrom:
     :return: an array the same size as sample['GenExp'] which defines how many extra spots per cell we can sample.
             For example x_ij means that for class j we will draw x_ij more spots of gene i.
@@ -282,10 +283,10 @@ def inject(sample, univ, selectFrom = 'Complement'):
     allGenes = sample['gene_name']
 
     # take the total gene count for each cell type
-    gc = sample['GenExp'].sum(axis=0)
+    gc = raw_data['totalGeneCounts']
 
     # percentage of total gene counts we want to inject
-    perc = 0.10
+    # perc = 0.10
     newSpotsCounts = [int(x * perc) for x in gc]
 
     out = np.zeros(sample['GenExp'].shape)
@@ -390,7 +391,6 @@ if __name__ == "__main__":
     # dataset_name = 'DEFAULT'
     # dataset_name = 'DEFAULT_42GENES'
     dataset_name = 'DEFAULT_99GENES'
-    inefficiency = 0.25
 
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
@@ -410,14 +410,16 @@ if __name__ == "__main__":
     sample = draw_gene_expression(raw_data, gene_expression)
     # sample['GenExp'] = adjust(raw_data, sample)
     # sample = thinner(sample, inefficiency * eGeneGamma)
-    # univ = gene_universe(gene_expression)
-    # injected = inject(sample, univ)
+    univ = cellType_geneUniverse(gene_expression)
+    perc = 0.10  # percentage of fake points to inject (percentage of the cells' total gene counts
+    injected = inject(sample, univ, perc, 'All')
+    sample['GenExp'] = sample['GenExp'] + injected
     spots = position_genes(sample)
 
-    fName = 'spots_ADJ_' + dataset_name + '_' + str(_seed) + '.csv'
+    fName = 'spots_' + dataset_name + '_' + str(_seed) + '_fakeGenes' + '.csv'
     dir_path = os.path.dirname(os.path.realpath(__file__))
     # outPath = os.path.join(dir_path, 'Simulated spots', 'inefficiency_' + str(inefficiency))
-    outPath = os.path.join(dir_path, 'Simulated spots', 'NoShrink')
+    outPath = os.path.join(dir_path, 'Simulated spots')
     outFile = os.path.join(outPath, fName)
 
     # make now the directory
