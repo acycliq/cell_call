@@ -12,13 +12,25 @@ function renderHeatmapTab(selected) {
     radioButton = selected; // mean or median?
     json = "./notebooks/confusionMatrixData.json"
 
-    if (document.getElementById('genes42').checked) {
-        checkBox0 = '42genes'
-    } else if (document.getElementById('genes62').checked) {
-        checkBox0 = '62genes'
-    } else {
-        checkBox0 = '98genes'
+    
+    checkBox0 = '98genes' //  default value
+    if (document.getElementById('genes42')){
+        document.getElementById('genes42').checked? checkBox0 = '42genes': checkBox0 = '98genes'
     }
+    
+    
+    if (document.getElementById('genes62')){
+        document.getElementById('genes62').checked? checkBox0 = '62genes': checkBox0 = '98genes'
+    }
+    
+
+    // if (document.getElementById('genes42').checked) {
+    //     checkBox0 = '42genes'
+    // } else if (document.getElementById('genes62').checked) {
+    //     checkBox0 = '62genes'
+    // } else {
+    //     checkBox0 = '98genes'
+    // }
 
     if (document.getElementById('nonNeurons').checked) {
         checkBox1 = 'nonNeuronsOn'
