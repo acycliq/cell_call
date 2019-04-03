@@ -208,42 +208,45 @@ if __name__ == "__main__":
     # SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/rectHeatmap/dashboard/data/img/'
     PATH = os.path.join(dir_path, '..', 'dashboard/data/img')
     MODEL_DATA = PATH + '/default_98genes/json/iss.json'
-    # SIM_DATA = PATH + '/sim_123456_42genes/json/iss.json'  # Simulation 1
-    SIM_DATA = PATH + '/sim_123456_42genes_excludedClasses/json/iss.json'  # Simulation 1
+    # SIM_DATA = PATH + '/sim_123456_98genes/json/iss.json'  # Simulation 1
+    SIM_DATA = PATH + '/sim_123456_98genes_excludedClasses/json/iss.json'  # Simulation 1
 
+    norms = ['mean', 'median']
+    _pool = [False, True]
 
-    # norm = 'mean'
-    # use_pool = False
+    for use_pool in _pool:
+        for norm in norms:
+            # norm = 'mean'
+            # use_pool = False
 
-    # norm = 'median'
-    # use_pool = False
-    # #
-    # norm = 'mean'
-    # use_pool = True
-    #
-    norm = 'median'
-    use_pool = True
+            # norm = 'median'
+            # use_pool = False
+            # #
+            # norm = 'mean'
+            # use_pool = True
+            #
+            # norm = 'median'
+            # use_pool = True
 
-    model_data = pd.read_json(MODEL_DATA)
-    sim_data = pd.read_json(SIM_DATA)
+            model_data = pd.read_json(MODEL_DATA)
+            sim_data = pd.read_json(SIM_DATA)
 
-    if use_pool:
-        model_data = pool(model_data)
-        sim_data = pool(sim_data)
+            if use_pool:
+                model_data = pool(model_data)
+                sim_data = pool(sim_data)
 
+            cm = confusion_matrix(model_data, sim_data, norm)
+            print(cm.sum(axis=0))
+            plot_confusion_matrix(cm, norm)
 
+            unmatched = [x for x in cm.index.values if x not in cm.columns.values]
+            if len(unmatched) > 0:
+                logger.info('The following cell class(es) exist in predicted but not in actual')
+                print(unmatched)
 
-    cm = confusion_matrix(model_data, sim_data, norm)
-    print(cm.sum(axis=0))
-    plot_confusion_matrix(cm, norm)
+            outDir = makeOutput(SIM_DATA, norm, use_pool)
+            target_file = os.path.join(outDir, 'confusionMatrix.json')
+            cm.to_json(target_file, orient='split')
+            logger.info('Saved to %s ' % target_file)
 
-    unmatched = [x for x in cm.index.values if x not in cm.columns.values]
-    if len(unmatched) > 0:
-        logger.info('The following cell class(es) exist in predicted but not in actual')
-        print(unmatched)
-
-    outDir = makeOutput(SIM_DATA, norm, use_pool)
-    target_file = os.path.join(outDir, 'confusionMatrix.json')
-    cm.to_json(target_file, orient='split')
-    logger.info('Saved to %s ' % target_file)
     logger.info('Done')
