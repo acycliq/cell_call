@@ -66,7 +66,7 @@ def best_class(df):
     out = [class_name[n][np.argmax(prob[n])] for n in range(class_name.shape[0])]
     return out
 
-def draw_gene_expression(df, ge):
+def draw_gene_expression(df, ge, eGeneGamma):
     # cell class (unique and ranked alphabetically)
     # best_classes = sorted(set(df['best_class']))
     class_list = ge.Class.values.tolist()
@@ -114,7 +114,10 @@ def draw_gene_expression(df, ge):
         col = ge[:, colNum].values
         # draw N counts with prob p
 
-        # derive the relative weights of each cell
+        # multiply now by the eGeneGamma
+        col = col * eGeneGamma
+
+        # derive the relative weights of each gene
         p = [x/sum(col) for x in col]
 
         # draw now a random sample genes. How many? as many as you have in the original
@@ -407,17 +410,19 @@ if __name__ == "__main__":
     grandTotal = getTotalGeneCounts(raw_data)
     raw_data['totalGeneCounts'] = grandTotal
 
-    sample = draw_gene_expression(raw_data, gene_expression)
+    sample = draw_gene_expression(raw_data, gene_expression, eGeneGamma)
     # sample['GenExp'] = adjust(raw_data, sample)
     # sample = thinner(sample, inefficiency * eGeneGamma)
     univ = cellType_geneUniverse(gene_expression)
-    perc = 0.30  # percentage of fake points to inject (percentage of the cells' total gene counts
-    fakesDomain = 'nonDomestic' # where to pick up the fakes from
-    injected = inject(sample, univ, perc, fakesDomain)
-    sample['GenExp'] = sample['GenExp'] + injected
+    # perc = 0.30  # percentage of fake points to inject (percentage of the cells' total gene counts
+    # fakesDomain = 'nonDomestic' # where to pick up the fakes from
+    # injected = inject(sample, univ, perc, fakesDomain)
+    # sample['GenExp'] = sample['GenExp'] + injected
+    sample['GenExp'] = sample['GenExp']
     spots = position_genes(sample)
 
-    fName = 'spots_' + dataset_name + '_' + str(_seed) + '_' + str(perc) + 'fakeGenes_' + fakesDomain + '.csv'
+    # fName = 'spots_' + dataset_name + '_' + str(_seed) + '_' + str(perc) + 'fakeGenes_' + fakesDomain + '.csv'
+    fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
     dir_path = os.path.dirname(os.path.realpath(__file__))
     # outPath = os.path.join(dir_path, 'Simulated spots', 'inefficiency_' + str(inefficiency))
     outPath = os.path.join(dir_path, 'Simulated spots')
