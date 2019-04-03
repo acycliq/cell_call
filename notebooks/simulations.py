@@ -270,7 +270,7 @@ def mkdir_p(path):
             raise
 
 
-def inject(sample, univ, perc, selectFrom = 'Complement'):
+def inject(sample, univ, perc, selectFrom):
     '''
     :param sample:
     :param univ:
@@ -294,12 +294,12 @@ def inject(sample, univ, perc, selectFrom = 'Complement'):
     for i, cn in enumerate(sample['class_name']):
         numSpots = newSpotsCounts[i]
         genesInClass = univ[cn]
-        if selectFrom == 'Complement':
+        if selectFrom == 'nonDomestic':
             domain = sorted(list(set(allGenes) - set(genesInClass)))
         elif selectFrom == 'All':
             domain = allGenes
         else:
-            raise ValueError('selectFrom must either be "All" or "Complement".')
+            raise ValueError('selectFrom must either be "All" or "nonDomestic".')
 
         newGenes = sorted(np.random.choice(domain, numSpots, replace=True))
         binNames, binCounts = np.unique(newGenes, return_counts=True)
@@ -411,12 +411,13 @@ if __name__ == "__main__":
     # sample['GenExp'] = adjust(raw_data, sample)
     # sample = thinner(sample, inefficiency * eGeneGamma)
     univ = cellType_geneUniverse(gene_expression)
-    perc = 0.10  # percentage of fake points to inject (percentage of the cells' total gene counts
-    injected = inject(sample, univ, perc, 'All')
+    perc = 0.30  # percentage of fake points to inject (percentage of the cells' total gene counts
+    fakesDomain = 'nonDomestic' # where to pick up the fakes from
+    injected = inject(sample, univ, perc, fakesDomain)
     sample['GenExp'] = sample['GenExp'] + injected
     spots = position_genes(sample)
 
-    fName = 'spots_' + dataset_name + '_' + str(_seed) + '_fakeGenes' + '.csv'
+    fName = 'spots_' + dataset_name + '_' + str(_seed) + '_' + str(perc) + 'fakeGenes_' + fakesDomain + '.csv'
     dir_path = os.path.dirname(os.path.realpath(__file__))
     # outPath = os.path.join(dir_path, 'Simulated spots', 'inefficiency_' + str(inefficiency))
     outPath = os.path.join(dir_path, 'Simulated spots')
