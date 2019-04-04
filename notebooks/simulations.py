@@ -324,6 +324,7 @@ def dropout(raw_data, perc):
     '''
 
     # loop over all cells in the raw_data
+    col = []
     for i in range(raw_data.shape[0]):
         p = raw_data['genesProb'].iloc[i]
         N = raw_data['totalGeneCounts'].iloc[i]
@@ -338,9 +339,12 @@ def dropout(raw_data, perc):
         # make sure you have no negatives
         newCounts = [max(x, 0) for x in newCounts]
 
-        # now put the newCounts into the raw_data
-        raw_data['CellGeneCount'].iloc[i] = newCounts
+        col.append(newCounts)
 
+        # now put the newCounts into the raw_data
+        # //raw_data['CellGeneCount'].iloc[i] = newCounts
+
+    raw_data['CellGeneCount'] = col
     return raw_data
 
 
