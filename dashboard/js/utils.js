@@ -77,3 +77,27 @@ function argMax(array) {
   return array.map((x, i) => [x, i]).reduce((r, a) => (a[0] > r[0] ? a : r))[1];
 }
 
+function diagonalMean(dataset){
+    xLabels = d3.map(dataset, function (d){return d.xLabel;}).keys();
+    yLabels = d3.map(dataset, function (d){return d.yLabel;}).keys();
+
+    // remove from x-axis those classes that do not appear in y axis
+    data = dataset.filter(function(d){ return yLabels.includes(d.xLabel)});
+
+    // take now all the elements in the diagonal
+    diagonal_obj = data.filter(function(d){ return d.yLabel === d.xLabel});
+    arr = d3.map(diagonal_obj, function(d) {return d.val}).keys()
+
+    // convert to float
+    arr = arr.map(function(d){ return +d;});
+
+    //take the total sum
+    sum = arr.reduce((a,b)=>a+b, 0)
+
+    // calc the mean
+    out = sum / arr.length
+
+    console.log('Confusion matrix score: ' + out)
+    return out
+
+}

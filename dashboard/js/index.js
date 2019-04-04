@@ -68,6 +68,7 @@ function renderHeatmapTab(selected) {
         }
         console.log('json parsed!!');
         renderHeatmap(dataset);
+        var diagonalScore = diagonalMean(dataset);
     });
 }
 
