@@ -72,6 +72,9 @@ def aggregator(df, column_names, norm):
         prob = df.loc[key, 'Prob']
         temp.loc[i, labels] = prob
 
+    raw_data = temp.copy()
+    raw_data.insert(0, 'model_class', df['model_class'].values)
+
     if norm == 'median':
         out = temp.median(axis=0)
     elif norm == 'mean':
@@ -81,7 +84,7 @@ def aggregator(df, column_names, norm):
         out = None
 
     print(out.sum())
-    return out
+    return out, raw_data
 
 
 def confusion_matrix(model_data, sim_data, norm='mean'):
@@ -101,16 +104,22 @@ def confusion_matrix(model_data, sim_data, norm='mean'):
     out = pd.DataFrame(np.zeros((m, n)), columns=umc, index=all_class_names)
 
     'loop over the class names (those assigned my the model)'
+    appended_data = []
     for c in umc:
         mask = df['model_class'] == c
         temp = df[mask]
-        agg = aggregator(temp, all_class_names, norm)
+        agg, raw_data = aggregator(temp, all_class_names, norm)
+
+        # store DataFrame in list
+        appended_data.append(raw_data)
         key = agg.index
         prob = agg.values
         out.loc[key, c] = prob
         print('Finished with %s' % c)
 
-    return out
+    # concatenate along the index(axis=0), overwrite raw_data variable
+    raw_data = pd.concat(appended_data, axis=0)
+    return out, raw_data
 
 def pool(df):
     print('Pooling all Non Neurons together.')
