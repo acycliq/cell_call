@@ -299,6 +299,8 @@ def inject(sample, univ, perc, selectFrom):
         genesInClass = univ[cn]
         if selectFrom == 'nonDomestic':
             domain = sorted(list(set(allGenes) - set(genesInClass)))
+        elif selectFrom == 'Domestic':
+            domain = sorted(set(genesInClass))
         elif selectFrom == 'All':
             domain = allGenes
         else:
@@ -310,6 +312,36 @@ def inject(sample, univ, perc, selectFrom):
         out[idx, i] = binCounts
 
     return out
+
+
+def dropout(raw_data, perc):
+    '''
+    Select the genes to be dropped. This is something like a reverse inject
+    :param sample:
+    :param univ:
+    :param perc:
+    :return:
+    '''
+
+    # loop over all cells in the raw_data
+    for i in range(raw_data.shape[0]):
+        p = raw_data['genesProb'].iloc[i]
+        N = raw_data['totalGeneCounts'].iloc[i]
+        cgc = raw_data['CellGeneCount'].iloc[i]
+
+        # draw N * perc counts with prob p
+        temp = np.random.multinomial(N*perc, p)
+
+        # remove the randomly selected counts from the original gene counts
+        newCounts = np.array(cgc) - temp
+
+        # make sure you have no negatives
+        newCounts = [max(x, 0) for x in newCounts]
+
+        # now put the newCounts into the raw_data
+        raw_data['CellGeneCount'].iloc[i] = newCounts
+
+    return raw_data
 
 
 def cellType_geneUniverse(gene_expression):
@@ -328,7 +360,7 @@ def cellType_geneUniverse(gene_expression):
     return out
 
 
-def cell_reads(df):
+def getGenesProb(df):
     p = []
     total = []
     # loop over the cells
@@ -395,6 +427,8 @@ if __name__ == "__main__":
     # dataset_name = 'DEFAULT_42GENES'
     dataset_name = 'DEFAULT_99GENES'
 
+    beta = 0.30  # percentage of fake points to inject (percentage of the cells' total gene counts
+
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
     # for each cell find its most likely cell class
@@ -409,16 +443,19 @@ if __name__ == "__main__":
 
     grandTotal = getTotalGeneCounts(raw_data)
     raw_data['totalGeneCounts'] = grandTotal
+    genesProb, _ = getGenesProb(raw_data)
+    raw_data['genesProb'] = genesProb
+
+    # now drop some gene counts
+    raw_data = dropout(raw_data, beta)
 
     sample = draw_gene_expression(raw_data, gene_expression, eGeneGamma)
     # sample['GenExp'] = adjust(raw_data, sample)
     # sample = thinner(sample, inefficiency * eGeneGamma)
     univ = cellType_geneUniverse(gene_expression)
-    # perc = 0.30  # percentage of fake points to inject (percentage of the cells' total gene counts
-    # fakesDomain = 'nonDomestic' # where to pick up the fakes from
-    # injected = inject(sample, univ, perc, fakesDomain)
-    # sample['GenExp'] = sample['GenExp'] + injected
-    sample['GenExp'] = sample['GenExp']
+
+    injected = inject(sample, univ, beta, 'All')  # put extra gene selected randomly
+    sample['GenExp'] = sample['GenExp'] + injected
     spots = position_genes(sample)
 
     # fName = 'spots_' + dataset_name + '_' + str(_seed) + '_' + str(perc) + 'fakeGenes_' + fakesDomain + '.csv'
