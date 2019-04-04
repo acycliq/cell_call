@@ -74,9 +74,9 @@ function renderHeatmapTab(selected) {
 }
 
 
-
+// Update now table on the confusion matrix tab with the analytics results
 function cmAnalytics(score) {
-        // check if a there is a reference to a datatable.
+    // check if a there is a reference to a datatable.
     // If yes, refresh with the new data
     // Otherwise create and populate a datatable
     if ($.fn.dataTable.isDataTable('#cm_analytics')) {
@@ -84,14 +84,9 @@ function cmAnalytics(score) {
         table.clear().rows.add(score).draw();
     } else {
         table = $('#cm_analytics').DataTable({
-            //bFilter: false,
             "lengthChange": false,
             searching: false,
-            //"scrollY":        "200px",
-            //"scrollCollapse": true,
             "paging": true,
-            //dom: 't',
-
             "data": score,
             "columns": [
                     {
