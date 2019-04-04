@@ -95,9 +95,15 @@ function diagonalMean(dataset){
     sum = arr.reduce((a,b)=>a+b, 0)
 
     // calc the mean
-    out = sum / arr.length
+    score = sum / arr.length
 
-    console.log('Confusion matrix score: ' + out)
+    console.log('Confusion matrix score: ' + score)
+
+    out = []
+    out.push({
+        "metric": 'Diagonal Mean',
+        "value": score,
+    })
     return out
 
 }

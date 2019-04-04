@@ -69,9 +69,44 @@ function renderHeatmapTab(selected) {
         console.log('json parsed!!');
         renderHeatmap(dataset);
         var diagonalScore = diagonalMean(dataset);
+        cmAnalytics(diagonalScore)
     });
 }
 
+
+
+function cmAnalytics(score) {
+        // check if a there is a reference to a datatable.
+    // If yes, refresh with the new data
+    // Otherwise create and populate a datatable
+    if ($.fn.dataTable.isDataTable('#cm_analytics')) {
+        table = $('#cm_analytics').DataTable();
+        table.clear().rows.add(score).draw();
+    } else {
+        table = $('#cm_analytics').DataTable({
+            //bFilter: false,
+            "lengthChange": false,
+            searching: false,
+            //"scrollY":        "200px",
+            //"scrollCollapse": true,
+            "paging": true,
+            //dom: 't',
+
+            "data": score,
+            "columns": [
+                    {
+                        title: "Metric",
+                        data: "metric"
+                    },
+                    {
+                        title: "Value",
+                        data: "value"
+                    }
+                ],
+        });
+
+    }
+}
 
 var sectionChartFilters = document.getElementById('section-chart-controls');
 var checkItAll = sectionChartFilters.querySelector('input[name="cb:select-all"]');
