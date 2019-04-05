@@ -224,7 +224,8 @@ def mutual_information(data):
         mask[i, col_id] = 1
 
     marginals = mask.sum(axis=0) / mask.shape[0]
-    contribution = prob.values * mask / marginals
+    # contribution = prob.values * mask / marginals
+    contribution = np.divide(prob.values * mask, marginals, out=np.zeros_like(prob.values), where=marginals != 0)
     logContribution = np.log2(contribution, where=(contribution != 0))
     mutualInformation = np.sum(logContribution) / sampleSize
 
@@ -269,13 +270,14 @@ if __name__ == "__main__":
             mi = mutual_information(raw_data)
 
             test_data = pd.DataFrame(
-                                    [['w', 0.80, 0.10, 0.10],
-                                    ['b', 0.15, 0.70, 0.15],
-                                    ['c', 0.05, 0.2, 0.75],
-                                    ['w', 0.80, 0.15, 0.05],
-                                    ['b', 0.05, 0.90, 0.05]
+                                    [['w', 0.10, 0.10, 0.10, 0.70],
+                                    ['b', 0.15, 0.70, 0.0, 0.15],
+                                    ['c', 0.05, 0.10, 0.75, 0.10],
+                                    ['w', 0.70, 0.15, 0.0, 0.15],
+                                    ['b', 0.05, 0.90, 0.05, 0.0],
+                                    ['b', 0.20, 0.60, 0.20, 0.0]
                                     ],
-                                    columns=['model_class', 'w', 'b', 'c']
+                                    columns=['model_class', 'w', 'b', 'c', 'd']
                                    )
             mi_junk = mutual_information(test_data)
             logger.info('Mutual Information is: %.9f ' % mi)
