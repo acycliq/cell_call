@@ -172,7 +172,11 @@ def makeOutput(SIM_DATA, norm, use_pool):
 
     root = 'jsonFiles' # All generated files are going to sit within this folder
 
-    if '99genes' in SIM_DATA:
+    if 'beta10' in SIM_DATA:
+        level0 = 'beta10'
+    elif 'beta30' in SIM_DATA:
+        level0 = 'beta30'
+    elif '99genes' in SIM_DATA:
         level0 = '99genes'
     elif '98genes' in SIM_DATA:
         level0 = '98genes'
@@ -240,7 +244,9 @@ if __name__ == "__main__":
     PATH = os.path.join(dir_path, '..', 'dashboard/data/img')
     MODEL_DATA = PATH + '/default_98genes/json/iss.json'
     # SIM_DATA = PATH + '/sim_123456_98genes/json/iss.json'  # Simulation 1
-    SIM_DATA = PATH + '/sim_123456_98genes_excludedClasses/json/iss.json'  # Simulation 1
+    # SIM_DATA = PATH + '/sim_123456_98genes_excludedClasses/json/iss.json'  # Simulation 1
+
+    SIM_DATA = PATH + '/sim_123456_98genes_beta10_FakeGenes/json/iss.json'
 
     norms = ['mean', 'median']
     _pool = [False, True]
@@ -280,7 +286,7 @@ if __name__ == "__main__":
 
             outDir = makeOutput(SIM_DATA, norm, use_pool)
             target_file = os.path.join(outDir, 'confusionMatrix.json')
-            # cm.to_json(target_file, orient='split')
+            cm.to_json(target_file, orient='split')
             logger.info('Saved to %s ' % target_file)
 
     logger.info('Done')

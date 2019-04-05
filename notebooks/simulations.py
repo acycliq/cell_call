@@ -273,7 +273,7 @@ def mkdir_p(path):
             raise
 
 
-def inject(sample, univ, perc, selectFrom):
+def inject(raw_data, sample, univ, perc, selectFrom):
     '''
     :param sample:
     :param univ:
@@ -356,7 +356,7 @@ def cellType_geneUniverse(gene_expression):
     out = {}
     cellTypes = np.unique(gene_expression.Class.values)
     for i, cellType in enumerate(cellTypes):
-        print(cellType)
+        # print(cellType)
         temp = gene_expression[:, gene_expression.Class == cellType]
         inCellType = temp.sum(axis=1) > 0
         val = temp.Genes[inCellType].values
@@ -419,9 +419,13 @@ def adjust(raw_data, sample):
     return out
 
 
+def paramGrid(alpha, beta):
+    grid = np.meshgrid(alpha, beta)
+    grid = np.array(grid).T.reshape(-1, 2)
+    return grid
 
 
-if __name__ == "__main__":
+def app(alpha, beta):
     # _seed = np.int(time.time())
     _seed = 123456
     np.random.seed(_seed)
@@ -431,7 +435,7 @@ if __name__ == "__main__":
     # dataset_name = 'DEFAULT_42GENES'
     dataset_name = 'DEFAULT_99GENES'
 
-    beta = 0.30  # percentage of fake points to inject (percentage of the cells' total gene counts
+    # beta = 0.10  # percentage of fake points to inject (percentage of the cells' total gene counts
 
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
@@ -454,28 +458,42 @@ if __name__ == "__main__":
     raw_data = dropout(raw_data, beta)
 
     sample = draw_gene_expression(raw_data, gene_expression, eGeneGamma)
-    # sample['GenExp'] = adjust(raw_data, sample)
-    # sample = thinner(sample, inefficiency * eGeneGamma)
     univ = cellType_geneUniverse(gene_expression)
 
-    injected = inject(sample, univ, beta, 'All')  # put extra gene selected randomly
+    injected = inject(raw_data, sample, univ, beta, 'All')  # put extra gene selected randomly
     sample['GenExp'] = sample['GenExp'] + injected
+    sample['GenExp'] = alpha * sample['GenExp']  # Balloon/shrink by alpha
+    sample['GenExp'] = sample['GenExp'].astype(int)  # cast as int
     spots = position_genes(sample)
 
-    # fName = 'spots_' + dataset_name + '_' + str(_seed) + '_' + str(perc) + 'fakeGenes_' + fakesDomain + '.csv'
-    fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
+    fName = 'spots_' + dataset_name + '_' + str(_seed) + '_alpha' + str(alpha) + '_beta' + str(beta) + 'fakeGenes' + '.csv'
+    # fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
     dir_path = os.path.dirname(os.path.realpath(__file__))
     # outPath = os.path.join(dir_path, 'Simulated spots', 'inefficiency_' + str(inefficiency))
-    outPath = os.path.join(dir_path, 'Simulated spots')
+    outPath = os.path.join(dir_path, 'Simulated spots', 'grid')
     outFile = os.path.join(outPath, fName)
 
     # make now the directory
     mkdir_p(outPath)
 
     pd.DataFrame(spots).to_csv(outFile, header=['name', 'x', 'y'], index=None)
+    logger.info('Saved to %s ' % outFile)
 
     print(spots[-3:, :])
     print('Done!')
+
+
+if __name__ == "__main__":
+    alpha = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
+    beta = [0.1, 0.3, 0.5, 0.7]
+    grid = paramGrid(alpha, beta)
+    for p in grid:
+        alpha = p[0]
+        beta = p[1]
+
+        # start the app
+        app(alpha, beta)
+
 
 
 
