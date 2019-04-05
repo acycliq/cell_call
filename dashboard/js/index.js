@@ -14,23 +14,23 @@ function renderHeatmapTab(selected) {
 
     
     checkBox0 = '98genes' //  default value
-    if (document.getElementById('genes42')){
-        document.getElementById('genes42').checked? checkBox0 = '42genes': checkBox0 = '98genes'
-    }
-    
-    
-    if (document.getElementById('genes62')){
-        document.getElementById('genes62').checked? checkBox0 = '62genes': checkBox0 = '98genes'
-    }
-    
-
-    // if (document.getElementById('genes42').checked) {
-    //     checkBox0 = '42genes'
-    // } else if (document.getElementById('genes62').checked) {
-    //     checkBox0 = '62genes'
-    // } else {
-    //     checkBox0 = '98genes'
+    // if (document.getElementById('beta10')){
+    //     document.getElementById('beta10').checked? checkBox0 = 'beta10': checkBox0 = '98genes'
     // }
+    //
+    //
+    // if (document.getElementById('beta30')){
+    //     document.getElementById('beta30').checked? checkBox0 = 'beta30': checkBox0 = '98genes'
+    // }
+    //
+
+    if (document.getElementById('beta10').checked) {
+        checkBox0 = 'beta10'
+    } else if (document.getElementById('beta30').checked) {
+        checkBox0 = 'beta30'
+    } else {
+        checkBox0 = '98genes'
+    }
 
     if (document.getElementById('nonNeurons').checked) {
         checkBox1 = 'nonNeuronsOn'
@@ -232,7 +232,7 @@ $('#layers-base-3 input').change(function () {
 
 $('#layers-base-4 input').change(function () {
     // uncheck the other checkbox
-    $("#genes62").prop("checked", false);
+    $("#beta30").prop("checked", false);
     var selected = document.ConfusionMatrixRadioButton.norm.value;
     console.log('check box clicked');
     renderHeatmapTab(selected)
@@ -240,7 +240,7 @@ $('#layers-base-4 input').change(function () {
 
 $('#layers-base-5 input').change(function () {
     // uncheck the other checkbox
-    $("#genes42").prop("checked", false);
+    $("#beta10").prop("checked", false);
     var selected = document.ConfusionMatrixRadioButton.norm.value;
     console.log('check box clicked');
     renderHeatmapTab(selected)
