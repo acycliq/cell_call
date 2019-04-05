@@ -209,6 +209,27 @@ def makeOutput(SIM_DATA, norm, use_pool):
     return outPath
 
 
+def mutual_information(data):
+    prob = data.iloc[:, 1:]
+    model_class = raw_data.iloc[:, 0]
+    # first find the locations in each row where the max occurs
+    mask = np.zeros(prob.shape)
+
+    # loop over the model class=
+    predictedNames = prob.columns
+    sampleSize = prob.shape[0]
+    for i, val in enumerate(model_class):
+        # find the index in the predicted
+        col_id = predictedNames.tolist().index(val)
+        mask[i, col_id] = 1
+
+    marginals = mask.sum(axis=0) / mask.shape[0]
+    contribution = prob.values * mask / marginals
+    logContribution = np.log2(contribution, where=(contribution != 0))
+    mutualInformation = np.sum(logContribution) / sampleSize
+
+    return mutualInformation
+
 
 if __name__ == "__main__":
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -244,7 +265,9 @@ if __name__ == "__main__":
                 model_data = pool(model_data)
                 sim_data = pool(sim_data)
 
-            cm = confusion_matrix(model_data, sim_data, norm)
+            cm, raw_data = confusion_matrix(model_data, sim_data, norm)
+            mi = mutual_information(raw_data)
+            logger.info('Mutual Information is: %.9f ' % mi)
             print(cm.sum(axis=0))
             plot_confusion_matrix(cm, norm)
 
@@ -255,7 +278,7 @@ if __name__ == "__main__":
 
             outDir = makeOutput(SIM_DATA, norm, use_pool)
             target_file = os.path.join(outDir, 'confusionMatrix.json')
-            cm.to_json(target_file, orient='split')
+            # cm.to_json(target_file, orient='split')
             logger.info('Saved to %s ' % target_file)
 
     logger.info('Done')
