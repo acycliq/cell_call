@@ -269,17 +269,6 @@ if __name__ == "__main__":
             cm, raw_data = confusion_matrix(model_data, sim_data, norm)
             mi = mutual_information(raw_data)
 
-            test_data = pd.DataFrame(
-                                    [['w', 0.10, 0.10, 0.10, 0.70],
-                                    ['b', 0.15, 0.70, 0.0, 0.15],
-                                    ['c', 0.05, 0.10, 0.75, 0.10],
-                                    ['w', 0.70, 0.15, 0.0, 0.15],
-                                    ['b', 0.05, 0.90, 0.05, 0.0],
-                                    ['b', 0.20, 0.60, 0.20, 0.0]
-                                    ],
-                                    columns=['model_class', 'w', 'b', 'c', 'd']
-                                   )
-            mi_junk = mutual_information(test_data)
             logger.info('Mutual Information is: %.9f ' % mi)
             print(cm.sum(axis=0))
             plot_confusion_matrix(cm, norm)
