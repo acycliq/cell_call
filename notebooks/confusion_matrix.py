@@ -211,7 +211,7 @@ def makeOutput(SIM_DATA, norm, use_pool):
 
 def mutual_information(data):
     prob = data.iloc[:, 1:]
-    model_class = raw_data.iloc[:, 0]
+    model_class = data.iloc[:, 0]
     # first find the locations in each row where the max occurs
     mask = np.zeros(prob.shape)
 
@@ -267,6 +267,17 @@ if __name__ == "__main__":
 
             cm, raw_data = confusion_matrix(model_data, sim_data, norm)
             mi = mutual_information(raw_data)
+
+            test_data = pd.DataFrame(
+                                    [['w', 0.80, 0.10, 0.10],
+                                    ['b', 0.15, 0.70, 0.15],
+                                    ['c', 0.05, 0.2, 0.75],
+                                    ['w', 0.80, 0.15, 0.05],
+                                    ['b', 0.05, 0.90, 0.05]
+                                    ],
+                                    columns=['model_class', 'w', 'b', 'c']
+                                   )
+            mi_junk = mutual_information(test_data)
             logger.info('Mutual Information is: %.9f ' % mi)
             print(cm.sum(axis=0))
             plot_confusion_matrix(cm, norm)
