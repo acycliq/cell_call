@@ -51,26 +51,36 @@ function renderHeatmapTab(selected) {
         '\\' + checkBox1 +
         '\\' + 'confusionMatrix.json';
     console.log('Pushing ' + confMatrixjson + ' in confusion matrix')
-    d3.json(confMatrixjson, function (data) {
-        dataset = []
-        for (var i = 0; i < data.index.length; i++) {
-            // console.log(' i: ', i)
-            for (var j = 0; j < data.columns.length; j++) {
-                // console.log('i: ' + i + ' j: ' + j + ' value: ' + data.data[i][j])
-                dataset.push({
-                    xKey: i + 1,
-                    xLabel: data.index[i],
-                    yKey: j + 1,
-                    yLabel: data.columns[j],
-                    val: +data.data[i][j],
-                })
-            }
-        }
+    // d3.json(confMatrixjson, function (data) {
+    //     dataset = []
+    //     for (var i = 0; i < data.index.length; i++) {
+    //         // console.log(' i: ', i)
+    //         for (var j = 0; j < data.columns.length; j++) {
+    //             // console.log('i: ' + i + ' j: ' + j + ' value: ' + data.data[i][j])
+    //             dataset.push({
+    //                 xKey: i + 1,
+    //                 xLabel: data.index[i],
+    //                 yKey: j + 1,
+    //                 yLabel: data.columns[j],
+    //                 val: +data.data[i][j],
+    //             })
+    //         }
+    //     }
+    //     console.log('json parsed!!');
+    //     renderHeatmap(dataset);
+    //     var diagonalScore = diagonalMean(dataset);
+    //     cmAnalytics(diagonalScore)
+    // });
+
+    d3.csv("notebooks/raw_data.csv", function(data){
+        norm = 'avg'
+        ddl = 1;
+        dataset = heatmapDataManager(data, norm, ddl)
         console.log('json parsed!!');
         renderHeatmap(dataset);
         var diagonalScore = diagonalMean(dataset);
         cmAnalytics(diagonalScore)
-    });
+    })
 }
 
 
@@ -210,6 +220,90 @@ function getSelected(inputs) {
     return selected
 }
 
+function heatmapDataManager(data, norm, ddl) {
+// Helper function to handle the data to be fed in to heatmap
+// ddl is the drill down level. Data are aggregated over that level.
+// For example 'Astro.1', 'Astro.2' ,..., 'Astro.5' will all be combined
+// in a big class 'Astro' if ddl=1
+// norm is either 'avg' or 'median'. The default is 'median'
+
+    function stripper(d, k) {
+        for (i = 0; i < k; ++i) {
+            if (d.lastIndexOf('.') > 0) {
+                d = d.substring(0, d.lastIndexOf('.'))
+            }
+        }
+        return d
+    }
+
+    // var ddl = 4; //drill down level
+    var result = data.map(o => Object.entries(o).reduce((o, [k, v]) => {
+        //const firsts = k => k.split('.').slice(0, -1).join('.');
+        if (k === 'model_class') {
+            o[k] = stripper(v, ddl);
+        } else {
+            k = stripper(k, ddl);
+            o[k] = (o[k] || 0) + parseFloat(v);
+        }
+        return o;
+    }, {}));
+
+
+    var out = d3.nest()
+        .key(function (d) {
+            return d.model_class;
+        })
+        .rollup(function (v) {
+            var teams = v.map(function (team) {
+                delete team.model_class;
+                return d3.entries(team);
+            }).reduce(function (memo, team) {
+                return memo.concat(team);
+            }, []);
+
+            var a = d3.nest()
+                .key(function (d) {
+                    return d.key;
+                })
+                .rollup(function (w) {
+                    return {
+                        count: w.length,
+                        median: d3.median(w, function (d) {
+                            return d['value'];
+                        }),
+                        avg: d3.mean(w, function (d) {
+                            return d['value'];
+                        })
+                    };
+                })
+                .entries(teams);
+
+            return a;
+        })
+        .entries(result);
+
+
+    dataset = [];
+    for (var i = 0; i < out.length; i++) { //62
+        // console.log(' i: ', i)
+        var cur = out[i],
+            curKey = cur.key, // this is the model_class
+            curVal = cur.value;
+        for (var j = 0; j < curVal.length; j++) { //71
+            // console.log('i: ' + i + ' j: ' + j + ' value: ' + data.data[i][j])
+            dataset.push({
+                xKey: j + 1,
+                xLabel: curVal[j].key,
+                yKey: i + 1,
+                yLabel: cur.key,
+                val: norm === 'avg'? +curVal[j].value.avg: +curVal[j].value.median,
+            })
+        }
+    }
+
+
+    return dataset
+}
 
 // listener on the Confusion matrix tab
 $('#layers-base input').change(function () {
