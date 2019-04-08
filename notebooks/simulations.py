@@ -345,7 +345,7 @@ def dropout(raw_data, perc):
         # //raw_data['CellGeneCount'].iloc[i] = newCounts
 
     raw_data['CellGeneCount'] = col
-    return raw_data
+    return raw_data.copy()
 
 
 def cellType_geneUniverse(gene_expression):
@@ -455,14 +455,14 @@ def app(alpha, beta):
     raw_data['genesProb'] = genesProb
 
     # now drop some gene counts
-    raw_data = dropout(raw_data, beta)
+    data = dropout(raw_data, alpha*beta)
 
-    sample = draw_gene_expression(raw_data, gene_expression, eGeneGamma)
+    sample = draw_gene_expression(data, gene_expression, eGeneGamma)
     univ = cellType_geneUniverse(gene_expression)
 
-    injected = inject(raw_data, sample, univ, beta, 'All')  # put extra gene selected randomly
+    injected = inject(data, sample, univ, alpha*beta, 'All')  # put extra gene selected randomly
     sample['GenExp'] = sample['GenExp'] + injected
-    sample['GenExp'] = alpha * sample['GenExp']  # Balloon/shrink by alpha
+    # sample['GenExp'] = alpha * sample['GenExp']  # Balloon/shrink by alpha
     sample['GenExp'] = sample['GenExp'].astype(int)  # cast as int
     spots = position_genes(sample)
 
@@ -487,6 +487,7 @@ if __name__ == "__main__":
     alpha = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
     beta = [0.1, 0.3, 0.5, 0.7]
     grid = paramGrid(alpha, beta)
+    grid = [[2, 0.5]]
     for p in grid:
         alpha = p[0]
         beta = p[1]
