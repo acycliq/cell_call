@@ -4,9 +4,9 @@ function renderDataTable(d) {
     var mydata = [];
     var mydata2 = [];
 
-    var str = "<strong>Cell Num: </strong>" + d.Cell_Num +
-        ",  (<strong>x, y</strong>): (" + d.x.toFixed(2) + ", " + d.y.toFixed(2) + ")";
-    document.getElementById('dtTitle').innerHTML = str;
+    // var str = "<strong>Cell Num: </strong>" + d.Cell_Num +
+    //     ",  (<strong>x, y</strong>): (" + d.x.toFixed(2) + ", " + d.y.toFixed(2) + ")";
+    // document.getElementById('dtTitle').innerHTML = str;
     var n = d3.max([d.CellGeneCount.length, d.Genenames.length]);
     for (i = 0; i < n; i++) {
         mydata.push({
@@ -55,6 +55,14 @@ function renderDataTable(d) {
 
     }
 
+    function getTotal(table){
+        var total = table.column(1).data().reduce(function (a,b) {return a+b})
+        $(table.column(1).footer()).html('Total: ' +total )
+        console.log('Total number of gene counts: ' + total )
+
+        return total
+    }
+
 
     if ($.fn.dataTable.isDataTable('#dtTable2')) {
         table2 = $('#dtTable2').DataTable();
@@ -90,6 +98,14 @@ function renderDataTable(d) {
     table2
         .order([1, 'desc'])
         .draw();
+
+    var total = getTotal(table)
+
+    var str = "<strong>Cell Num: </strong>" + d.Cell_Num
+        + ", <strong>Gene Counts: </strong>" + total.toFixed(0)
+        + ",  (<strong>x, y</strong>): (" + d.x.toFixed(2) + ", " + d.y.toFixed(2) + ")"
+     ;
+    document.getElementById('dtTitle').innerHTML = str;
 
 
 }
