@@ -446,33 +446,18 @@ def app(alpha, beta):
     nonZero = raw_data['best_class'] != 'Zero'
     raw_data = raw_data[nonZero]
 
+    # for each cell find the total gene counts and stick that into the dataframe for later use.
     grandTotal = getTotalGeneCounts(raw_data)
     raw_data['totalGeneCounts'] = grandTotal
-    genesProb, _ = getGenesProb(raw_data)
-    raw_data['genesProb'] = genesProb
 
-    # make a df to manipulate
-    data = raw_data.copy()
-
-    # now drop some gene counts
-    # data = dropout(data, alpha*beta)
+    # genesProb, _ = getGenesProb(raw_data)
+    # raw_data['genesProb'] = genesProb
 
     sample = draw_gene_expression(raw_data, gene_expression, eGeneGamma, alpha, beta)
-    univ = cellType_geneUniverse(gene_expression)
 
-    print('In app, before injection alpha')
-    print('Cell at i = 1444 now has %.2f ' % sum(sample['GenExp'][:, 1444]))
     injected = inject(raw_data, sample, alpha*beta)  # put extra gene selected randomly
     sample['GenExp'] = sample['GenExp'] + injected
-    print('In app, after injection alpha')
-    print('Cell at i = 1444 now has %.2f ' % sum(sample['GenExp'][:, 1444]))
-
-    print('In app, before applying alpha')
-    print('Cell at i = 1444 now has %.2f ' % sum(sample['GenExp'][:,1444]))
-    # sample['GenExp'] = alpha * sample['GenExp']  # Balloon/shrink by alpha
     sample['GenExp'] = sample['GenExp'].astype(int)  # cast as int
-    print('In app, after applying alpha')
-    print('Cell at i = 1444 now has %.2f ' % sum(sample['GenExp'][:, 1444]))
     spots = position_genes(sample)
 
     fName = 'spots_' + dataset_name + '_' + str(_seed) + '_alpha' + str(alpha) + '_beta' + str(beta) + 'fakeGenes' + '.csv'
