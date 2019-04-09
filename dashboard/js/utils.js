@@ -107,3 +107,8 @@ function diagonalMean(dataset){
     return out
 
 }
+
+
+function deleteCookie(keyName) {
+    sessionStorage.removeItem('keyName')
+}
