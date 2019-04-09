@@ -66,9 +66,10 @@ def best_class(df):
     out = [class_name[n][np.argmax(prob[n])] for n in range(class_name.shape[0])]
     return out
 
-def draw_gene_expression(df, ge, eGeneGamma):
+def draw_gene_expression(df, ge, eGeneGamma, alpha, beta):
     # cell class (unique and ranked alphabetically)
     # best_classes = sorted(set(df['best_class']))
+    # totalCountsArray = getTotalGeneCounts(df)
     class_list = ge.Class.values.tolist()
     N = df.shape[0]
     M = ge.shape[0]
@@ -85,6 +86,7 @@ def draw_gene_expression(df, ge, eGeneGamma):
     for i in range(N):  # loop over the cells
         # select a class
         bc = df['best_class'].iloc[i]
+        # totalCounts = totalCountsArray[i]
         totalCounts = df['totalGeneCounts'].iloc[i]
         _cell_num = df['Cell_Num'].iloc[i]
         _x = df['X'].iloc[i]
@@ -121,15 +123,17 @@ def draw_gene_expression(df, ge, eGeneGamma):
         p = [x/sum(col) for x in col]
 
         # draw now a random sample genes. How many? as many as you have in the original
-        # cell.
-        temp = np.random.multinomial(totalCounts, p)
+        # cell scaled by the parameters alpha and beta
+        temp = np.random.multinomial(totalCounts * alpha * (1-beta), p)
 
         # append and make a gene expression matrix for you simulated spots
         out['GenExp'][:, i] = temp
 
+    print('In draw_gene_expression')
     print('Cell at i = 1444 is %d ' % df.iloc[1444]['Cell_Num'])
     print('Cell at i = 1444 initially had %.2f ' % df.loc[2278]['totalGeneCounts'])
     print('Cell at i = 1444 now has %.2f ' % sum(df['CellGeneCount'].loc[2278]))
+    print('Sum of out at column i = 1444 is %d ' % sum(out['GenExp'][:, 1444]))
     return out
 
 
@@ -276,7 +280,7 @@ def mkdir_p(path):
             raise
 
 
-def inject(raw_data, sample, univ, perc, selectFrom):
+def inject(raw_data, sample, perc):
     '''
     :param sample:
     :param univ:
@@ -299,17 +303,7 @@ def inject(raw_data, sample, univ, perc, selectFrom):
     assert out.shape[1] == len(sample['class_name'])
     for i, cn in enumerate(sample['class_name']):
         numSpots = newSpotsCounts[i]
-        genesInClass = univ[cn]
-        if selectFrom == 'nonDomestic':
-            domain = sorted(list(set(allGenes) - set(genesInClass)))
-        elif selectFrom == 'Domestic':
-            domain = sorted(set(genesInClass))
-        elif selectFrom == 'All':
-            domain = allGenes
-        else:
-            raise ValueError('selectFrom must either be "All" or "nonDomestic".')
-
-        newGenes = sorted(np.random.choice(domain, numSpots, replace=True))
+        newGenes = sorted(np.random.choice(allGenes, numSpots, replace=True))
         binNames, binCounts = np.unique(newGenes, return_counts=True)
         idx = [allGenes.index(x) for x in binNames]
         out[idx, i] = binCounts
@@ -317,9 +311,9 @@ def inject(raw_data, sample, univ, perc, selectFrom):
     return out
 
 
-def dropout(raw_data, perc):
+def dropout(data, perc):
     '''
-    Select the genes to be dropped. This is something like a reverse inject
+    Return a dataframe where the genes have be removed in a propotional to the total gene counts manner
     :param sample:
     :param univ:
     :param perc:
@@ -328,10 +322,10 @@ def dropout(raw_data, perc):
 
     # loop over all cells in the raw_data
     col = []
-    for i in range(raw_data.shape[0]):
-        p = raw_data['genesProb'].iloc[i]
-        N = raw_data['totalGeneCounts'].iloc[i]
-        cgc = raw_data['CellGeneCount'].iloc[i]
+    for i in range(data.shape[0]):
+        p = data['genesProb'].iloc[i]
+        N = data['totalGeneCounts'].iloc[i]
+        cgc = data['CellGeneCount'].iloc[i]
 
         # draw N * perc counts with prob p
         temp = np.random.multinomial(N*perc, p)
@@ -347,8 +341,8 @@ def dropout(raw_data, perc):
         # now put the newCounts into the raw_data
         # //raw_data['CellGeneCount'].iloc[i] = newCounts
 
-    raw_data['CellGeneCount'] = col
-    return raw_data.copy()
+    data['CellGeneCount'] = col
+    return data
 
 
 def cellType_geneUniverse(gene_expression):
@@ -436,7 +430,7 @@ def app(alpha, beta):
     # Fetch the data
     # dataset_name = 'DEFAULT'
     # dataset_name = 'DEFAULT_42GENES'
-    dataset_name = 'DEFAULT_99GENES'
+    dataset_name = 'DEFAULT_98GENES'
 
     # beta = 0.10  # percentage of fake points to inject (percentage of the cells' total gene counts
 
@@ -457,16 +451,28 @@ def app(alpha, beta):
     genesProb, _ = getGenesProb(raw_data)
     raw_data['genesProb'] = genesProb
 
-    # now drop some gene counts
-    data = dropout(raw_data, alpha*beta)
+    # make a df to manipulate
+    data = raw_data.copy()
 
-    sample = draw_gene_expression(data, gene_expression, eGeneGamma)
+    # now drop some gene counts
+    # data = dropout(data, alpha*beta)
+
+    sample = draw_gene_expression(raw_data, gene_expression, eGeneGamma, alpha, beta)
     univ = cellType_geneUniverse(gene_expression)
 
-    injected = inject(data, sample, univ, alpha*beta, 'All')  # put extra gene selected randomly
+    print('In app, before injection alpha')
+    print('Cell at i = 1444 now has %.2f ' % sum(sample['GenExp'][:, 1444]))
+    injected = inject(raw_data, sample, alpha*beta)  # put extra gene selected randomly
     sample['GenExp'] = sample['GenExp'] + injected
+    print('In app, after injection alpha')
+    print('Cell at i = 1444 now has %.2f ' % sum(sample['GenExp'][:, 1444]))
+
+    print('In app, before applying alpha')
+    print('Cell at i = 1444 now has %.2f ' % sum(sample['GenExp'][:,1444]))
     # sample['GenExp'] = alpha * sample['GenExp']  # Balloon/shrink by alpha
     sample['GenExp'] = sample['GenExp'].astype(int)  # cast as int
+    print('In app, after applying alpha')
+    print('Cell at i = 1444 now has %.2f ' % sum(sample['GenExp'][:, 1444]))
     spots = position_genes(sample)
 
     fName = 'spots_' + dataset_name + '_' + str(_seed) + '_alpha' + str(alpha) + '_beta' + str(beta) + 'fakeGenes' + '.csv'
@@ -490,7 +496,7 @@ if __name__ == "__main__":
     alpha = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
     beta = [0.1, 0.3, 0.5, 0.7]
     grid = paramGrid(alpha, beta)
-    grid = [[2, 0.5]]
+    grid = [[1, 1]]
     for p in grid:
         alpha = p[0]
         beta = p[1]
