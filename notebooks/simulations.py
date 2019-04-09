@@ -128,12 +128,12 @@ def draw_gene_expression(df, ge, eGeneGamma, alpha, beta):
 
         # append and make a gene expression matrix for you simulated spots
         out['GenExp'][:, i] = temp
-
-    print('In draw_gene_expression')
-    print('Cell at i = 1444 is %d ' % df.iloc[1444]['Cell_Num'])
-    print('Cell at i = 1444 initially had %.2f ' % df.loc[2278]['totalGeneCounts'])
-    print('Cell at i = 1444 now has %.2f ' % sum(df['CellGeneCount'].loc[2278]))
-    print('Sum of out at column i = 1444 is %d ' % sum(out['GenExp'][:, 1444]))
+    #
+    # print('In draw_gene_expression')
+    # print('Cell at i = 1444 is %d ' % df.iloc[1444]['Cell_Num'])
+    # print('Cell at i = 1444 initially had %.2f ' % df.loc[2278]['totalGeneCounts'])
+    # print('Cell at i = 1444 now has %.2f ' % sum(df['CellGeneCount'].loc[2278]))
+    # print('Sum of out at column i = 1444 is %d ' % sum(out['GenExp'][:, 1444]))
     return out
 
 
