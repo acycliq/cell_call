@@ -1,17 +1,27 @@
 
 // THESE ARE NOW IN THE GLOBAL SCOPE
 var cookie = sessionStorage['myvariable'],
+    cookie2 = sessionStorage['myvariable2'],
     cellData,
     geneData;
 
 
-if (!cookie){ // if you dont have cookie, run the default selection
+if ((!cookie) && (!cookie2)){ // if you dont have cookie, run the default selection
     console.log('No cookie, starting with default dataset')
     var configSettings = config().get('98 gene panel')
 }
 else {
-    console.log('Found cookie: ' + cookie)
-    var configSettings = config().get(cookie)
+    if (cookie)
+    {
+        console.log('Found cookie: ' + cookie)
+        var configSettings = config().get(cookie)
+    }
+    else
+    {
+        console.log('Found cookie: ' + cookie2)
+        var configSettings = config().get(cookie2)
+    }
+
 }
 run(configSettings)
 
@@ -30,6 +40,23 @@ function dispatcher(x){
 
     //save a cookie
     sessionStorage['myvariable'] = x;
+
+    // delete the cookie from dropdown 1
+    sessionStorage.removeItem('myvariable2')
+
+    //reload page
+    location.reload(true);
+
+}
+
+function dispatcher2(x2){
+    console.log('you clicked '+ x2)
+
+    // save a cookie
+    sessionStorage['myvariable2'] = x2;
+
+    // delete the cookie from dropdown 1
+    sessionStorage.removeItem('myvariable')
 
     //reload page
     location.reload(true);

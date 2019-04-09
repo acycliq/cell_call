@@ -269,10 +269,10 @@ polyline {
     border-right-color: transparent;
 }
 
-/*!*Show/hide dropdown menu on mouse hover*!*/
-/*.dropdown:hover > .dropdown-menu {*/
-    /*display: block;*/
-/*}*/
+/*Show/hide dropdown menu on mouse hover*/
+.dropdown:hover > .dropdown-menu {
+    display: block;
+}
 /*******************************************/
 
 /*bootstrap multilevel dropdown*/
