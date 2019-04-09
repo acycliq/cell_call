@@ -428,11 +428,7 @@ def app(alpha, beta):
     np.random.seed(_seed)
 
     # Fetch the data
-    # dataset_name = 'DEFAULT'
-    # dataset_name = 'DEFAULT_42GENES'
     dataset_name = 'DEFAULT_98GENES'
-
-    # beta = 0.10  # percentage of fake points to inject (percentage of the cells' total gene counts
 
     raw_data, gene_expression, eGeneGamma = fetch_data(dataset_name)
 
@@ -461,9 +457,7 @@ def app(alpha, beta):
     spots = position_genes(sample)
 
     fName = 'spots_' + dataset_name + '_' + str(_seed) + '_alpha' + str(alpha) + '_beta' + str(beta) + 'fakeGenes' + '.csv'
-    # fName = 'spots_' + dataset_name + '_' + str(_seed) + '.csv'
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    # outPath = os.path.join(dir_path, 'Simulated spots', 'inefficiency_' + str(inefficiency))
     outPath = os.path.join(dir_path, 'Simulated spots', 'grid')
     outFile = os.path.join(outPath, fName)
 
