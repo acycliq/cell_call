@@ -236,57 +236,112 @@ def mutual_information(data):
     return mutualInformation
 
 
-if __name__ == "__main__":
-    dir_path = os.path.dirname(os.path.realpath(__file__))
 
-    # VIEWER_PATH = 'https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/'
-    # SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/rectHeatmap/dashboard/data/img/'
+def paramGrid(alpha, beta):
+    grid = np.meshgrid(alpha, beta)
+    grid = np.array(grid).T.reshape(-1, 2)
+    return grid
+
+def mk_dir(target):
+    try:
+        os.makedirs('target')
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
+
+
+def app(alpha, beta):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
     PATH = os.path.join(dir_path, '..', 'dashboard/data/img')
     MODEL_DATA = PATH + '/default_98genes/json/iss.json'
-    # SIM_DATA = PATH + '/sim_123456_98genes/json/iss.json'  # Simulation 1
-    # SIM_DATA = PATH + '/sim_123456_98genes_excludedClasses/json/iss.json'  # Simulation 1
 
-    SIM_DATA = PATH + '/sim_123456_98genes_beta10_FakeGenes/json/iss.json'
+    subfolder = 'alpha' + str(alpha) + '_' + 'beta' + str(beta)
+    fName = 'alpha' + str(alpha) + '_' + 'beta' + str(beta) + '_sims_iss.json'
+    SIM_DATA = os.path.join(PATH, 'grid', 'constrained', subfolder, fName)
 
-    norms = ['mean', 'median']
-    _pool = [False, True]
 
-    for use_pool in _pool:
-        for norm in norms:
-            # norm = 'mean'
-            # use_pool = False
+    model_data = pd.read_json(MODEL_DATA)
+    sim_data = pd.read_json(SIM_DATA)
 
-            # norm = 'median'
-            # use_pool = False
-            # #
-            # norm = 'mean'
-            # use_pool = True
-            #
-            # norm = 'median'
-            # use_pool = True
+    cm, raw_data = confusion_matrix(model_data, sim_data)
+    # mi = mutual_information(raw_data)
 
-            model_data = pd.read_json(MODEL_DATA)
-            sim_data = pd.read_json(SIM_DATA)
+    root = 'D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\grid\confusion_matrix'
+    subfolder = 'alpha' + str(alpha) + '_' + 'beta' + str(beta)
+    fName = 'alpha' + str(alpha) + '_' + 'beta' + str(beta) + '_cm.csv'
+    target = os.path.join(root, subfolder, fName)
+    mk_dir(os.path.join(root, subfolder))
+    raw_data.to_csv(target, index=False)
+    logger.info('Saved to %s ' % target)
 
-            if use_pool:
-                model_data = pool(model_data)
-                sim_data = pool(sim_data)
 
-            cm, raw_data = confusion_matrix(model_data, sim_data, norm)
-            mi = mutual_information(raw_data)
+if __name__ == "__main__":
+    alpha = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
+    beta = [0.0, 0.25, 0.5, 0.75, 1.0]
+    grid = paramGrid(alpha, beta)
+    for p in grid:
+        alpha = p[0]
+        beta = p[1]
 
-            logger.info('Mutual Information is: %.9f ' % mi)
-            print(cm.sum(axis=0))
-            plot_confusion_matrix(cm, norm)
-
-            unmatched = [x for x in cm.index.values if x not in cm.columns.values]
-            if len(unmatched) > 0:
-                logger.info('The following cell class(es) exist in predicted but not in actual')
-                print(unmatched)
-
-            outDir = makeOutput(SIM_DATA, norm, use_pool)
-            target_file = os.path.join(outDir, 'confusionMatrix.json')
-            cm.to_json(target_file, orient='split')
-            logger.info('Saved to %s ' % target_file)
+        # start the app
+        app(alpha, beta)
 
     logger.info('Done')
+
+
+
+# if __name__ == "__main__":
+#     dir_path = os.path.dirname(os.path.realpath(__file__))
+#
+#     # VIEWER_PATH = 'https://raw.githubusercontent.com/acycliq/issplus/master/dashboard/data/img/'
+#     # SIM_PATH = 'https://raw.githubusercontent.com/acycliq/spacetx/rectHeatmap/dashboard/data/img/'
+#     PATH = os.path.join(dir_path, '..', 'dashboard/data/img')
+#     MODEL_DATA = PATH + '/default_98genes/json/iss.json'
+#     # SIM_DATA = PATH + '/sim_123456_98genes/json/iss.json'  # Simulation 1
+#     # SIM_DATA = PATH + '/sim_123456_98genes_excludedClasses/json/iss.json'  # Simulation 1
+#
+#     SIM_DATA = PATH + '/sim_123456_98genes_beta10_FakeGenes/json/iss.json'
+#
+#     norms = ['mean', 'median']
+#     _pool = [False, True]
+#
+#     for use_pool in _pool:
+#         for norm in norms:
+#             # norm = 'mean'
+#             # use_pool = False
+#
+#             # norm = 'median'
+#             # use_pool = False
+#             # #
+#             # norm = 'mean'
+#             # use_pool = True
+#             #
+#             # norm = 'median'
+#             # use_pool = True
+#
+#             model_data = pd.read_json(MODEL_DATA)
+#             sim_data = pd.read_json(SIM_DATA)
+#
+#             if use_pool:
+#                 model_data = pool(model_data)
+#                 sim_data = pool(sim_data)
+#
+#             cm, raw_data = confusion_matrix(model_data, sim_data, norm)
+#             mi = mutual_information(raw_data)
+#
+#             logger.info('Mutual Information is: %.9f ' % mi)
+#             print(cm.sum(axis=0))
+#             plot_confusion_matrix(cm, norm)
+#
+#             unmatched = [x for x in cm.index.values if x not in cm.columns.values]
+#             if len(unmatched) > 0:
+#                 logger.info('The following cell class(es) exist in predicted but not in actual')
+#                 print(unmatched)
+#
+#             outDir = makeOutput(SIM_DATA, norm, use_pool)
+#             target_file = os.path.join(outDir, 'confusionMatrix.json')
+#             cm.to_json(target_file, orient='split')
+#             logger.info('Saved to %s ' % target_file)
+#
+#     logger.info('Done')
