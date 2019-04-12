@@ -1,3 +1,5 @@
+var menuSelection;  // Another one in the global scope!
+
 function renderHeatmapTab(selected) {
 
     'hide the toolip raised by the section chart'
@@ -23,34 +25,34 @@ function renderHeatmapTab(selected) {
     //     document.getElementById('beta30').checked? checkBox0 = 'beta30': checkBox0 = '98genes'
     // }
     //
-
-    if (document.getElementById('beta10').checked) {
-        checkBox0 = 'beta10'
-    } else if (document.getElementById('beta30').checked) {
-        checkBox0 = 'beta30'
-    } else {
-        checkBox0 = '98genes'
-    }
-
-    if (document.getElementById('nonNeurons').checked) {
-        checkBox1 = 'nonNeuronsOn'
-    } else {
-        checkBox1 = 'nonNeuronsOff'
-    }
-
-
-    if (document.getElementById('rangeDomain').checked) {
-        checkBox2 = 'rangeDomainOn'
-    } else {
-        checkBox2 = 'rangeDomainOff'
-    }
-
-    var confMatrixjson = '.\\notebooks\\jsonFiles\\' + checkBox0 +
-        '\\' + checkBox2 +
-        '\\' + radioButton +
-        '\\' + checkBox1 +
-        '\\' + 'confusionMatrix.json';
-    console.log('Pushing ' + confMatrixjson + ' in confusion matrix')
+    //
+    // if (document.getElementById('beta10').checked) {
+    //     checkBox0 = 'beta10'
+    // } else if (document.getElementById('beta30').checked) {
+    //     checkBox0 = 'beta30'
+    // } else {
+    //     checkBox0 = '98genes'
+    // }
+    //
+    // if (document.getElementById('nonNeurons').checked) {
+    //     checkBox1 = 'nonNeuronsOn'
+    // } else {
+    //     checkBox1 = 'nonNeuronsOff'
+    // }
+    //
+    //
+    // if (document.getElementById('rangeDomain').checked) {
+    //     checkBox2 = 'rangeDomainOn'
+    // } else {
+    //     checkBox2 = 'rangeDomainOff'
+    // }
+    //
+    // var confMatrixjson = '.\\notebooks\\jsonFiles\\' + checkBox0 +
+    //     '\\' + checkBox2 +
+    //     '\\' + radioButton +
+    //     '\\' + checkBox1 +
+    //     '\\' + 'confusionMatrix.json';
+    // console.log('Pushing ' + confMatrixjson + ' in confusion matrix')
     // d3.json(confMatrixjson, function (data) {
     //     dataset = []
     //     for (var i = 0; i < data.index.length; i++) {
@@ -72,10 +74,10 @@ function renderHeatmapTab(selected) {
     //     cmAnalytics(diagonalScore)
     // });
 
-    d3.csv("notebooks/raw_data.csv", function(data){
-        norm = 'avg'
-        ddl = 1;
-        dataset = heatmapDataManager(data, norm, ddl)
+    d3.csv(menuSelection.target_file, function(data){
+        // norm = 'avg'
+        // ddl = 1;
+        dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
         console.log('json parsed!!');
         renderHeatmap(dataset);
         var diagonalScore = diagonalMean(dataset);
@@ -309,49 +311,49 @@ function heatmapDataManager(data, norm, ddl) {
 $('#layers-base input').change(function () {
     var selected = document.ConfusionMatrixRadioButton.norm.value;
     console.log('radio button: ' + selected + ' was selected');
-    renderHeatmapTab(selected)
+    target_file = submitHelper()
+    renderHeatmapTab(target_file)
 });
 
 $('#layers-base-2 input').change(function () {
     var selected = document.ConfusionMatrixRadioButton.norm.value;
     console.log('check box clicked');
-    renderHeatmapTab(selected)
+    target_file = submitHelper()
+    renderHeatmapTab(target_file)
 });
 
 $('#layers-base-3 input').change(function () {
     var selected = document.ConfusionMatrixRadioButton.norm.value;
     console.log('check box clicked');
-    renderHeatmapTab(selected)
+    target_file = submitHelper()
+    renderHeatmapTab(target_file)
 });
 
 $('#layers-base-4 input').change(function () {
-    // uncheck the other checkbox
-    $("#beta30").prop("checked", false);
-    var selected = document.ConfusionMatrixRadioButton.norm.value;
-    console.log('check box clicked');
-    renderHeatmapTab(selected)
+    target_file = submitHelper()
+    renderHeatmapTab(target_file)
 });
 
 $('#layers-base-5 input').change(function () {
-    // uncheck the other checkbox
-    $("#beta10").prop("checked", false);
-    var selected = document.ConfusionMatrixRadioButton.norm.value;
-    console.log('check box clicked');
-    renderHeatmapTab(selected)
+    target_file = submitHelper()
+    renderHeatmapTab(target_file)
 });
+
+$('#layers-base-6 input').change(function () {
+    target_file = submitHelper()
+    renderHeatmapTab(target_file)
+});
+
+
+// $('#layers-base-7 input').change(function () {
+//     target_file = submitHelper()
+//     renderHeatmapTab(target_file)
+// });
 
 $('#confusion-table-tab').on('shown.bs.tab', function (e) {
     console.log('Confusion matrix tab was clicked.');
-    $('#myDropdown').hide(); // hide the dropdown
-    $('#dropdown-inefficiency').hide();
-    var selected = document.ConfusionMatrixRadioButton.norm.value;
-    console.log('Radio button ' + selected + ' is selected');
-    renderHeatmapTab(selected);
-
-
-    // hide the search forms
-    $('#nav-table-search').hide();
-    $('#nav-place-search').hide();
+    target_file = submitHelper()
+    renderHeatmapTab(target_file)
 });
 
 // listener on the Viewer tab
@@ -369,3 +371,19 @@ $('#workflow-tab').on('shown.bs.tab', function (e) {
     // hide the toolip raised by the section chart
     d3.select('#tooltip').style('opacity', 0)
 });
+
+function submitHelper(){
+    menuSelection = []
+    var norm = document.ConfusionMatrixRadioButton.norm.value;
+    var foldVal = document.cm_fold_level.button.value;
+    var betaVal = document.cm_beta.button.value;
+    var alphaVal = document.cm_alpha.button.value;
+    var target_file = './dashboard/data/confusion_matrix/grid/unconstrained/alpha' + alphaVal + '_beta' + betaVal + '/alpha' + alphaVal + '_beta' + betaVal + '_cm_raw_data.csv'
+
+    menuSelection.norm = norm;
+    menuSelection.foldVal = foldVal;
+    menuSelection.alphaVal = alphaVal;
+    menuSelection.betaVal = betaVal;
+    menuSelection.target_file = target_file;
+    return menuSelection
+}

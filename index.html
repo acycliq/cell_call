@@ -309,7 +309,7 @@
         <!-- nav bar left side: tabs -the map, table, about nav tabs, for content, see below -->
         <li class="active"><a href="#map-content" data-toggle="tab" id="map-tab">Viewer</a></li>
         <!--<li><a href="#table-content" data-toggle="tab" id="table-tab">Confusion Matrix</a></li>-->
-        <!--<li><a href="#confusion-table-content" data-toggle="tab" id="confusion-table-tab">Confusion Matrix</a></li>-->
+        <li><a href="#confusion-table-content" data-toggle="tab" id="confusion-table-tab">Confusion Matrix</a></li>
         <!--<li><a href="#workflow-content" data-toggle="tab" id="workflow-tab">Workflow</a></li>-->
 
     </ul>
@@ -515,7 +515,7 @@
                                             <!-- basemaps: radio buttons, see initMapLayerControl() -->
                                             <div id="layers-base">
                                                 <form name="ConfusionMatrixRadioButton">
-                                                    <input value="mean" type="radio" name="norm" checked/>
+                                                    <input value="avg" type="radio" name="norm" checked/>
                                                     <span> Mean &nbsp &nbsp</span>
                                                     <input value="median" type="radio" name="norm"/>
                                                     <span> Median </span>
@@ -540,19 +540,69 @@
                                             </div>
                                             <hr>
                                             <div id="layers-base-4">
-                                                <label>
-                                                    <input type="checkbox" id="beta10">
-                                                    <span> Fake genes, 10% </span>
-                                                </label>
-                                                <br>
+                                                Alpha
+                                                <form name="cm_alpha" style="margin-top:5px">
+                                                    <div>
+                                                        <input value="0.25" type="radio" name="button" checked/>
+                                                        <span> 0.25 &nbsp &nbsp</span>
+                                                        <input value="0.5" type="radio" name="button"/>
+                                                        <span> 0.5 &nbsp &nbsp</span>
+                                                        <input value="0.75" type="radio" name="button"/>
+                                                        <span> 0.75 &nbsp &nbsp</span>
+                                                        <input value="1.0" type="radio" name="button"/>
+                                                        <span> 1.0 &nbsp &nbsp</span>
+                                                    </div>
+                                                    <div style="margin-top:5px">
+                                                        <input value="1.25" type="radio" name="button"/>
+                                                        <span> 1.25 &nbsp &nbsp</span>
+                                                        <input value="1.5" type="radio" name="button"/>
+                                                        <span> 1.5 &nbsp &nbsp</span>
+                                                        <input value="1.75" type="radio" name="button"/>
+                                                        <span> 1.75 &nbsp &nbsp</span>
+                                                        <input value="2.0" type="radio" name="button"/>
+                                                        <span> 2.0 &nbsp &nbsp</span>
+                                                    </div>
+                                                    <div style="margin-top:5px">
+                                                        <input value="2.25" type="radio" name="button"/>
+                                                        <span> 2.25 &nbsp &nbsp</span>
+                                                        <input value="2.5" type="radio" name="button"/>
+                                                        <span> 2.5 &nbsp &nbsp</span>
+                                                        <input value="2.75" type="radio" name="button"/>
+                                                        <span> 2.75 &nbsp &nbsp</span>
+                                                        <input value="3.0" type="radio" name="button"/>
+                                                        <span> 3.0 &nbsp &nbsp</span>
+                                                    </div>
+                                                </form>
                                             </div>
                                             <hr>
                                             <div id="layers-base-5">
-                                                <label>
-                                                    <input type="checkbox" id="beta30">
-                                                    <span> Fake genes, 30% </span>
-                                                </label>
-                                                <br>
+                                                Beta
+                                                <form name="cm_beta" style="margin-top:5px">
+                                                    <input value="0.0" type="radio" name="button"/>
+                                                    <span> 0.25 &nbsp &nbsp</span>
+                                                    <input value="0.25" type="radio" name="button"/>
+                                                    <span> 0.25 &nbsp &nbsp</span>
+                                                    <input value="0.5" type="radio" name="button"/>
+                                                    <span> 0.5 &nbsp &nbsp</span>
+                                                    <input value="0.75" type="radio" name="button"/>
+                                                    <span> 0.75 &nbsp &nbsp</span>
+                                                    <input value="1.0" type="radio" name="button" checked/>
+                                                    <span> 1.0 </span>
+                                                </form>
+                                            </div>
+                                            <hr>
+                                            <div id="layers-base-6">
+                                                Fold level
+                                                <form name="cm_fold_level" style="margin-top:5px">
+                                                    <input value="0" type="radio" name="button" checked/>
+                                                    <span> 0 &nbsp &nbsp</span>
+                                                    <input value="1" type="radio" name="button"/>
+                                                    <span> 1 &nbsp &nbsp</span>
+                                                    <input value="2" type="radio" name="button"/>
+                                                    <span> 2 &nbsp &nbsp</span>
+                                                    <input value="3" type="radio" name="button"/>
+                                                    <span> 3 &nbsp &nbsp</span>
+                                                </form>
                                             </div>
                                             <hr>
                                             <!--<div id="layers-base-4">-->
