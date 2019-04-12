@@ -27,7 +27,9 @@ function cmAnalytics(score) {
         table = $('#cm_analytics').DataTable({
             "lengthChange": false,
             searching: false,
-            "paging": true,
+            "paging": false,
+            "bPaginate": false,//Dont want paging
+            "bInfo": false, //Dont display info e.g. "Showing 1 to 4 of 4 entries"
             "data": score,
             "columns": [
                     {
