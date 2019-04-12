@@ -5,80 +5,9 @@ function renderHeatmapTab(selected) {
     'hide the toolip raised by the section chart'
     d3.select('#tooltip').style('opacity', 0)
 
-    var radioButton,
-        checkBox0,
-        checkBox1,
-        checkBox2,
-        json;
-
-    radioButton = selected; // mean or median?
-    json = "./notebooks/confusionMatrixData.json"
-
-    
-    checkBox0 = '98genes' //  default value
-    // if (document.getElementById('beta10')){
-    //     document.getElementById('beta10').checked? checkBox0 = 'beta10': checkBox0 = '98genes'
-    // }
-    //
-    //
-    // if (document.getElementById('beta30')){
-    //     document.getElementById('beta30').checked? checkBox0 = 'beta30': checkBox0 = '98genes'
-    // }
-    //
-    //
-    // if (document.getElementById('beta10').checked) {
-    //     checkBox0 = 'beta10'
-    // } else if (document.getElementById('beta30').checked) {
-    //     checkBox0 = 'beta30'
-    // } else {
-    //     checkBox0 = '98genes'
-    // }
-    //
-    // if (document.getElementById('nonNeurons').checked) {
-    //     checkBox1 = 'nonNeuronsOn'
-    // } else {
-    //     checkBox1 = 'nonNeuronsOff'
-    // }
-    //
-    //
-    // if (document.getElementById('rangeDomain').checked) {
-    //     checkBox2 = 'rangeDomainOn'
-    // } else {
-    //     checkBox2 = 'rangeDomainOff'
-    // }
-    //
-    // var confMatrixjson = '.\\notebooks\\jsonFiles\\' + checkBox0 +
-    //     '\\' + checkBox2 +
-    //     '\\' + radioButton +
-    //     '\\' + checkBox1 +
-    //     '\\' + 'confusionMatrix.json';
-    // console.log('Pushing ' + confMatrixjson + ' in confusion matrix')
-    // d3.json(confMatrixjson, function (data) {
-    //     dataset = []
-    //     for (var i = 0; i < data.index.length; i++) {
-    //         // console.log(' i: ', i)
-    //         for (var j = 0; j < data.columns.length; j++) {
-    //             // console.log('i: ' + i + ' j: ' + j + ' value: ' + data.data[i][j])
-    //             dataset.push({
-    //                 xKey: i + 1,
-    //                 xLabel: data.index[i],
-    //                 yKey: j + 1,
-    //                 yLabel: data.columns[j],
-    //                 val: +data.data[i][j],
-    //             })
-    //         }
-    //     }
-    //     console.log('json parsed!!');
-    //     renderHeatmap(dataset);
-    //     var diagonalScore = diagonalMean(dataset);
-    //     cmAnalytics(diagonalScore)
-    // });
-
     d3.csv(menuSelection.target_file, function(data){
-        // norm = 'avg'
-        // ddl = 1;
-        dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
-        console.log('json parsed!!');
+        var dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
+        console.log('data from '+ menuSelection.target_file + 'fed into the confusion matrix');
         renderHeatmap(dataset);
         var diagonalScore = diagonalMean(dataset);
         cmAnalytics(diagonalScore)
@@ -352,14 +281,18 @@ $('#layers-base-6 input').change(function () {
 
 $('#confusion-table-tab').on('shown.bs.tab', function (e) {
     console.log('Confusion matrix tab was clicked.');
-    target_file = submitHelper()
+    // hide the navbar dropdown menus
+    $('#myDropdown').hide();
+    $('#myDropdown2').hide();
+    target_file = submitHelper();
     renderHeatmapTab(target_file)
 });
 
 // listener on the Viewer tab
 $('#map-tab').on('shown.bs.tab', function (e) {
     console.log('Viewer tab was clicked.');
-    $('#myDropdown').show() // show the dropdown
+    $('#myDropdown').show(); // show the dropdown
+    $('#myDropdown2').show();
 });
 
 // listener on the Worlflow tab
