@@ -242,12 +242,10 @@ def paramGrid(alpha, beta):
     grid = np.array(grid).T.reshape(-1, 2)
     return grid
 
+
 def mk_dir(target):
-    try:
-        os.makedirs('target')
-    except OSError as e:
-        if e.errno != errno.EEXIST:
-            raise
+    if not os.path.exists(target):
+        os.makedirs(target)
 
 
 
@@ -267,9 +265,9 @@ def app(alpha, beta):
     cm, raw_data = confusion_matrix(model_data, sim_data)
     # mi = mutual_information(raw_data)
 
-    root = 'D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\dashboard\data\img\grid\confusion_matrix'
+    root = 'D:\Dimitris\Dropbox\_grid'
     subfolder = 'alpha' + str(alpha) + '_' + 'beta' + str(beta)
-    fName = 'alpha' + str(alpha) + '_' + 'beta' + str(beta) + '_cm.csv'
+    fName = 'alpha' + str(alpha) + '_' + 'beta' + str(beta) + '_cm_raw_data.csv'
     target = os.path.join(root, subfolder, fName)
     mk_dir(os.path.join(root, subfolder))
     raw_data.to_csv(target, index=False)
