@@ -78,6 +78,7 @@ function argMax(array) {
 }
 
 function diagonalMean(dataset){
+    var arr = []
     xLabels = d3.map(dataset, function (d){return d.xLabel;}).keys();
     yLabels = d3.map(dataset, function (d){return d.yLabel;}).keys();
 
@@ -86,10 +87,15 @@ function diagonalMean(dataset){
 
     // take now all the elements in the diagonal
     diagonal_obj = data.filter(function(d){ return d.yLabel === d.xLabel});
-    arr = d3.map(diagonal_obj, function(d) {return d.val}).keys()
 
-    // convert to float
-    arr = arr.map(function(d){ return +d;});
+    for (i=0; i< diagonal_obj.length; ++i){
+       arr[i] = diagonal_obj[i].val
+    }
+
+    // arr = d3.map(diagonal_obj, function(d) {return d.val}).keys()
+    //
+    // // convert to float
+    // arr = arr.map(function(d){ return +d;});
 
     //take the total sum
     sum = arr.reduce((a,b)=>a+b, 0)
