@@ -378,7 +378,10 @@ function submitHelper(){
     var foldVal = document.cm_fold_level.button.value;
     var betaVal = document.cm_beta.button.value;
     var alphaVal = document.cm_alpha.button.value;
-    var target_file = './dashboard/data/confusion_matrix/grid/unconstrained/alpha' + alphaVal + '_beta' + betaVal + '/alpha' + alphaVal + '_beta' + betaVal + '_cm_raw_data.csv'
+    var mode = document.getElementById("constrained").checked? "constrained": "unconstrained"
+    var target_file = './dashboard/data/confusion_matrix/grid/' + mode
+                        + '/alpha' + alphaVal + '_beta' + betaVal
+                        + '/alpha' + alphaVal + '_beta' + betaVal + '_cm_raw_data.csv'
 
     menuSelection.norm = norm;
     menuSelection.foldVal = foldVal;
