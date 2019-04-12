@@ -257,6 +257,7 @@ def app(alpha, beta):
     subfolder = 'alpha' + str(alpha) + '_' + 'beta' + str(beta)
     fName = 'alpha' + str(alpha) + '_' + 'beta' + str(beta) + '_sims_iss.json'
     SIM_DATA = os.path.join(PATH, 'grid', 'constrained', subfolder, fName)
+    # SIM_DATA = os.path.join(PATH, 'grid', 'uncostrained', subfolder, fName)
 
 
     model_data = pd.read_json(MODEL_DATA)
