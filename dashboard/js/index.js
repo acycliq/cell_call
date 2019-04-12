@@ -7,7 +7,7 @@ function renderHeatmapTab(selected) {
 
     d3.csv(menuSelection.target_file, function(data){
         var dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
-        console.log('data from '+ menuSelection.target_file + 'fed into the confusion matrix');
+        console.log('data from '+ menuSelection.target_file + ' fed into the confusion matrix');
         renderHeatmap(dataset);
         var diagonalScore = diagonalMean(dataset);
         cmAnalytics(diagonalScore)
