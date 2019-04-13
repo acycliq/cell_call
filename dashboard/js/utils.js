@@ -92,6 +92,8 @@ function diagonalMean(dataset){
        arr[i] = diagonal_obj[i].val
     }
 
+    console.log('Array across the diagonal is: ' + arr)
+
     // arr = d3.map(diagonal_obj, function(d) {return d.val}).keys()
     //
     // // convert to float
