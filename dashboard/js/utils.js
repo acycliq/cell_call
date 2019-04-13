@@ -152,7 +152,7 @@ function saveCsv(args) {
     // from https://halistechnology.com/2015/05/28/use-javascript-to-export-your-data-as-csv/
     var data, filename, link;
 
-    filename = menuSelection.norm + '_fold' + menuSelection.foldVal + '_alpha' + menuSelection.alphaVal + '_beta' + menuSelection.betaVal + '.csv'
+    filename = menuSelection.mode + '_' + menuSelection.norm + '_fold' + menuSelection.foldVal + '_alpha' + menuSelection.alphaVal + '_beta' + menuSelection.betaVal + '.csv'
 
     var csv = convertArrayOfObjectsToCSV({
         data: cm_dataset

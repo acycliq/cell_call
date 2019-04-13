@@ -312,6 +312,7 @@ function submitHelper(){
                         + '/alpha' + alphaVal + '_beta' + betaVal + '_cm_raw_data.csv'
 
     menuSelection.norm = norm;
+    menuSelection.mode = mode;
     menuSelection.foldVal = foldVal;
     menuSelection.alphaVal = alphaVal;
     menuSelection.betaVal = betaVal;
