@@ -230,7 +230,9 @@ function heatmapDataManager(data, norm, ddl) {
                 xLabel: curVal[j].key,
                 yKey: i + 1,
                 yLabel: cur.key,
-                val: norm === 'avg'? +curVal[j].value.avg: +curVal[j].value.median,
+                val: norm === 'avg'? +curVal[j].value.avg: // check if you want the avg
+                        norm === 'median'? +curVal[j].value.median: //else check if you want the median
+                            '',                                     // else return an empty string. You should not get this deep.
             })
         }
     }
