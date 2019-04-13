@@ -1,7 +1,7 @@
 var menuSelection,
     cm_dataset;  // Another one in the global scope!
 
-function renderHeatmapTab(selected) {
+function renderHeatmapTab(menuSelection) {
 
     'hide the toolip raised by the section chart'
     d3.select('#tooltip').style('opacity', 0)
@@ -243,54 +243,44 @@ function heatmapDataManager(data, norm, ddl) {
 
 // listener on the Confusion matrix tab
 $('#layers-base input').change(function () {
-    var selected = document.ConfusionMatrixRadioButton.norm.value;
-    console.log('radio button: ' + selected + ' was selected');
-    target_file = submitHelper()
-    renderHeatmapTab(target_file)
+    var target = submitHelper();
+    renderHeatmapTab(target)
 });
 
 $('#layers-base-2 input').change(function () {
-    var selected = document.ConfusionMatrixRadioButton.norm.value;
-    console.log('check box clicked');
-    target_file = submitHelper()
-    renderHeatmapTab(target_file)
+    var target = submitHelper();
+    renderHeatmapTab(target)
 });
 
 $('#layers-base-3 input').change(function () {
-    var selected = document.ConfusionMatrixRadioButton.norm.value;
-    console.log('check box clicked');
-    target_file = submitHelper()
-    renderHeatmapTab(target_file)
+    var target = submitHelper();
+    renderHeatmapTab(target)
 });
 
 $('#layers-base-4 input').change(function () {
-    target_file = submitHelper()
-    renderHeatmapTab(target_file)
+    var target = submitHelper();
+    renderHeatmapTab(target)
 });
 
 $('#layers-base-5 input').change(function () {
-    target_file = submitHelper()
-    renderHeatmapTab(target_file)
+    var target = submitHelper();
+    renderHeatmapTab(target)
 });
 
 $('#layers-base-6 input').change(function () {
-    target_file = submitHelper()
-    renderHeatmapTab(target_file)
+    var target = submitHelper();
+    renderHeatmapTab(target)
 });
 
 
-// $('#layers-base-7 input').change(function () {
-//     target_file = submitHelper()
-//     renderHeatmapTab(target_file)
-// });
-
+// listener on the Confusion matrix tab
 $('#confusion-table-tab').on('shown.bs.tab', function (e) {
     console.log('Confusion matrix tab was clicked.');
     // hide the navbar dropdown menus
     $('#myDropdown').hide();
     $('#myDropdown2').hide();
-    target_file = submitHelper();
-    renderHeatmapTab(target_file)
+    var target = submitHelper();
+    renderHeatmapTab(target)
 });
 
 // listener on the Viewer tab
@@ -311,7 +301,7 @@ $('#workflow-tab').on('shown.bs.tab', function (e) {
 });
 
 function submitHelper(){
-    menuSelection = []
+    menuSelection = [];
     var norm = document.ConfusionMatrixRadioButton.norm.value;
     var foldVal = document.cm_fold_level.button.value;
     var betaVal = document.cm_beta.button.value;
