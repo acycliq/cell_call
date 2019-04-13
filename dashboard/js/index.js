@@ -1,4 +1,5 @@
-var menuSelection;  // Another one in the global scope!
+var menuSelection,
+    cm_dataset;  // Another one in the global scope!
 
 function renderHeatmapTab(selected) {
 
@@ -6,10 +7,10 @@ function renderHeatmapTab(selected) {
     d3.select('#tooltip').style('opacity', 0)
 
     d3.csv(menuSelection.target_file, function(data){
-        var dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
+        cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
         console.log('data from '+ menuSelection.target_file + ' fed into the confusion matrix');
-        renderHeatmap(dataset);
-        var diagonalScore = diagonalMean(dataset);
+        renderHeatmap(cm_dataset);
+        var diagonalScore = diagonalMean(cm_dataset);
         cmAnalytics(diagonalScore)
     })
 }
