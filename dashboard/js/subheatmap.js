@@ -75,7 +75,8 @@ function subheatmap(dataset, chartObj) {
 
     // Clip path
     svg.append("clipPath")
-        .attr("id", "clipSubHeatMap")
+        // .attr("id", "clipSubHeatMap")
+        .attr("id", chartObj.clipId)
         .append("rect")
         .attr("width", width)
         .attr("height", height);
@@ -90,8 +91,10 @@ function subheatmap(dataset, chartObj) {
 
 
     // Heatmap dots
+    // var junk = 'clipSubHeatMap'
     var heatDotsGroup = svg.append("g")
-        .attr("clip-path", "url(#clipSubHeatMap)")
+        // .attr("clip-path", "url(#clipSubHeatMap)")
+        .attr("clip-path", "url(#" + chartObj.clipId + ')"')
         .append("g");
 
 

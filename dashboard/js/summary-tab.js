@@ -35,7 +35,7 @@ function renderSubHeatmapManager() {
         var myChartObj = [];
         // chartObj.data = []; this is created later
         chartObj.divId = '#summary-tab-chart-1';
-        chartObj.clipId = '#clipSubHeatMap';
+        chartObj.clipId = 'clipSubHeatMap'; // WITHOUT THE # SYMBOL
         renderSubHeatmap(mydata, chartObj);
 
         // cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
