@@ -1,5 +1,8 @@
 
 chartObj = []; //global scope!!
+chartObj2 = []; //global scope!!
+chartObj3 = []; //global scope!!
+chartObj4 = []; //global scope!!
 // listener on the Worlflow tab
 $('#workflow-tab').on('shown.bs.tab', function (e) {
     console.log('Workflow tab was clicked.');
@@ -23,26 +26,67 @@ function renderSubHeatmapManager() {
         });
 
         var filter = {mode:'constrained', norm:'mean', fold:0};
-
-        var mydata = data.filter(function(item){
-            for (var key in filter){
-                if (item[key]===undefined || item[key] != filter[key])
-                    return false
-            }
-            return true
-        });
-        console.log(mydata);
-        var myChartObj = [];
-        // chartObj.data = []; this is created later
         chartObj.divId = '#summary-tab-chart-1';
-        chartObj.clipId = 'clipSubHeatMap'; // WITHOUT THE # SYMBOL
-        renderSubHeatmap(mydata, chartObj);
+        chartObj.clipId = 'clipSubHeatMap-1'; // WITHOUT THE # SYMBOL
+        chartObj.clipHashId = '#clipSubHeatMap-1';
+        subplot(data, filter, chartObj)
 
-        // cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
-        // console.log('data from '+ menuSelection.target_file + ' fed into the confusion matrix');
-        // renderHeatmap(cm_dataset);
-        // var diagonalScore = diagonalMean(cm_dataset);
-        // cmAnalytics(diagonalScore)
-        console.log('Done')
+        var filter2 = {mode:'constrained', norm:'mean', fold:1};
+        chartObj2.divId = '#summary-tab-chart-2';
+        chartObj2.clipId = 'clipSubHeatMap-2'; // WITHOUT THE # SYMBOL
+        chartObj2.clipHashId = '#clipSubHeatMap-2';
+        subplot(data, filter2, chartObj2)
+
+        var filter3 = {mode:'constrained', norm:'mean', fold:2};
+        chartObj3.divId = '#summary-tab-chart-3';
+        chartObj3.clipId = 'clipSubHeatMap-3'; // WITHOUT THE # SYMBOL
+        chartObj3.clipHashId = '#clipSubHeatMap-3';
+        subplot(data, filter3, chartObj3)
+
+        var filter4 = {mode:'constrained', norm:'mean', fold:3};
+        chartObj4.divId = '#summary-tab-chart-4';
+        chartObj4.clipId = 'clipSubHeatMap-4'; // WITHOUT THE # SYMBOL
+        chartObj4.clipHashId = '#clipSubHeatMap-4';
+        subplot(data, filter4, chartObj4)
+
+
+        // subplot('mean')
+
+        // var mydata = data.filter(function(item){
+        //     for (var key in filter){
+        //         if (item[key]===undefined || item[key] != filter[key])
+        //             return false
+        //     }
+        //     return true
+        // });
+        //
+        // renderSubHeatmap(mydata, chartObj);
+        // console.log('Done')
     })
+}
+
+// function subplot(arg){
+//     var filter = {mode:'constrained', norm:arg, fold:0};
+//     chartObj.divId = '#summary-tab-chart-1';
+//     chartObj.clipId = 'clipSubHeatMap'; // WITHOUT THE # SYMBOL
+//     chartObj.clipHashId = '#clipSubHeatMap';
+//     subplotWorker(data, filter, chartObj)
+// }
+
+function subplot(data, filter, chartObj) {
+    // var filter = {mode: 'constrained', norm: 'mean', fold: 0};
+
+    var mydata = data.filter(function (item) {
+        for (var key in filter) {
+            if (item[key] === undefined || item[key] != filter[key])
+                return false
+        }
+        return true
+    });
+    console.log(mydata);
+    // chartObj.divId = '#summary-tab-chart-1';
+    // chartObj.clipId = 'clipSubHeatMap'; // WITHOUT THE # SYMBOL
+    // chartObj.clipHashId = '#clipSubHeatMap';
+    renderSubHeatmap(mydata, chartObj);
+
 }
