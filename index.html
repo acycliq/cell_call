@@ -94,6 +94,7 @@
     <script src='dashboard/js/dapi.js'></script>
     <script src='dashboard/js/glyphAssignment.js'></script>
     <script src='dashboard/js/heatmap.js'></script>
+    <script src='dashboard/js/subheatmap.js'></script>
     <script src='dashboard/js/exporter.js'></script>
     <!--<script src='dashboard/js/index.js'></script>-->
     <script src='dashboard/js/config.js'></script>
@@ -310,7 +311,7 @@
         <li class="active"><a href="#map-content" data-toggle="tab" id="map-tab">Viewer</a></li>
         <!--<li><a href="#table-content" data-toggle="tab" id="table-tab">Confusion Matrix</a></li>-->
         <li><a href="#confusion-table-content" data-toggle="tab" id="confusion-table-tab">Confusion Matrix</a></li>
-        <!--<li><a href="#workflow-content" data-toggle="tab" id="workflow-tab">Workflow</a></li>-->
+        <li><a href="#workflow-content" data-toggle="tab" id="workflow-tab">Workflow</a></li>
 
     </ul>
 
@@ -846,20 +847,203 @@
                     <!--//top row-->
                     <div class="row" style="margin-top:5px">
                         <div class="col-sm-12">
-                            <!-- workflow -->
-                            <div class="col-sm-4" id="workflow-img">
-                                <div class="chart-wrapper">
-                                    <div class="chart-title">
-                                        Workflow
+                            <div class="col-sm-2">
+                                <div class=row">
+                                    <div class="chart-wrapper">
+                                        <div class="chart-title">
+                                        Controls
                                     </div>
-                                    <div class="chart-stage" id="workflow">
-                                        <svg width="600" height="750">
-                                            <image xlink:href="./notebooks/workflow2.PNG" width="100%" height="100%" x="0" y="0" />
-                                        </svg>
+                                        <div class="chart-stage" div id="summary-tab-controls">
+                                        <div data-panel="layers" class="layer-control-2">
+                                            <!-- basemaps: radio buttons, see initMapLayerControl() -->
+                                            <div id="summary-tab-base">
+                                                <form name="summaryRadiobutton">
+                                                    <input value="avg" type="radio" name="norm" checked/>
+                                                    <span> Mean &nbsp &nbsp</span>
+                                                    <input value="median" type="radio" name="norm"/>
+                                                    <span> Median </span>
+                                                </form>
+                                            </div>
+                                            <hr>
+
+                                            <!--<div id="layers-base-2">-->
+                                                <!--<label>-->
+                                                    <!--<input type="checkbox" id="nonNeurons">-->
+                                                    <!--<span> Group Non Neurons together </span>-->
+                                                <!--</label>-->
+                                            <!--</div>-->
+                                            <!--<hr>-->
+
+                                            <div id="summary-tab-base-3">
+                                                <label>
+                                                    <input type="checkbox" id="summary-tab-constrained" checked>
+                                                    <span> Range same as domain </span>
+                                                </label>
+                                            </div>
+                                            <hr>
+                                            <div id="summary-tab-base-4">
+                                                Alpha
+                                                <form name="summary_alpha" style="margin-top:5px">
+                                                    <div>
+                                                        <input value="0.25" type="radio" name="button"/>
+                                                        <span> 0.25 &nbsp &nbsp</span>
+                                                        <input value="0.5" type="radio" name="button"/>
+                                                        <span> 0.5 &nbsp &nbsp</span>
+                                                        <input value="0.75" type="radio" name="button"/>
+                                                        <span> 0.75 &nbsp &nbsp</span>
+                                                        <input value="1.0" type="radio" name="button" checked/>
+                                                        <span> 1.0 &nbsp &nbsp</span>
+                                                    </div>
+                                                    <div style="margin-top:5px">
+                                                        <input value="1.25" type="radio" name="button"/>
+                                                        <span> 1.25 &nbsp &nbsp</span>
+                                                        <input value="1.5" type="radio" name="button"/>
+                                                        <span> 1.5 &nbsp &nbsp</span>
+                                                        <input value="1.75" type="radio" name="button"/>
+                                                        <span> 1.75 &nbsp &nbsp</span>
+                                                        <input value="2.0" type="radio" name="button"/>
+                                                        <span> 2.0 &nbsp &nbsp</span>
+                                                    </div>
+                                                    <div style="margin-top:5px">
+                                                        <input value="2.25" type="radio" name="button"/>
+                                                        <span> 2.25 &nbsp &nbsp</span>
+                                                        <input value="2.5" type="radio" name="button"/>
+                                                        <span> 2.5 &nbsp &nbsp</span>
+                                                        <input value="2.75" type="radio" name="button"/>
+                                                        <span> 2.75 &nbsp &nbsp</span>
+                                                        <input value="3.0" type="radio" name="button"/>
+                                                        <span> 3.0 &nbsp &nbsp</span>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <hr>
+                                            <div id="summary-tab-base-5">
+                                                Beta
+                                                <form name="summary_beta" style="margin-top:5px">
+                                                    <input value="0.0" type="radio" name="button" checked/>
+                                                    <span> 0.0 &nbsp &nbsp</span>
+                                                    <input value="0.25" type="radio" name="button"/>
+                                                    <span> 0.25 &nbsp &nbsp</span>
+                                                    <input value="0.5" type="radio" name="button"/>
+                                                    <span> 0.5 &nbsp &nbsp</span>
+                                                    <input value="0.75" type="radio" name="button"/>
+                                                    <span> 0.75 &nbsp &nbsp</span>
+                                                    <input value="1.0" type="radio" name="button"/>
+                                                    <span> 1.0 </span>
+                                                </form>
+                                            </div>
+                                            <hr>
+                                            <div id="summary-tab-base-6">
+                                                Fold level
+                                                <form name="summary_fold_level" style="margin-top:5px">
+                                                    <input value="0" type="radio" name="button" checked/>
+                                                    <span> 0 &nbsp &nbsp</span>
+                                                    <input value="1" type="radio" name="button"/>
+                                                    <span> 1 &nbsp &nbsp</span>
+                                                    <input value="2" type="radio" name="button"/>
+                                                    <span> 2 &nbsp &nbsp</span>
+                                                    <input value="3" type="radio" name="button"/>
+                                                    <span> 3 &nbsp &nbsp</span>
+                                                </form>
+                                            </div>
+                                            <hr>
+
+                                            <div>
+                                                <button class="btn" onclick="saveSvg()"><i class="fa fa-download"></i>
+                                                    SVG
+                                                </button>
+                                                <button class="btn" onclick="saveCsv()"><i class="fa fa-download"></i>
+                                                    CSV
+                                                </button>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
                                     </div>
                                 </div>
+
+                                <!--<div>-->
+                                    <!--<div class="chart-wrapper">-->
+                                        <!--<div class="chart-title">-->
+                                            <!--Analytics-->
+                                        <!--</div>-->
+                                        <!--<div class="chart-stage">-->
+                                            <!--<table id="cm_analytics" class="display compact custom"data-page-length='5' width=100%></table>-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
                             </div>
-                            <!-- Workflow -->
+
+                            <!-- Map -->
+                            <div class="col-sm-8" id="summary-tab-matrix">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="chart-wrapper">
+                                                <div class="chart-title">
+                                                    Chart 1
+                                                </div>
+                                                <div class="chart-stage" id="summary-tab-chart-1">
+                                                    <svg width="550" height="350"></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="chart-wrapper">
+                                                <div class="chart-title">
+                                                    Chart 2
+                                                </div>
+                                                <div class="chart-stage" id="summary-tab-chart-2">
+                                                    <svg width="225" height="350"></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="chart-wrapper">
+                                                <div class="chart-title">
+                                                    Chart 3
+                                                </div>
+                                                <div class="chart-stage" id="summary-tab-chart-3">
+                                                    <svg width="225" height="350"></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="chart-wrapper">
+                                                <div class="chart-title">
+                                                    Chart 4
+                                                </div>
+                                                <div class="chart-stage" id="summary-tab-chart-4">
+                                                    <svg width="225" height="350"></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                </div>
+                            <!-- Map -->
+
+                            <!--<div class="col-sm-2">-->
+                                <!--<div class="chart-wrapper">-->
+                                    <!--<div class="chart-title">-->
+                                        <!--Analytics-->
+                                    <!--</div>-->
+                                    <!--<div class="chart-stage">-->
+                                        <!--<table id="cm_analytics" class="display compact custom"data-page-length='5' width=100%></table>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
+
+
                         </div>
                     </div>
                 </div>
@@ -882,6 +1066,7 @@
 
     <!--Another user script. Needs to be here, after all the divs have been read-->
     <script src='dashboard/js/index.js'></script>
+    <script src='dashboard/js/summary-tab.js'></script>
 
 
     <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
