@@ -3,7 +3,7 @@ chartObj = []; //global scope!!
 chartObj2 = []; //global scope!!
 chartObj3 = []; //global scope!!
 chartObj4 = []; //global scope!!
-// listener on the Worlflow tab
+// listener on the summary (overview) tab
 $('#overview-tab').on('shown.bs.tab', function (e) {
     console.log('Workflow tab was clicked.');
     $('#myDropdown').hide(); // hide the dropdown
@@ -18,6 +18,38 @@ $('#overview-tab').on('shown.bs.tab', function (e) {
 
     renderSubHeatmapManager(arg)
 });
+
+
+// listener
+$('#summary-tab-base input').change(function () {
+    var selection = document.summaryRadiobutton.norm.value
+    console.log('you selected: ' + selection)
+    var arg = [];
+    // arg.mode = 'constrained';
+    // arg.norm = selection;
+    arg = selectionChecker()
+
+    renderSubHeatmapManager(arg)
+});
+
+// listener
+$('#summary-tab-base-3 input').change(function () {
+    var arg = [];
+    arg = selectionChecker();
+    renderSubHeatmapManager(arg)
+});
+
+
+function selectionChecker(){
+    menuSelection = [];
+    var norm = document.summaryRadiobutton.norm.value;
+    var mode = document.getElementById("summary-tab-constrained").checked? "constrained": "uncostrained"
+
+    menuSelection.norm = norm;
+    menuSelection.mode = mode;
+    return menuSelection
+}
+
 
 
 function renderSubHeatmapManager(arg) {
