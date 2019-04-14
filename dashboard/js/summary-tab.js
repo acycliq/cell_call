@@ -53,29 +53,10 @@ function renderSubHeatmapManager(arg) {
         chartObj4.clipHashId = '#clipSubHeatMap-4';
         subplot(data, filter4, chartObj4);
 
-
-        // subplot('mean')
-
-        // var mydata = data.filter(function(item){
-        //     for (var key in filter){
-        //         if (item[key]===undefined || item[key] != filter[key])
-        //             return false
-        //     }
-        //     return true
-        // });
-        //
-        // renderSubHeatmap(mydata, chartObj);
-        // console.log('Done')
     })
 }
 
-// function subplot(arg){
-//     var filter = {mode:'constrained', norm:arg, fold:0};
-//     chartObj.divId = '#summary-tab-chart-1';
-//     chartObj.clipId = 'clipSubHeatMap'; // WITHOUT THE # SYMBOL
-//     chartObj.clipHashId = '#clipSubHeatMap';
-//     subplotWorker(data, filter, chartObj)
-// }
+
 
 function subplot(data, filter, chartObj) {
     // var filter = {mode: 'constrained', norm: 'mean', fold: 0};
@@ -88,9 +69,6 @@ function subplot(data, filter, chartObj) {
         return true
     });
     console.log(mydata);
-    // chartObj.divId = '#summary-tab-chart-1';
-    // chartObj.clipId = 'clipSubHeatMap'; // WITHOUT THE # SYMBOL
-    // chartObj.clipHashId = '#clipSubHeatMap';
     renderSubHeatmap(mydata, chartObj);
 
 }
