@@ -4,7 +4,7 @@ chartObj2 = []; //global scope!!
 chartObj3 = []; //global scope!!
 chartObj4 = []; //global scope!!
 // listener on the Worlflow tab
-$('#workflow-tab').on('shown.bs.tab', function (e) {
+$('#overview-tab').on('shown.bs.tab', function (e) {
     console.log('Workflow tab was clicked.');
     $('#myDropdown').hide(); // hide the dropdown
     $('#myDropdown2').hide(); // hide the dropdown
