@@ -1,5 +1,5 @@
 
-
+chartObj = []; //global scope!!
 // listener on the Worlflow tab
 $('#workflow-tab').on('shown.bs.tab', function (e) {
     console.log('Workflow tab was clicked.');
@@ -33,11 +33,10 @@ function renderSubHeatmapManager() {
         });
         console.log(mydata);
         var myChartObj = [];
-        var chartObj1 = [];
-        chartObj1.data = [];
-        chartObj1.divId = '#summary-tab-chart-1';
-        chartObj1.clipId = '#clipSubHeatMap';
-        renderSubHeatmap(mydata, '#summary-tab-chart-1', myChartObj);
+        // chartObj.data = []; this is created later
+        chartObj.divId = '#summary-tab-chart-1';
+        chartObj.clipId = '#clipSubHeatMap';
+        renderSubHeatmap(mydata, chartObj);
 
         // cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
         // console.log('data from '+ menuSelection.target_file + ' fed into the confusion matrix');

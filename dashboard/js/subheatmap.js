@@ -1,7 +1,7 @@
-function subheatmap(dataset, chartId) {
+function subheatmap(dataset, chartObj) {
     console.log("I am in heatmap.js")
 
-    var svg = d3.select(chartId).select("svg")
+    var svg = d3.select(chartObj.divId).select("svg")
 
     var tsn = d3.transition().duration(1000);
 
@@ -66,7 +66,7 @@ function subheatmap(dataset, chartId) {
     var percentFormat = d3.format('.0%') // rounded percentage
 
     // SVG canvas
-    svg = d3.select(chartId).select("svg")
+    svg = d3.select(chartObj.divId).select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .call(zoom)
@@ -266,39 +266,40 @@ function updateBands(chartData) {
         chartData.band.y = d3.scaleBand().domain(chartData.labels.y).range([chartData.height, 0])
 }
 
-function renderSubHeatmap(dataset, chartId, chartObj) {
+function renderSubHeatmap(dataset, chartObj) {
     var percentFormat = d3.format('.2%');
 
-    var svg = d3.select(chartId)
+    var svg = d3.select(chartObj.divId)
         .select("svg");
     if (svg.select("#clipSubHeatMap").empty()) {
-        chartObj = subheatmap(dataset, chartId);
+        chartObj.data = subheatmap(dataset, chartObj);
+        // chartObj.data = chartObjData;
     }
 
     //chartData = svg.datum();
     //Do the axes
-    updateLabels(dataset, chartObj.labels);
+    updateLabels(dataset, chartObj.data.labels);
 
-    updateBands(chartObj)
+    updateBands(chartObj.data)
 
     //updateScales(dataset, chartData.scale);
 
-    updateAxes(dataset, chartObj);
+    updateAxes(dataset, chartObj.data);
 
-    updateDot(chartObj);
+    updateDot(chartObj.data);
 
-    var yAxis = svg.select('.y.axis').call(chartObj.axis.y)
+    var yAxis = svg.select('.y.axis').call(chartObj.data.axis.y)
     var xAxis = svg.select('.x.axis')
-        .attr("transform", "translate(0, " + chartObj.height + ")")
-        .call(chartObj.axis.x)
+        .attr("transform", "translate(0, " + chartObj.data.height + ")")
+        .call(chartObj.data.axis.x)
         .selectAll("text")
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
         .attr("transform", "rotate(-60)");
 
-    var zoom = chartObj.zoom
-        .scaleExtent([1, chartObj.dot.height])
+    var zoom = chartObj.data.zoom
+        .scaleExtent([1, chartObj.data.dot.height])
 
     // .on("zoom", zoomed); // Inactivate the zoom until it is properly working
 
@@ -315,22 +316,22 @@ function renderSubHeatmap(dataset, chartId, chartObj) {
         var _t = d3.event.transform;
         var t = _t
         t.x = Math.min(_t.x, 5);
-        t.x = Math.max(t.x, (1 - t.k) * chartObj.width);
+        t.x = Math.max(t.x, (1 - t.k) * chartObj.data.width);
 
         // translate and scale the x dimension only
         var my_transform = "translate(" + t.x + ", " + 0 + ") scale(" + t.k + ", 1)"
 
-        chartObj.band.x.range([0, chartObj.width * t.k]);
-        chartObj.heatDotsGroup.selectAll("rect")
+        chartObj.data.band.x.range([0, chartObj.data.width * t.k]);
+        chartObj.data.heatDotsGroup.selectAll("rect")
             .attr("transform", my_transform);
 
         svg.select('.x.axis')
-            .attr("transform", "translate(" + t.x + "," + (chartObj.height) + ")")
-            .call(chartObj.axis.x);
+            .attr("transform", "translate(" + t.x + "," + (chartObj.data.height) + ")")
+            .call(chartObj.data.axis.x);
     }
 
     // Do the chart
-    const update = chartObj.heatDotsGroup.selectAll("rect")
+    const update = chartObj.data.heatDotsGroup.selectAll("rect")
         .data(dataset);
 
     update
@@ -347,17 +348,17 @@ function renderSubHeatmap(dataset, chartId, chartObj) {
         }).css("opacity", 0);
     })
         .merge(update)
-        .transition(chartObj.tsn)
-        .attr("width", chartObj.dot.width)
-        .attr("height", chartObj.dot.height)
+        .transition(chartObj.data.tsn)
+        .attr("width", chartObj.data.dot.width)
+        .attr("height", chartObj.data.dot.height)
         .attr("x", function (d) {
-            return chartObj.band.x(d.xLabel);
+            return chartObj.data.band.x(d.xLabel);
         })
         .attr("y", function (d) {
-            return chartObj.band.y(d.yLabel);
+            return chartObj.data.band.y(d.yLabel);
         })
         .attr("fill", function (d) {
-            return chartObj.colorScale(d.val);
+            return chartObj.data.colorScale(d.val);
         });
 
     update.exit().remove();
