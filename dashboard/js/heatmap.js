@@ -1,7 +1,7 @@
-function heatmap(dataset) {
+function heatmap(dataset, chartId) {
     console.log("I am in heatmap.js")
 
-    var svg = d3.select("#heat-chart").select("svg")
+    var svg = d3.select(chartId).select("svg")
 
     var tsn = d3.transition().duration(1000);
 
@@ -66,7 +66,7 @@ function heatmap(dataset) {
     var percentFormat = d3.format('.0%') // rounded percentage
 
     // SVG canvas
-    svg = d3.select("#heat-chart").select("svg")
+    svg = d3.select(chartId).select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .call(zoom)
@@ -266,13 +266,13 @@ function updateBands(chartData) {
         chartData.band.y = d3.scaleBand().domain(chartData.labels.y).range([chartData.height, 0])
 }
 
-function renderHeatmap(dataset) {
+function renderHeatmap(dataset, chartId) {
     var percentFormat = d3.format('.2%');
 
-    var svg = d3.select("#heat-chart")
+    var svg = d3.select(chartId)
         .select("svg");
     if (svg.select("#clipHeatMap").empty()) {
-        chartData = heatmap(dataset);
+        chartData = heatmap(dataset, chartId);
     }
 
     //chartData = svg.datum();
