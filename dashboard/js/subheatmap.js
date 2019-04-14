@@ -274,7 +274,7 @@ function renderSubHeatmap(dataset, chartObj) {
 
     var svg = d3.select(chartObj.divId)
         .select("svg");
-    if (svg.select("#clipSubHeatMap").empty()) {
+    if (svg.select(chartObj.clipHashId).empty()) {
         chartObj.data = subheatmap(dataset, chartObj);
         // chartObj.data = chartObjData;
     }
