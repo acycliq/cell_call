@@ -1,10 +1,30 @@
 var menuSelection,
     cm_dataset;  // Another one in the global scope!
 
+
+var non_neuron = ['Astro.1',
+                 'Astro.2',
+                 'Astro.3',
+                 'Astro.4',
+                 'Astro.5',
+                 'Choroid',
+                 'Endo',
+                 'Eryth.1',
+                 'Eryth.2',
+                 'Microglia.1',
+                 'Microglia.2',
+                 'Oligo.1',
+                 'Oligo.2',
+                 'Oligo.3',
+                 'Oligo.4',
+                 'Oligo.5',
+                 'Vsmc'
+                 ];
+
 function renderHeatmapTab(menuSelection) {
 
-    'hide the toolip raised by the section chart'
-    d3.select('#tooltip').style('opacity', 0)
+    // hide the toolip raised by the section chart
+    d3.select('#tooltip').style('opacity', 0);
 
     d3.csv(menuSelection.target_file, function(data){
         cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
@@ -154,6 +174,25 @@ function getSelected(inputs) {
     return selected
 }
 
+
+function sortObjects(array) {
+    let keys;
+
+    function _sort(obj) {
+        if (!keys) {
+            keys = Object.keys(obj);
+            return obj;
+        }
+        return keys.reduce((sorted, key) => {
+            sorted[key] = obj[key];
+            return sorted;
+        }, {})
+    }
+
+    return array.map(_sort);
+}
+
+
 function heatmapDataManager(data, norm, ddl) {
 // Helper function to handle the data to be fed in to heatmap
 // ddl is the drill down level. Data are aggregated over that level.
@@ -169,6 +208,23 @@ function heatmapDataManager(data, norm, ddl) {
         }
         return d
     }
+
+
+    // if you select to group the NonNeurons, this is where grouping happens
+    if (document.getElementById("nonNeurons").checked) {
+        console.log('Grouping non neurons together')
+        var data = data.map(o => Object.entries(o).reduce((o, [k, v]) => {
+            //const firsts = k => k.split('.').slice(0, -1).join('.');
+            if (k === 'model_class') {
+                o[k] = non_neuron.includes(v) ? 'NonNeuron' : v;
+            } else {
+                k = non_neuron.includes(k) ? 'NonNeuron' : k;
+                o[k] = (o[k] || 0) + parseFloat(v);
+            }
+            return o;
+        }, {}));
+    }
+
 
     // var ddl = 4; //drill down level
     var result = data.map(o => Object.entries(o).reduce((o, [k, v]) => {
@@ -248,6 +304,7 @@ $('#layers-base input').change(function () {
 });
 
 $('#layers-base-2 input').change(function () {
+    console.log('Group non neurons was clicked')
     var target = submitHelper();
     renderHeatmapTab(target)
 });
