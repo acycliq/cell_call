@@ -1,11 +1,11 @@
-function heatmap(dataset, chartId) {
+function subheatmap(dataset, chartObj) {
     console.log("I am in heatmap.js")
 
-    var svg = d3.select(chartId).select("svg")
+    var svg = d3.select(chartObj.divId).select("svg")
 
     var tsn = d3.transition().duration(1000);
 
-    var margin = {top: 10, right: 85, bottom: 130, left: 160};
+    var margin = {top: 10, right: 85, bottom: 60, left: 60};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -66,7 +66,7 @@ function heatmap(dataset, chartId) {
     var percentFormat = d3.format('.0%') // rounded percentage
 
     // SVG canvas
-    svg = d3.select(chartId).select("svg")
+    svg = d3.select(chartObj.divId).select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .call(zoom)
@@ -75,7 +75,8 @@ function heatmap(dataset, chartId) {
 
     // Clip path
     svg.append("clipPath")
-        .attr("id", "clipHeatMap")
+        // .attr("id", "clipSubHeatMap")
+        .attr("id", chartObj.clipId)
         .append("rect")
         .attr("width", width)
         .attr("height", height);
@@ -90,8 +91,10 @@ function heatmap(dataset, chartId) {
 
 
     // Heatmap dots
+    // var junk = 'clipSubHeatMap'
     var heatDotsGroup = svg.append("g")
-        .attr("clip-path", "url(#clipHeatMap)")
+        // .attr("clip-path", "url(#clipSubHeatMap)")
+        .attr("clip-path", "url(#" + chartObj.clipId + ')"')
         .append("g");
 
 
@@ -132,20 +135,20 @@ function heatmap(dataset, chartId) {
         .append('g')
         .attr('id', 'xAxisLabelText')
         .append('text')
-        .text("Predicted");
+        .text("Alpha");
 
     // text label for the y axis
     textGroup
         .append('g')
         .attr('id', 'yAxisLabel')
-        .attr('transform', "translate(" + (-0.9*margin.left) + " ," + (height/2) + ") rotate(-90)")
+        .attr('transform', "translate(" + (-0.7*margin.left) + " ," + (height/2) + ") rotate(-90)")
         .attr('font-family', 'sans-serif')
         .attr('font-size', 12)
         .attr('text-anchor', 'middle')
         .append('g')
         .attr('id', 'yAxisLabelText')
         .append('text')
-        .text("Actual");
+        .text("Beta");
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -155,7 +158,7 @@ function heatmap(dataset, chartId) {
     // Create the gradient
     svg.append("defs")
         .append("linearGradient")
-        .attr("id", "legend-traffic")
+        .attr("id", "sub-legend-traffic")
         .attr("x1", "0%").attr("y1", "100%")
         .attr("x2", "0%").attr("y2", "0%")
         .selectAll("stop")
@@ -169,7 +172,7 @@ function heatmap(dataset, chartId) {
         });
 
 
-    var legend = {  height: Math.min(width * 0.8, 400),
+    var legend = {  height: Math.min(width * 0.8, 200),
                     width: 10};
 
     // Color Legend container
@@ -184,7 +187,7 @@ function heatmap(dataset, chartId) {
         .attr("y", 0)
         .attr("width", legend.width)
         .attr("height", legend.height)
-        .style("fill", "url(#legend-traffic)");
+        .style("fill", "url(#sub-legend-traffic)");
 
     // Set scale for x-axis
     var xScaleLegend = d3.scaleLinear()
@@ -266,39 +269,40 @@ function updateBands(chartData) {
         chartData.band.y = d3.scaleBand().domain(chartData.labels.y).range([chartData.height, 0])
 }
 
-function renderHeatmap(dataset, chartId) {
+function renderSubHeatmap(dataset, chartObj) {
     var percentFormat = d3.format('.2%');
 
-    var svg = d3.select(chartId)
+    var svg = d3.select(chartObj.divId)
         .select("svg");
-    if (svg.select("#clipHeatMap").empty()) {
-        chartData = heatmap(dataset, chartId);
+    if (svg.select(chartObj.clipHashId).empty()) {
+        chartObj.data = subheatmap(dataset, chartObj);
+        // chartObj.data = chartObjData;
     }
 
     //chartData = svg.datum();
     //Do the axes
-    updateLabels(dataset, chartData.labels);
+    updateLabels(dataset, chartObj.data.labels);
 
-    updateBands(chartData)
+    updateBands(chartObj.data)
 
     //updateScales(dataset, chartData.scale);
 
-    updateAxes(dataset, chartData);
+    updateAxes(dataset, chartObj.data);
 
-    updateDot(chartData);
+    updateDot(chartObj.data);
 
-    var yAxis = svg.select('.y.axis').call(chartData.axis.y)
+    var yAxis = svg.select('.y.axis').call(chartObj.data.axis.y)
     var xAxis = svg.select('.x.axis')
-        .attr("transform", "translate(0, " + chartData.height + ")")
-        .call(chartData.axis.x)
+        .attr("transform", "translate(0, " + chartObj.data.height + ")")
+        .call(chartObj.data.axis.x)
         .selectAll("text")
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
         .attr("transform", "rotate(-60)");
 
-    var zoom = chartData.zoom
-        .scaleExtent([1, chartData.dot.height])
+    var zoom = chartObj.data.zoom
+        .scaleExtent([1, chartObj.data.dot.height])
 
     // .on("zoom", zoomed); // Inactivate the zoom until it is properly working
 
@@ -315,29 +319,29 @@ function renderHeatmap(dataset, chartId) {
         var _t = d3.event.transform;
         var t = _t
         t.x = Math.min(_t.x, 5);
-        t.x = Math.max(t.x, (1 - t.k) * chartData.width);
+        t.x = Math.max(t.x, (1 - t.k) * chartObj.data.width);
 
         // translate and scale the x dimension only
         var my_transform = "translate(" + t.x + ", " + 0 + ") scale(" + t.k + ", 1)"
 
-        chartData.band.x.range([0, chartData.width * t.k]);
-        chartData.heatDotsGroup.selectAll("rect")
+        chartObj.data.band.x.range([0, chartObj.data.width * t.k]);
+        chartObj.data.heatDotsGroup.selectAll("rect")
             .attr("transform", my_transform);
 
         svg.select('.x.axis')
-            .attr("transform", "translate(" + t.x + "," + (chartData.height) + ")")
-            .call(chartData.axis.x);
+            .attr("transform", "translate(" + t.x + "," + (chartObj.data.height) + ")")
+            .call(chartObj.data.axis.x);
     }
 
     // Do the chart
-    const update = chartData.heatDotsGroup.selectAll("rect")
+    const update = chartObj.data.heatDotsGroup.selectAll("rect")
         .data(dataset);
 
     update
         .enter()
         .append("rect")
         .on("mouseover", function (d) {
-            $("#tooltip_heatmap").html("Predicted: " + d.xLabel + "<br/>Actual: " + d.yLabel + "<br/>Prob: " + percentFormat(d.val));
+            $("#tooltip_heatmap").html("Alpha: " + d.xLabel + "<br/>Beta: " + d.yLabel + "<br/>Score: " + percentFormat(d.val));
             var xpos = d3.event.pageX + 10;
             var ypos = d3.event.pageY + 20;
             $("#tooltip_heatmap").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
@@ -347,17 +351,17 @@ function renderHeatmap(dataset, chartId) {
         }).css("opacity", 0);
     })
         .merge(update)
-        .transition(chartData.tsn)
-        .attr("width", chartData.dot.width)
-        .attr("height", chartData.dot.height)
+        .transition(chartObj.data.tsn)
+        .attr("width", chartObj.data.dot.width)
+        .attr("height", chartObj.data.dot.height)
         .attr("x", function (d) {
-            return chartData.band.x(d.xLabel);
+            return chartObj.data.band.x(d.xLabel);
         })
         .attr("y", function (d) {
-            return chartData.band.y(d.yLabel);
+            return chartObj.data.band.y(d.yLabel);
         })
         .attr("fill", function (d) {
-            return chartData.colorScale(d.val);
+            return chartObj.data.colorScale(d.val);
         });
 
     update.exit().remove();

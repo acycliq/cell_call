@@ -9,7 +9,7 @@ function renderHeatmapTab(menuSelection) {
     d3.csv(menuSelection.target_file, function(data){
         cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
         console.log('data from '+ menuSelection.target_file + ' fed into the confusion matrix');
-        renderHeatmap(cm_dataset);
+        renderHeatmap(cm_dataset, '#heat-chart');
         var diagonalScore = diagonalMean(cm_dataset);
         cmAnalytics(diagonalScore)
     })
@@ -289,16 +289,16 @@ $('#map-tab').on('shown.bs.tab', function (e) {
     $('#myDropdown').show(); // show the dropdown
     $('#myDropdown2').show();
 });
-
-// listener on the Worlflow tab
-$('#workflow-tab').on('shown.bs.tab', function (e) {
-    console.log('Workflow tab was clicked.');
-    $('#myDropdown').hide(); // hide the dropdown
-    $('#dropdown-inefficiency').hide();
-
-    // hide the toolip raised by the section chart
-    d3.select('#tooltip').style('opacity', 0)
-});
+//
+// // listener on the Worlflow tab
+// $('#workflow-tab').on('shown.bs.tab', function (e) {
+//     console.log('Workflow tab was clicked.');
+//     $('#myDropdown').hide(); // hide the dropdown
+//     $('#dropdown-inefficiency').hide();
+//
+//     // hide the toolip raised by the section chart
+//     d3.select('#tooltip').style('opacity', 0)
+// });
 
 function submitHelper(){
     menuSelection = [];
