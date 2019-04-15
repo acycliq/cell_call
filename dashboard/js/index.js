@@ -209,6 +209,16 @@ function heatmapDataManager(data, norm, ddl) {
         return d
     }
 
+    // find the position of the i-th occurrence of substring m in string str
+    function getPosition(str, m, i) { return str.split(m, i).join(m).length; }
+
+    // unstripper('this.is.a.test', 2) = 'this.is'
+    // unstripper('this.is.a.test', 3) = 'this.is.a'
+    function unstripper(d, k) {
+        var out = d.substring(0, getPosition(d, '.', k));
+        return out
+    }
+
 
     // if you select to group the NonNeurons, this is where grouping happens
     if (document.getElementById("nonNeurons").checked) {
