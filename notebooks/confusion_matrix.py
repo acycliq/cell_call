@@ -87,7 +87,14 @@ def aggregator(df, column_names, norm):
     return out, raw_data
 
 
-def confusion_matrix(model_data, sim_data, norm='mean'):
+def stripper(x, n):
+    for i in range(n):
+        if x.rfind('.') > 0:
+            x = x[:x.rfind('.')]
+    return x
+
+
+def confusion_matrix(model_data, sim_data, norm='mean', fold=0):
     'get the model class, ie most likely as this is derived from the model'
     _model_class = best_class(model_data)
 
@@ -98,6 +105,10 @@ def confusion_matrix(model_data, sim_data, norm='mean'):
 
     'get all the unique model_class names'
     umc = sorted(list(set(_model_class)))
+
+    'if you fold the names, then remove the last dot separated substring'
+    all_class_names = [stripper(x, fold) for x in all_class_names]
+    umc = [stripper(x, fold) for x in umc]
 
     n = len(umc)
     m = len(all_class_names)
@@ -120,6 +131,21 @@ def confusion_matrix(model_data, sim_data, norm='mean'):
     # concatenate along the index(axis=0), overwrite raw_data variable
     raw_data = pd.concat(appended_data, axis=0)
     return out, raw_data
+
+
+def analytics(df):
+    d = []  #keep here the elements of the diagonal
+    model_classes = df.columns.values
+    for c in model_classes:
+        if c in df.index:
+            # maybe i should append a zero if c not in the index.
+            # Now I just ignore this.'
+            d.append(df.loc[c, c])
+
+    avg = np.mean(d)
+    median = np.median(d)
+    return avg, median
+
 
 def pool(df):
     print('Pooling all Non Neurons together.')
@@ -264,6 +290,7 @@ def app(alpha, beta):
     sim_data = pd.read_json(SIM_DATA)
 
     cm, raw_data = confusion_matrix(model_data, sim_data)
+    avg, median = analytics(cm)
     # mi = mutual_information(raw_data)
 
     root = 'D:\Dimitris\Dropbox\_grid'
