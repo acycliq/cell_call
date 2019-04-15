@@ -27,7 +27,7 @@ function renderHeatmapTab(menuSelection) {
     d3.select('#tooltip').style('opacity', 0);
 
     d3.csv(menuSelection.target_file, function(data){
-        cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal);
+        cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal, +menuSelection.unfoldVal);
         console.log('data from '+ menuSelection.target_file + ' fed into the confusion matrix');
         renderHeatmap(cm_dataset, '#heat-chart');
         var diagonalScore = diagonalMean(cm_dataset);
@@ -193,11 +193,11 @@ function sortObjects(array) {
 }
 
 
-function heatmapDataManager(data, norm, ddl) {
+function heatmapDataManager(data, norm, dul, ddl) {
 // Helper function to handle the data to be fed in to heatmap
-// ddl is the drill down level. Data are aggregated over that level.
+// dul is the drill down level. Data are aggregated over that level.
 // For example 'Astro.1', 'Astro.2' ,..., 'Astro.5' will all be combined
-// in a big class 'Astro' if ddl=1
+// in a big class 'Astro' if dul=1
 // norm is either 'avg' or 'median'. The default is 'median'
 
     function stripper(d, k) {
@@ -215,7 +215,7 @@ function heatmapDataManager(data, norm, ddl) {
     // unstripper('this.is.a.test', 2) = 'this.is'
     // unstripper('this.is.a.test', 3) = 'this.is.a'
     function unstripper(d, k) {
-        var out = d.substring(0, getPosition(d, '.', k));
+        var out = d.substring(0, getPosition(d, '.', k+1));
         return out
     }
 
@@ -236,17 +236,35 @@ function heatmapDataManager(data, norm, ddl) {
     }
 
 
-    // var ddl = 4; //drill down level
-    var result = data.map(o => Object.entries(o).reduce((o, [k, v]) => {
-        //const firsts = k => k.split('.').slice(0, -1).join('.');
-        if (k === 'model_class') {
-            o[k] = stripper(v, ddl);
-        } else {
-            k = stripper(k, ddl);
-            o[k] = (o[k] || 0) + parseFloat(v);
-        }
-        return o;
-    }, {}));
+    if ($('#layers-base-7 input:radio:checked').length){
+        // var ddl = 4; //drill down level
+        var result = data.map(o => Object.entries(o).reduce((o, [k, v]) => {
+            //const firsts = k => k.split('.').slice(0, -1).join('.');
+            if (k === 'model_class') {
+                o[k] = unstripper(v, ddl);
+            } else {
+                k = unstripper(k, ddl);
+                o[k] = (o[k] || 0) + parseFloat(v);
+            }
+            return o;
+        }, {}));
+    }
+
+
+    if ($('#layers-base-6 input:radio:checked').length) {
+
+        // var dul = 3; //drill down level
+        var result = data.map(o => Object.entries(o).reduce((o, [k, v]) => {
+            //const firsts = k => k.split('.').slice(0, -1).join('.');
+            if (k === 'model_class') {
+                o[k] = stripper(v, dul);
+            } else {
+                k = stripper(k, dul);
+                o[k] = (o[k] || 0) + parseFloat(v);
+            }
+            return o;
+        }, {}));
+    }
 
 
     var out = d3.nest()
@@ -335,9 +353,23 @@ $('#layers-base-5 input').change(function () {
 });
 
 $('#layers-base-6 input').change(function () {
+    ["unfold_0", "unfold_1", "unfold_2", "unfold_3"].forEach(function (id) {
+                document.getElementById(id).checked = false;
+            });
+
     var target = submitHelper();
     renderHeatmapTab(target)
 });
+
+$('#layers-base-7 input').change(function () {
+    ["fold_0", "fold_1", "fold_2", "fold_3"].forEach(function (id) {
+                document.getElementById(id).checked = false;
+            });
+
+    var target = submitHelper();
+    renderHeatmapTab(target)
+});
+
 
 
 // listener on the Confusion matrix tab
@@ -371,6 +403,7 @@ function submitHelper(){
     menuSelection = [];
     var norm = document.ConfusionMatrixRadioButton.norm.value;
     var foldVal = document.cm_fold_level.button.value;
+    var unfoldVal = document.cm_unfold_level.button.value;
     var betaVal = document.cm_beta.button.value;
     var alphaVal = document.cm_alpha.button.value;
     var mode = document.getElementById("constrained").checked? "constrained": "unconstrained"
@@ -380,7 +413,8 @@ function submitHelper(){
 
     menuSelection.norm = norm;
     menuSelection.mode = mode;
-    menuSelection.foldVal = foldVal;
+    menuSelection.foldVal = foldVal;     //drilling up
+    menuSelection.unfoldVal = unfoldVal; //drilling down
     menuSelection.alphaVal = alphaVal;
     menuSelection.betaVal = betaVal;
     menuSelection.target_file = target_file;
