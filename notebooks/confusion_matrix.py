@@ -282,8 +282,8 @@ def app(alpha, beta):
 
     subfolder = 'alpha' + str(alpha) + '_' + 'beta' + str(beta)
     fName = 'alpha' + str(alpha) + '_' + 'beta' + str(beta) + '_sims_iss.json'
-    SIM_DATA = os.path.join(PATH, 'grid', 'constrained', subfolder, fName)
-    # SIM_DATA = os.path.join(PATH, 'grid', 'uncostrained', subfolder, fName)
+    # SIM_DATA = os.path.join(PATH, 'grid', 'constrained', subfolder, fName)
+    SIM_DATA = os.path.join(PATH, 'grid', 'unconstrained', subfolder, fName)
 
 
     model_data = pd.read_json(MODEL_DATA)
@@ -304,7 +304,7 @@ def app(alpha, beta):
 
 if __name__ == "__main__":
     alpha = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
-    beta = [0.0, 0.25, 0.5, 0.75, 1.0]
+    beta = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     grid = paramGrid(alpha, beta)
     for p in grid:
         alpha = p[0]
