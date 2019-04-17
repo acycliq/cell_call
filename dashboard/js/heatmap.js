@@ -243,6 +243,18 @@ function updateDot(chartData) {
         chartData.dot.height = chartData.height / (1 * chartData.labels.y.length)
 }
 
+
+function updateMargins(chartData, svg, margin) {
+    // var margin = {top: 10, right: 50, bottom: 230, left: 250};
+
+    var width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
+
+    chartData.width = width;
+    chartData.height = height;
+}
+
+
 function updateAxes(data, chartData) {
     var band = chartData.band,
         labels = chartData.labels;
@@ -273,6 +285,15 @@ function renderHeatmap(dataset, chartId) {
         .select("svg");
     if (svg.select("#clipHeatMap").empty()) {
         chartData = heatmap(dataset, chartId);
+    }
+
+    if (document.getElementById("binaryClasses").checked){
+        var margin = {top: 10, right: 50, bottom: 210, left: 250};
+        updateMargins(chartData, svg, margin);
+    }
+    else {
+        var margin = {top: 10, right: 85, bottom: 130, left: 160};
+        updateMargins(chartData, svg, margin);
     }
 
     //chartData = svg.datum();
