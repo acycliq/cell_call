@@ -27,7 +27,9 @@ function renderHeatmapTab(menuSelection) {
     d3.select('#tooltip').style('opacity', 0);
 
     d3.csv(menuSelection.target_file, function(data){
-        data = use_binary_classes(data)
+        if (menuSelection.useBinaryClasses){
+            data = use_binary_classes(data)
+        };
         cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal, +menuSelection.unfoldVal);
         console.log('data from '+ menuSelection.target_file + ' fed into the confusion matrix');
         renderHeatmap(cm_dataset, '#heat-chart');
@@ -343,6 +345,14 @@ $('#layers-base-3 input').change(function () {
     renderHeatmapTab(target)
 });
 
+$('#layers-base-8 input').change(function () {
+    console.log('Binary Class checkbox changed status')
+    $("#fold_row2").toggle($(this).is(":checked"))
+    $("#unfold_row2").toggle($(this).is(":checked"))
+    var target = submitHelper();
+    renderHeatmapTab(target)
+});
+
 $('#layers-base-4 input').change(function () {
     var target = submitHelper();
     renderHeatmapTab(target)
@@ -354,7 +364,7 @@ $('#layers-base-5 input').change(function () {
 });
 
 $('#layers-base-6 input').change(function () {
-    ["unfold_0", "unfold_1", "unfold_2", "unfold_3"].forEach(function (id) {
+    ["unfold_0", "unfold_1", "unfold_2", "unfold_3", "unfold_4", "unfold_5", "unfold_6", "unfold_7"].forEach(function (id) {
                 document.getElementById(id).checked = false;
             });
 
@@ -363,7 +373,7 @@ $('#layers-base-6 input').change(function () {
 });
 
 $('#layers-base-7 input').change(function () {
-    ["fold_0", "fold_1", "fold_2", "fold_3"].forEach(function (id) {
+    ["fold_0", "fold_1", "fold_2", "fold_3", "fold_4", "fold_5", "fold_6", "fold_7"].forEach(function (id) {
                 document.getElementById(id).checked = false;
             });
 
@@ -379,6 +389,8 @@ $('#confusion-table-tab').on('shown.bs.tab', function (e) {
     // hide the navbar dropdown menus
     $('#myDropdown').hide();
     $('#myDropdown2').hide();
+    $("#fold_row2").hide();
+    $("#unfold_row2").hide();
     var target = submitHelper();
     renderHeatmapTab(target)
 });
@@ -408,12 +420,14 @@ function submitHelper(){
     var betaVal = document.cm_beta.button.value;
     var alphaVal = document.cm_alpha.button.value;
     var mode = document.getElementById("constrained").checked? "constrained": "unconstrained"
+    var useBinaryClasses = document.getElementById("binaryClasses").checked? true: false;
     var target_file = './dashboard/data/confusion_matrix/grid/' + mode
                         + '/alpha' + alphaVal + '_beta' + betaVal
                         + '/alpha' + alphaVal + '_beta' + betaVal + '_cm_raw_data.csv'
 
     menuSelection.norm = norm;
     menuSelection.mode = mode;
+    menuSelection.useBinaryClasses = useBinaryClasses;
     menuSelection.foldVal = foldVal;     //drilling up
     menuSelection.unfoldVal = unfoldVal; //drilling down
     menuSelection.alphaVal = alphaVal;
