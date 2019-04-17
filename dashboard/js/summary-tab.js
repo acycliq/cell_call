@@ -8,6 +8,9 @@ $('#overview-tab').on('shown.bs.tab', function (e) {
     console.log('Workflow tab was clicked.');
     $('#myDropdown').hide(); // hide the dropdown
     $('#myDropdown2').hide(); // hide the dropdown
+    $('#myDropdown3').hide(); // hide the dropdown
+    $('#myDropdown4').hide(); // hide the dropdown
+    $('#myDropdown5').hide(); // hide the dropdown
 
     // hide the toolip raised by the section chart
     d3.select('#tooltip').style('opacity', 0)
@@ -43,7 +46,7 @@ $('#summary-tab-base-3 input').change(function () {
 function selectionChecker(){
     menuSelection = [];
     var norm = document.summaryRadiobutton.norm.value;
-    var mode = document.getElementById("summary-tab-constrained").checked? "constrained": "uncostrained"
+    var mode = document.getElementById("summary-tab-constrained").checked? "constrained": "unconstrained"
 
     menuSelection.norm = norm;
     menuSelection.mode = mode;
