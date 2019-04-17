@@ -389,6 +389,9 @@ $('#confusion-table-tab').on('shown.bs.tab', function (e) {
     // hide the navbar dropdown menus
     $('#myDropdown').hide();
     $('#myDropdown2').hide();
+    $('#myDropdown3').hide();
+    $('#myDropdown4').hide();
+    $('#myDropdown5').hide();
     $("#fold_row2").hide();
     $("#unfold_row2").hide();
     var target = submitHelper();
@@ -400,6 +403,9 @@ $('#map-tab').on('shown.bs.tab', function (e) {
     console.log('Viewer tab was clicked.');
     $('#myDropdown').show(); // show the dropdown
     $('#myDropdown2').show();
+    $('#myDropdown3').show();
+    $('#myDropdown4').show();
+    $('#myDropdown5').show();
 });
 //
 // // listener on the Worlflow tab
