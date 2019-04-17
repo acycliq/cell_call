@@ -441,6 +441,7 @@
         <!--<li><a href="#table-content" data-toggle="tab" id="table-tab">Confusion Matrix</a></li>-->
         <li><a href="#confusion-table-content" data-toggle="tab" id="confusion-table-tab">Confusion Matrix</a></li>
         <li><a href="#overview-content" data-toggle="tab" id="overview-tab">Top level overview</a></li>
+        <li><a href="#python-content" data-toggle="tab" id="python-tab">Notebook</a></li>
 
     </ul>
 
@@ -993,8 +994,42 @@
             </div>
         </div><!-- about content tab -->
 
+        <!--python tab-->
+        <div class="tab-pane fade" id="python-content">
+            <div class="container-fluid">
+                <div class="col-sm-7">
 
-    </div><!-- tab-content -->
+                    <div class="chart-wrapper">
+                        <div class="chart-title">
+                            Sceenshot
+                        </div>
+                        <div class="chart-stage" id="python_screenshot">
+                            <g>
+                                <p> This is a static image. Click here
+                                    <a href="https://colab.research.google.com/github/acycliq/spacetx/blob/master/dashboard/data/confusion_matrix/cm_summary/summary_plots.ipynb">
+                                        <img border="0" alt="W3Schools"
+                                             src="./dashboard./data./confusion_matrix./cm_summary/colab.svg" width="70"
+                                             height="20">
+                                    </a> to open a python notebook and pass-in your own settings for similar charts.
+                                </p>
+                                <p> The chart shows how the mean of the diagonal in the confusion matrix
+                                    changes as you change alpha and beta and for different levels of folding.
+                                </p>
+                                <p> The closer it gets to one, the better. If it is one, then it means that the classifier
+                                    recovers the true cell class with 100% precision.
+                                </p>
+                            </g>
+                            <svg width="900" height="800">
+                                <image xlink:href="./dashboard/data/confusion_matrix/cm_summary/notebook.png" width="100%"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        </div><!-- tab-content -->
 
     <!--<hr>-->
 
@@ -1010,6 +1045,7 @@
     <!--Another user script. Needs to be here, after all the divs have been read-->
     <script src='dashboard/js/index.js'></script>
     <script src='dashboard/js/summary-tab.js'></script>
+    <script src='dashboard/js/python-tab.js'></script>
 
 
     <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
