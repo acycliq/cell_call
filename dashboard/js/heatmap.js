@@ -250,6 +250,8 @@ function updateMargins(chartData, svg, margin) {
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
 
+    svg.select('g').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
     chartData.width = width;
     chartData.height = height;
 }
