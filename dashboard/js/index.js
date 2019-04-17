@@ -27,6 +27,7 @@ function renderHeatmapTab(menuSelection) {
     d3.select('#tooltip').style('opacity', 0);
 
     d3.csv(menuSelection.target_file, function(data){
+        data = use_binary_classes(data)
         cm_dataset = heatmapDataManager(data, menuSelection.norm, +menuSelection.foldVal, +menuSelection.unfoldVal);
         console.log('data from '+ menuSelection.target_file + ' fed into the confusion matrix');
         renderHeatmap(cm_dataset, '#heat-chart');
@@ -420,3 +421,227 @@ function submitHelper(){
     menuSelection.target_file = target_file;
     return menuSelection
 }
+
+
+function use_binary_classes(data) {
+
+    res = []
+    data.forEach(function (d) {
+        if (d.model_class === 'Sst.Nos1') {
+            d.model_class = 'Sst.Sst.Pcp4'
+        }
+        if (d.model_class === 'Sst.Npy.Cort') {
+            d.model_class = 'Sst.Sst.Rbp4.Rbp4.Npy.Cort'
+        }
+        if (d.model_class === 'Sst.Npy.Zbtb20') {
+            d.model_class = 'Sst.Sst.Rbp4.Rbp4.Npy.Cdh13.Pcp4'
+        }
+        if (d.model_class === 'Sst.Npy.Serpine2') {
+            d.model_class = 'Sst.Sst.Rbp4.Rbp4.Npy.Cdh13.Crhbp'
+        }
+        if (d.model_class === 'Sst.Npy.Mgat4c') {
+            d.model_class = 'Sst.Sst.Rbp4.Rbp4.Rbp4.Camk2n1.Npy'
+        }
+        if (d.model_class === 'Sst.Pnoc.Calb1.Igfbp5') {
+            d.model_class = 'Sst.Sst.Rbp4.Rbp4.Rbp4.Camk2n1.Pnoc.Nrsn1'
+        }
+        if (d.model_class === 'Sst.Pnoc.Calb1.Pvalb') {
+            d.model_class = 'Sst.Sst.Rbp4.Rbp4.Rbp4.Camk2n1.Pnoc.Cdh13'
+        }
+        if (d.model_class === 'Sst.Pnoc.Pvalb') {
+            d.model_class = 'Sst.Sst.Rbp4.Rbp4.Rbp4.Col25a1'
+        }
+        if (d.model_class === 'Sst.Erbb4.Rgs10') {
+            d.model_class = 'Sst.Sst.Rbp4.Rgs10'
+        }
+        if (d.model_class === 'Sst.Erbb4.Crh') {
+            d.model_class = 'Sst.Pvalb.Rbp4.6330403K07Rik.Sst'
+        }
+        if (d.model_class === 'Sst.Erbb4.Th') {
+            d.model_class = 'Sst.Pvalb.Rbp4.6330403K07Rik.Tac1.Sst'
+        }
+        if (d.model_class === 'Pvalb.Tac1.Nr4a2') {
+            d.model_class = 'Sst.Pvalb.Rbp4.6330403K07Rik.Tac1.Pvalb'
+        }
+        if (d.model_class === 'Pvalb.Tac1.Sst') {
+            d.model_class = 'Sst.Pvalb.Rbp4.Pvalb.Sst'
+        }
+        if (d.model_class === 'Pvalb.Tac1.Syt2') {
+            d.model_class = 'Sst.Pvalb.Rbp4.Pvalb.Pvalb.Rbp4'
+        }
+        if (d.model_class === 'Pvalb.Tac1.Akr1c18') {
+            d.model_class = 'Sst.Pvalb.Rbp4.Pvalb.Pvalb.Nsg2'
+        }
+        if (d.model_class === 'Pvalb.C1ql1.Pvalb') {
+            d.model_class = 'Sst.Pvalb.Snca.Pvalb.Pvalb'
+        }
+        if (d.model_class === 'Pvalb.C1ql1.Cpne5') {
+            d.model_class = 'Sst.Pvalb.Snca.Pvalb.Snca'
+        }
+        if (d.model_class === 'Pvalb.C1ql1.Npy') {
+            d.model_class = 'Sst.Pvalb.Snca.Npy'
+        }
+        if (d.model_class === 'Cacna2d1.Lhx6.Reln') {
+            d.model_class = 'Vip.Npy.Cryab.Npy.Nrsn1.Cox6a2'
+        }
+        if (d.model_class === 'Cacna2d1.Lhx6.Vwa5a') {
+            d.model_class = 'Vip.Npy.Cryab.Npy.Nrsn1.Npy'
+        }
+        if (d.model_class === 'Cacna2d1.Ndnf.Npy') {
+            d.model_class = 'Vip.Npy.Cryab.Npy.Kit.Npy'
+        }
+        if (d.model_class === 'Cacna2d1.Ndnf.Rgs10') {
+            d.model_class = 'Vip.Npy.Cryab.Npy.Kit.Cnr1'
+        }
+        if (d.model_class === 'Cacna2d1.Ndnf.Cxcl14') {
+            d.model_class = 'Vip.Npy.Cryab.Ntng1.Cryab.Cxcl14.Npy'
+        }
+        if (d.model_class === 'Calb2.Cryab') {
+            d.model_class = 'Vip.Npy.Cryab.Ntng1.Cryab.Cxcl14.Calb2'
+        }
+        if (d.model_class === 'Sst.Cryab') {
+            d.model_class = 'Vip.Npy.Cryab.Ntng1.Cryab.Sst'
+        }
+        if (d.model_class === 'Ntng1.Synpr') {
+            d.model_class = 'Vip.Npy.Cryab.Ntng1.Ntng1.Cxcl14.Serpine2'
+        }
+        if (d.model_class === 'Ntng1.Rgs10') {
+            d.model_class = 'Vip.Npy.Cryab.Ntng1.Ntng1.Cxcl14.Nrip3'
+        }
+        if (d.model_class === 'Ntng1.Chrm2') {
+            d.model_class = 'Vip.Npy.Cryab.Ntng1.Ntng1.Pcp4'
+        }
+        if (d.model_class === 'Cck.Sema5a') {
+            d.model_class = 'Vip.Npy.Cnr1.Vip.Ntng1.Ntng1'
+        }
+        if (d.model_class === 'Cck.Lmo1.Npy') {
+            d.model_class = 'Vip.Npy.Cnr1.Vip.Ntng1.Yjefn3.Trp53i11'
+        }
+        if (d.model_class === 'Cck.Calca') {
+            d.model_class = 'Vip.Npy.Cnr1.Vip.Ntng1.Yjefn3.Cryab'
+        }
+        if (d.model_class === 'Cck.Lmo1.Vip.Fam19a2') {
+            d.model_class = 'Vip.Npy.Cnr1.Vip.Vip.Krt73'
+        }
+        if (d.model_class === 'Cck.Lmo1.Vip.Crh') {
+            d.model_class = 'Vip.Npy.Cnr1.Vip.Vip.Fxyd6.Vip'
+        }
+        if (d.model_class === 'Cck.Lmo1.Vip.Tac2') {
+            d.model_class = 'Vip.Npy.Cnr1.Vip.Vip.Fxyd6.Npy'
+        }
+        if (d.model_class === 'Cck.Lypd1') {
+            d.model_class = 'Vip.Npy.Cnr1.Cxcl14.Lypd1'
+        }
+        if (d.model_class === 'Cck.Cxcl14.Calb1.Tnfaip8l3') {
+            d.model_class = 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Vsnl1.Vsnl1'
+        }
+        if (d.model_class === 'Cck.Cxcl14.Calb1.Igfbp5') {
+            d.model_class = 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Vsnl1.Npy'
+        }
+        if (d.model_class === 'Cck.Cxcl14.Slc17a8') {
+            d.model_class = 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Kctd12.Kctd12'
+        }
+        if (d.model_class === 'Cck.Cxcl14.Calb1.Kctd12') {
+            d.model_class = 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Kctd12.Rgs12.Kctd12'
+        }
+        if (d.model_class === 'Cck.Cxcl14.Calb1.Tac2') {
+            d.model_class = 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Kctd12.Rgs12.Tac2'
+        }
+        if (d.model_class === 'Cck.Cxcl14.Vip') {
+            d.model_class = 'Vip.Vip.Cck.Cck.Sncg'
+        }
+        if (d.model_class === 'Vip.Crh.Pcp4') {
+            d.model_class = 'Vip.Vip.Cck.Cck.Crh.Pcp4'
+        }
+        if (d.model_class === 'Vip.Crh.C1ql1') {
+            d.model_class = 'Vip.Vip.Cck.Cck.Crh.Apoe'
+        }
+        if (d.model_class === 'Calb2.Vip.Gpd1') {
+            d.model_class = 'Vip.Vip.Cck.Myl1.Cpne2.Camk2n1'
+        }
+        if (d.model_class === 'Calb2.Vip.Igfbp4') {
+            d.model_class = 'Vip.Vip.Cck.Myl1.Cpne2.Tac2'
+        }
+        if (d.model_class === 'Calb2.Vip.Nos1') {
+            d.model_class = 'Vip.Vip.Cck.Myl1.Alcam'
+        }
+        if (d.model_class === 'Calb2.Cntnap5a.Rspo3') {
+            d.model_class = 'Vip.Vip.Nnat.Cxcl14'
+        }
+        if (d.model_class === 'Calb2.Cntnap5a.Vip') {
+            d.model_class = 'Vip.Vip.Nnat.Vip.Vsnl1'
+        }
+        if (d.model_class === 'Calb2.Cntnap5a.Igfbp6') {
+            d.model_class = 'Vip.Vip.Nnat.Vip.Ntng1'
+        }
+
+        res.push({
+            model_class: d.model_class
+        })
+    });
+
+    var replaceKeyInObjectArray = (a, r) => a.map(o =>
+        Object.keys(o).map((key) => ({[r[key] || key]: o[key]})
+        ).reduce((a, b) => Object.assign({}, a, b)));
+
+    var replaceMap = { //"abc": "yyj" }
+
+        'Sst.Nos1': 'Sst.Sst.Pcp4',
+        'Sst.Npy.Cort': 'Sst.Sst.Rbp4.Rbp4.Npy.Cort',
+        'Sst.Npy.Zbtb20': 'Sst.Sst.Rbp4.Rbp4.Npy.Cdh13.Pcp4',
+        'Sst.Npy.Serpine2': 'Sst.Sst.Rbp4.Rbp4.Npy.Cdh13.Crhbp',
+        'Sst.Npy.Mgat4c': 'Sst.Sst.Rbp4.Rbp4.Rbp4.Camk2n1.Npy',
+        'Sst.Pnoc.Calb1.Igfbp5': 'Sst.Sst.Rbp4.Rbp4.Rbp4.Camk2n1.Pnoc.Nrsn1',
+        'Sst.Pnoc.Calb1.Pvalb': 'Sst.Sst.Rbp4.Rbp4.Rbp4.Camk2n1.Pnoc.Cdh13',
+        'Sst.Pnoc.Pvalb': 'Sst.Sst.Rbp4.Rbp4.Rbp4.Col25a1',
+        'Sst.Erbb4.Rgs10': 'Sst.Sst.Rbp4.Rgs10',
+        'Sst.Erbb4.Crh': 'Sst.Pvalb.Rbp4.6330403K07Rik.Sst',
+        'Sst.Erbb4.Th': 'Sst.Pvalb.Rbp4.6330403K07Rik.Tac1.Sst',
+        'Pvalb.Tac1.Nr4a2': 'Sst.Pvalb.Rbp4.6330403K07Rik.Tac1.Pvalb',
+        'Pvalb.Tac1.Sst': 'Sst.Pvalb.Rbp4.Pvalb.Sst',
+        'Pvalb.Tac1.Syt2': 'Sst.Pvalb.Rbp4.Pvalb.Pvalb.Rbp4',
+        'Pvalb.Tac1.Akr1c18': 'Sst.Pvalb.Rbp4.Pvalb.Pvalb.Nsg2',
+        'Pvalb.C1ql1.Pvalb': 'Sst.Pvalb.Snca.Pvalb.Pvalb',
+        'Pvalb.C1ql1.Cpne5': 'Sst.Pvalb.Snca.Pvalb.Snca',
+        'Pvalb.C1ql1.Npy': 'Sst.Pvalb.Snca.Npy',
+        'Cacna2d1.Lhx6.Reln': 'Vip.Npy.Cryab.Npy.Nrsn1.Cox6a2',
+        'Cacna2d1.Lhx6.Vwa5a': 'Vip.Npy.Cryab.Npy.Nrsn1.Npy',
+        'Cacna2d1.Ndnf.Npy': 'Vip.Npy.Cryab.Npy.Kit.Npy',
+        'Cacna2d1.Ndnf.Rgs10': 'Vip.Npy.Cryab.Npy.Kit.Cnr1',
+        'Cacna2d1.Ndnf.Cxcl14': 'Vip.Npy.Cryab.Ntng1.Cryab.Cxcl14.Npy',
+        'Calb2.Cryab': 'Vip.Npy.Cryab.Ntng1.Cryab.Cxcl14.Calb2',
+        'Sst.Cryab': 'Vip.Npy.Cryab.Ntng1.Cryab.Sst',
+        'Ntng1.Synpr': 'Vip.Npy.Cryab.Ntng1.Ntng1.Cxcl14.Serpine2',
+        'Ntng1.Rgs10': 'Vip.Npy.Cryab.Ntng1.Ntng1.Cxcl14.Nrip3',
+        'Ntng1.Chrm2': 'Vip.Npy.Cryab.Ntng1.Ntng1.Pcp4',
+        'Cck.Sema5a': 'Vip.Npy.Cnr1.Vip.Ntng1.Ntng1',
+        'Cck.Lmo1.Npy': 'Vip.Npy.Cnr1.Vip.Ntng1.Yjefn3.Trp53i11',
+        'Cck.Calca': 'Vip.Npy.Cnr1.Vip.Ntng1.Yjefn3.Cryab',
+        'Cck.Lmo1.Vip.Fam19a2': 'Vip.Npy.Cnr1.Vip.Vip.Krt73',
+        'Cck.Lmo1.Vip.Crh': 'Vip.Npy.Cnr1.Vip.Vip.Fxyd6.Vip',
+        'Cck.Lmo1.Vip.Tac2': 'Vip.Npy.Cnr1.Vip.Vip.Fxyd6.Npy',
+        'Cck.Lypd1': 'Vip.Npy.Cnr1.Cxcl14.Lypd1',
+        'Cck.Cxcl14.Calb1.Tnfaip8l3': 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Vsnl1.Vsnl1',
+        'Cck.Cxcl14.Calb1.Igfbp5': 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Vsnl1.Npy',
+        'Cck.Cxcl14.Slc17a8': 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Kctd12.Kctd12',
+        'Cck.Cxcl14.Calb1.Kctd12': 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Kctd12.Rgs12.Kctd12',
+        'Cck.Cxcl14.Calb1.Tac2': 'Vip.Npy.Cnr1.Cxcl14.Kctd12.Kctd12.Rgs12.Tac2',
+        'Cck.Cxcl14.Vip': 'Vip.Vip.Cck.Cck.Sncg',
+        'Vip.Crh.Pcp4': 'Vip.Vip.Cck.Cck.Crh.Pcp4',
+        'Vip.Crh.C1ql1': 'Vip.Vip.Cck.Cck.Crh.Apoe',
+        'Calb2.Vip.Gpd1': 'Vip.Vip.Cck.Myl1.Cpne2.Camk2n1',
+        'Calb2.Vip.Igfbp4': 'Vip.Vip.Cck.Myl1.Cpne2.Tac2',
+        'Calb2.Vip.Nos1': 'Vip.Vip.Cck.Myl1.Alcam',
+        'Calb2.Cntnap5a.Rspo3': 'Vip.Vip.Nnat.Cxcl14',
+        'Calb2.Cntnap5a.Vip': 'Vip.Vip.Nnat.Vip.Vsnl1',
+        'Calb2.Cntnap5a.Igfbp6': 'Vip.Vip.Nnat.Vip.Ntng1',
+
+
+    };
+
+    out = replaceKeyInObjectArray(data, replaceMap);
+
+
+    return out
+}
+
