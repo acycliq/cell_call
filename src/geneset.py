@@ -1,8 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
-import utils
-import common
+import src.utils
+import src.common
 import sys
 import logging
 
@@ -17,7 +17,9 @@ logging.basicConfig(
 THE WHOLE CODE HERE NEEDS SOME SERIOUS REVIEWING!!
 YOU BETTER START FROM SCRATCH. IT IS A MESS
 '''
-class GeneSet(common.Base):
+
+
+class GeneSet(src.common.Base):
     def __init__(self, ini):
         my_path = os.path.abspath(os.path.dirname(__file__))
         self._populate(os.path.join(my_path, ini['geneset']))
@@ -71,7 +73,7 @@ class GeneSet(common.Base):
         return self._CellInfo
 
     def _populate(self, path_str):
-        mat = utils.loadmat(path_str)
+        mat = src.utils.loadmat(path_str)
         dictionary = mat["GeneSet"]
         for key in mat["GeneSet"]:
             str_key = "_"+key

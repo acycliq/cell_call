@@ -1,8 +1,8 @@
 import ruamel.yaml
 from pathlib import Path
-import utils
+import src.utils
 import numpy
-from geneset import GeneSet
+from src.geneset import GeneSet
 import os
 import logging
 
@@ -34,7 +34,7 @@ def read(filename, dataset_name):
     print("reading CellMap from %s" % matStr)
     # print(os.path.abspath(os.sep))
     # os.path.join(my_path, '..', matStr)
-    mat = utils.loadmat(os.path.join(my_path, '..', matStr))
+    mat = src.utils.loadmat(os.path.join(my_path, '..', matStr))
     cf['label_image'] = mat["CellMap"]
     cf['gSet'] = GeneSet(cf)
 
