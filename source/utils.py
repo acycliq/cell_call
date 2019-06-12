@@ -1,8 +1,20 @@
 import numpy as np
 from skimage.measure import regionprops
 import scipy.io as spio
-from source import cell
+from source.systemData import Cell
 import os
+import logging
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+CONFIG_FILE = dir_path + '/config.yml'
+# yaml = ruamel.yaml.YAML(typ='safe')
+
+logger = logging.getLogger()
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s:%(levelname)s:%(message)s"
+    )
+
 
 
 def loadmat(filename):
@@ -43,20 +55,27 @@ def _todict(matobj):
     return dict
 
 
-def parse(label_image_path, roi):
+def parse(label_image, roi):
     '''
     Read image and calc some statistics
     :return:
     '''
 
-    print("reading CellMap from %s" % label_image_path)
-    label_image = loadmat(os.path.join(label_image_path))
-    label_image = label_image["CellMap"]
+    xRange = roi["x1"] - roi["x0"]
+    yRange = roi["y1"] - roi["y0"]
+    roiSize = np.array([yRange, xRange]) + 1
+
+    # sanity check
+    assert np.all(label_image.shape == roiSize), 'Image is %d by %d but the ROI implies %d by %d' % (label_image.shape[1], label_image.shape[0], xRange, yRange)
+
     x0 = roi["x0"]
     y0 = roi["y0"]
 
     rp = regionprops(label_image)
     cellYX = np.array([x.centroid for x in rp]) + np.array([y0, x0])
+
+    logger.info(' Shifting the centroids of the cells one pixel on each dimension')
+    cellYX = cellYX + 1.0
 
     cellArea0 = np.array([x.area for x in rp])
     meanCellRadius = np.mean(np.sqrt(cellArea0 / np.pi)) * 0.5
@@ -69,7 +88,7 @@ def parse(label_image_path, roi):
 
     cells = []
     for i, val in enumerate(cellYX):
-        cells.append(cell.Cell(val[1], val[0], i))
+        cells.append(Cell(val[1], val[0], i))
 
     print('done')
 
