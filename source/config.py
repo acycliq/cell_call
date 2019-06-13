@@ -10,4 +10,5 @@ DEFAULT = {
     'rSpot': 2,
     'label_image': '../data/default/CellMap.mat',
     'roi': {"x0": 6150, "x1": 13751, "y0": 12987, "y1": 18457},
+    'geneset': '../data/GeneSet.mat',
 }
