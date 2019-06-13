@@ -1,7 +1,6 @@
 import numpy as np
 from skimage.measure import regionprops
 import scipy.io as spio
-from source.systemData import Cell
 import os
 import logging
 
@@ -55,49 +54,49 @@ def _todict(matobj):
     return dict
 
 
-def parse(label_image, roi):
-    '''
-    Read image and calc some statistics
-    :return:
-    '''
-
-    xRange = roi["x1"] - roi["x0"]
-    yRange = roi["y1"] - roi["y0"]
-    roiSize = np.array([yRange, xRange]) + 1
-
-    # sanity check
-    assert np.all(label_image.shape == roiSize), 'Image is %d by %d but the ROI implies %d by %d' % (label_image.shape[1], label_image.shape[0], xRange, yRange)
-
-    x0 = roi["x0"]
-    y0 = roi["y0"]
-
-    rp = regionprops(label_image)
-    cellYX = np.array([x.centroid for x in rp]) + np.array([y0, x0])
-
-    logger.info(' Shifting the centroids of the cells one pixel on each dimension')
-    cellYX = cellYX + 1.0
-
-    cellArea0 = np.array([x.area for x in rp])
-    meanCellRadius = np.mean(np.sqrt(cellArea0 / np.pi)) * 0.5
-
-    relCellRadius = np.sqrt(cellArea0 / np.pi) / meanCellRadius
-    relCellRadius = np.append(relCellRadius, 1)
-
-    # logger.info("Rebasing CellYX to match the one-based indexed Matlab object. ")
-    # cellYX = cellYX + 1
-
-    cells = []
-    for i, val in enumerate(cellYX):
-        cells.append(Cell(val[1], val[0], i))
-
-    print('done')
-
-    # self.YX = cellYX
-    # self.nC = cellYX.shape[0] + 1
-    # self.meanRadius = meanCellRadius
-    # self.relativeRadius = relCellRadius
-
-    # nom = np.exp(-self.relativeRadius ** 2 / 2) * (1 - np.exp(ini['InsideCellBonus'])) + np.exp(ini['InsideCellBonus'])
-    # denom = np.exp(-0.5) * (1 - np.exp(ini['InsideCellBonus'])) + np.exp(ini['InsideCellBonus'])
-    # CellAreaFactor = nom / denom
-    # self.areaFactor = CellAreaFactor
+# def parse(label_image, roi):
+#     '''
+#     Read image and calc some statistics
+#     :return:
+#     '''
+#
+#     xRange = roi["x1"] - roi["x0"]
+#     yRange = roi["y1"] - roi["y0"]
+#     roiSize = np.array([yRange, xRange]) + 1
+#
+#     # sanity check
+#     assert np.all(label_image.shape == roiSize), 'Image is %d by %d but the ROI implies %d by %d' % (label_image.shape[1], label_image.shape[0], xRange, yRange)
+#
+#     x0 = roi["x0"]
+#     y0 = roi["y0"]
+#
+#     rp = regionprops(label_image)
+#     cellYX = np.array([x.centroid for x in rp]) + np.array([y0, x0])
+#
+#     logger.info(' Shifting the centroids of the cells one pixel on each dimension')
+#     cellYX = cellYX + 1.0
+#
+#     cellArea0 = np.array([x.area for x in rp])
+#     meanCellRadius = np.mean(np.sqrt(cellArea0 / np.pi)) * 0.5
+#
+#     relCellRadius = np.sqrt(cellArea0 / np.pi) / meanCellRadius
+#     relCellRadius = np.append(relCellRadius, 1)
+#
+#     # logger.info("Rebasing CellYX to match the one-based indexed Matlab object. ")
+#     # cellYX = cellYX + 1
+#
+#     cells = []
+#     for i, val in enumerate(cellYX):
+#         cells.append(Cell(val[1], val[0], i))
+#
+#     print('done')
+#
+#     # self.YX = cellYX
+#     # self.nC = cellYX.shape[0] + 1
+#     # self.meanRadius = meanCellRadius
+#     # self.relativeRadius = relCellRadius
+#
+#     # nom = np.exp(-self.relativeRadius ** 2 / 2) * (1 - np.exp(ini['InsideCellBonus'])) + np.exp(ini['InsideCellBonus'])
+#     # denom = np.exp(-0.5) * (1 - np.exp(ini['InsideCellBonus'])) + np.exp(ini['InsideCellBonus'])
+#     # CellAreaFactor = nom / denom
+#     # self.areaFactor = CellAreaFactor
