@@ -1,6 +1,8 @@
 import numpy as np
 from skimage.measure import regionprops
 import os
+import xarray as xr
+from source.utils import loadmat
 import logging
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -21,6 +23,8 @@ class Cell(object):
         self._y = y
         self._spots = None
         self._cellType = None
+        self._areaFactor = None
+        self._relativeRadius = None
 
     @property
     def Id(self):
@@ -62,6 +66,22 @@ class Cell(object):
     def cellType(self, value):
         self._cellType = value
 
+    @property
+    def areaFactor(self):
+        return self._areaFactor
+
+    @areaFactor.setter
+    def areaFactor (self, value):
+        self._areaFactor = value
+
+    @property
+    def relativeRadius(self):
+        return self._relativeRadius
+
+    @relativeRadius.setter
+    def relativeRadius(self, value):
+        self._relativeRadius = value
+
 
 class Cells(object):
     def __init__(self, label_image, config):
@@ -89,11 +109,10 @@ class Cells(object):
 
 class Spot(object):
     def __init__(self, Id, x, y, geneName):
-        print(x)
-        self._Id = None
-        self._x = None
-        self._y = None
-        self._geneName = None
+        self._Id = Id
+        self._x = x
+        self._y = y
+        self._geneName = geneName
         self._cellAssignment = None
 
     @property
@@ -165,12 +184,31 @@ def _parse(label_image, config):
 
     my_list = []
     for i, val in enumerate(cellYX):
-        my_list.append(Cell(val[1], val[0], i))
+        c = Cell(val[1], val[0], i)
+        c.relativeRadius = relCellRadius[i]
+        c.areaFactor = areaFactor[i]
+
+        my_list.append(c)
 
     stats = dict()
     stats['areaFactor'] = areaFactor
     stats['meanRadius'] = meanCellRadius
     stats['relativeRadius'] = relCellRadius
     return my_list, stats
+
+
+def geneSet(config):
+    genesetPath = config['geneset']
+    gs = loadmat(genesetPath)
+    ge = gs["GeneSet"]["GeneExp"]
+    GeneName = gs["GeneSet"]["GeneName"]
+    Class = gs["GeneSet"]["Class"]
+    gene_expression = xr.DataArray(ge, coords=[GeneName, Class], dims=['GeneName', 'Class'])
+
+    logger.info('Writing gene_expression to disk')
+    # gene_expression.to_netcdf('D:\\gene_expression.ncdf')
+
+    ds_disk = xr.open_dataset('D:\\gene_expression.ncdf')
+    print('hello')
 
 
