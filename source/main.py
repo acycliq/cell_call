@@ -1,6 +1,7 @@
-from source.utils import loadmat
 from source.systemData import Cells
-from source.systemData import Spot
+from systemData import Spot
+from utils import loadmat
+from systemData import geneSet
 import source.config as config
 import starfish as sf
 import xarray as xr
@@ -18,12 +19,15 @@ logging.basicConfig(
 
 
 roi = config.DEFAULT['roi']
-label_image_path = config.DEFAULT['label_image']
-saFile = "D:\Dimitris\OneDrive - University College London\dev\Python\spacetx\data_preprocessed\spot_attributes.nc"
 
-label_image = loadmat(os.path.join(label_image_path))
+label_image_path = config.DEFAULT['label_image']
 print("reading CellMap from %s" % label_image_path)
+label_image = loadmat(os.path.join(label_image_path))
 label_image = label_image["CellMap"]
+
+saFile = "../data_preprocessed/spot_attributes.nc"
+
+
 
 cells = Cells(label_image, config.DEFAULT)
 c = cells.collection[0]
@@ -31,9 +35,15 @@ c = cells.collection[0]
 
 logger.info('********* Getting spotattributes from %s **********', saFile)
 sa = sf.types.SpotAttributes(xr.open_dataset(saFile).to_dataframe())
+df = sa.data
 
-spots = [Spot(1, d.x, d.y) for d in sa.data]
-#
-# sa.data.target
-# sa.data.x
-# sa.data.y
+spots = []
+for r in zip(df.index, df.x, df.y, df.target):
+    spots.append(Spot(r[0], r[1], r[2], r[3]))
+
+
+geneSet(config.DEFAULT)
+
+
+print('Done')
+
