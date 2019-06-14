@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from skimage.measure import regionprops
 import os
 import xarray as xr
@@ -197,18 +198,74 @@ def _parse(label_image, config):
     return my_list, stats
 
 
-def geneSet(config):
+def _load_geneset(config):
+    '''
+    :param config:
+    :return:
+    '''
     genesetPath = config['geneset']
     gs = loadmat(genesetPath)
+    logger.info('Loading geneset from %s' % genesetPath)
     ge = gs["GeneSet"]["GeneExp"]
     GeneName = gs["GeneSet"]["GeneName"]
     Class = gs["GeneSet"]["Class"]
+
     gene_expression = xr.DataArray(ge, coords=[GeneName, Class], dims=['GeneName', 'Class'])
+    return gene_expression
 
-    logger.info('Writing gene_expression to disk')
-    # gene_expression.to_netcdf('D:\\gene_expression.ncdf')
 
-    ds_disk = xr.open_dataset('D:\\gene_expression.ncdf')
-    print('hello')
+def _normalise(df):
+    '''
+    removes columns with zero mean (ie all zeros) and then rescales so that
+    total counts remain the same.
+    :param df:
+    :return:
+    '''
+
+    # find the mean for each column
+    col_mean = df.mean(axis=0)
+
+    isZero = col_mean == 0.0
+
+    # remove column if its mean is zero
+    df2 = df.loc[:, ~isZero]
+
+    total = df.sum().sum()
+    total2 = df2.sum().sum()
+
+    # rescale df2 so that the total counts are the same
+    df2 = df2 * total/total2
+
+    # sanity check
+    assert df.sum().sum() == df2.sum().sum()
+
+    return df2
+
+
+
+def geneSet(config, genes):
+    ge = _load_geneset(config)
+
+    # make a dataframe from the xarray
+    df = pd.DataFrame(ge.data, index=ge.GeneName, columns=ge.Class)
+    df = df.loc[genes]
+
+    df = _normalise(df)
+
+    # take the transpose, ie classes-by-genes
+    dft = df.T
+
+    # loop over genes and calc the mean expression within each cell type
+    mean_expression = dft.groupby(level=0).mean().T
+
+    # add the zero cell type
+    mean_expression['Zero'] = np.zeros([mean_expression.shape[0], 1])
+
+    # sort the dataframe
+    mean_expression = mean_expression.sort_index(axis=1).sort_index(axis=0)
+
+    log_mean_expression = np.log(mean_expression + config['SpotReg'])
+
+    return mean_expression
 
 

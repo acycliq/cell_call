@@ -42,7 +42,8 @@ for r in zip(df.index, df.x, df.y, df.target):
     spots.append(Spot(r[0], r[1], r[2], r[3]))
 
 
-geneSet(config.DEFAULT)
+gene_universe = set(sa.data.target)
+geneSet(config.DEFAULT, gene_universe)
 
 
 print('Done')
