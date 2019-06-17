@@ -4,6 +4,7 @@ from skimage.measure import regionprops
 import os
 import xarray as xr
 from source.utils import loadmat
+from sklearn.neighbors import NearestNeighbors
 import logging
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -149,6 +150,13 @@ class Spot(object):
         self._geneName = value
 
 
+class Spots(object):
+    def __init__(self, df):
+        self.list = []
+        for r in zip(df.index, df.x, df.y, df.target):
+            self.list.append(Spot(r[0], r[1], r[2], r[3]))
+
+
 def _parse(label_image, config):
     '''
     Read image and calc some statistics
@@ -247,7 +255,7 @@ def geneSet(config, genes):
     ge = _load_geneset(config)
 
     # make a dataframe from the xarray
-    df = pd.DataFrame(ge.data, index=ge.GeneName, columns=ge.Class)
+    df = pd.DataFrame(ge.data, index=ge.GeneName, columns=ge.Class, dtype='float64')
     df = df.loc[genes]
 
     df = _normalise(df)
@@ -256,16 +264,28 @@ def geneSet(config, genes):
     dft = df.T
 
     # loop over genes and calc the mean expression within each cell type
-    mean_expression = dft.groupby(level=0).mean().T
-
-    # add the zero cell type
-    mean_expression['Zero'] = np.zeros([mean_expression.shape[0], 1])
+    mean_expression = config['Inefficiency'] * dft.groupby(level=0).mean().T
 
     # sort the dataframe
     mean_expression = mean_expression.sort_index(axis=1).sort_index(axis=0)
 
+    # append the zero cell
+    mean_expression['Zero'] = np.zeros([mean_expression.shape[0], 1])
+
     log_mean_expression = np.log(mean_expression + config['SpotReg'])
 
-    return mean_expression
+
+    #
+    # log_mean_expression = np.log(mean_expression + config['SpotReg'])
+
+    return mean_expression, log_mean_expression
+
+
+def closestCell(spotYX, cellYX, config):
+    nN = config['nNeighbors']
+    # for each spot find the closest cell (in fact the top nN-closest cells...)
+    nbrs = NearestNeighbors(n_neighbors=nN, algorithm='ball_tree').fit(cellYX)
+    Dist, Neighbors = nbrs.kneighbors(spotYX)
+
 
 

@@ -1,5 +1,6 @@
 from source.systemData import Cells
 from systemData import Spot
+from systemData import Spots
 from utils import loadmat
 from systemData import geneSet
 import source.config as config
@@ -40,6 +41,8 @@ df = sa.data
 spots = []
 for r in zip(df.index, df.x, df.y, df.target):
     spots.append(Spot(r[0], r[1], r[2], r[3]))
+
+mySpots = Spots(df)
 
 
 gene_universe = set(sa.data.target)
