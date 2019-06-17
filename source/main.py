@@ -1,8 +1,7 @@
 from source.systemData import Cells
-from systemData import Spot
 from systemData import Spots
 from utils import loadmat
-from systemData import geneSet
+from singleCell import geneSet
 import source.config as config
 import starfish as sf
 import xarray as xr
@@ -36,17 +35,14 @@ c = cells.collection[0]
 
 logger.info('********* Getting spotattributes from %s **********', saFile)
 sa = sf.types.SpotAttributes(xr.open_dataset(saFile).to_dataframe())
-df = sa.data
 
-spots = []
-for r in zip(df.index, df.x, df.y, df.target):
-    spots.append(Spot(r[0], r[1], r[2], r[3]))
+spots = Spots(sa.data)
+geneUniv = spots.geneUniv()
+geneSet(geneUniv, config.DEFAULT)
 
-mySpots = Spots(df)
-
-
-gene_universe = set(sa.data.target)
-geneSet(config.DEFAULT, gene_universe)
+spots.collection[0].closestCell(cells.coords())
+spots.closestCell(cells.coords())
+spots.myClosest(cells.nn())
 
 
 print('Done')

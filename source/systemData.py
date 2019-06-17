@@ -1,10 +1,8 @@
 import numpy as np
-import pandas as pd
 from skimage.measure import regionprops
-import os
-import xarray as xr
-from source.utils import loadmat
 from sklearn.neighbors import NearestNeighbors
+import os
+import config
 import logging
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -108,6 +106,17 @@ class Cells(object):
     def collection(self):
         return self._collection
 
+    def coords(self):
+        def xy(d): return d.x, d.y
+        return list(map(xy, self.collection))
+
+    def nn(self):
+        n = config.DEFAULT['nNeighbors']
+        # for each spot find the closest cell (in fact the top nN-closest cells...)
+        nbrs = NearestNeighbors(n_neighbors=n, algorithm='auto').fit(self.coords())
+        return nbrs
+
+
 
 class Spot(object):
     def __init__(self, Id, x, y, geneName):
@@ -149,12 +158,40 @@ class Spot(object):
     def geneName(self, value):
         self._geneName = value
 
+    def closestCell(self, nbrs):
+        _, neighbors = nbrs.kneighbors([[self.x, self.y]])
+
+        return neighbors
+
 
 class Spots(object):
     def __init__(self, df):
-        self.list = []
+        self.collection = []
         for r in zip(df.index, df.x, df.y, df.target):
-            self.list.append(Spot(r[0], r[1], r[2], r[3]))
+            self.collection.append(Spot(r[0], r[1], r[2], r[3]))
+
+    def coords(self):
+        def xy(d): return d.x, d.y
+        return list(map(xy, self.collection))
+
+    def geneUniv(self):
+        _map = map(lambda d: d.geneName, self.collection)
+        return set(_map)
+
+    def closestCell(self, cellXY):
+        n = config.DEFAULT['nNeighbors']
+        # for each spot find the closest cell (in fact the top nN-closest cells...)
+        nbrs = NearestNeighbors(n_neighbors=n, algorithm='auto').fit(cellXY)
+        _, neighbors = nbrs.kneighbors(self.coords())
+        return neighbors
+
+    def myClosest(self, nbrs):
+        _map = map(lambda d: d.closestCell(nbrs), self.collection)
+        return list(_map)
+
+
+
+
 
 
 def _parse(label_image, config):
@@ -204,88 +241,5 @@ def _parse(label_image, config):
     stats['meanRadius'] = meanCellRadius
     stats['relativeRadius'] = relCellRadius
     return my_list, stats
-
-
-def _load_geneset(config):
-    '''
-    :param config:
-    :return:
-    '''
-    genesetPath = config['geneset']
-    gs = loadmat(genesetPath)
-    logger.info('Loading geneset from %s' % genesetPath)
-    ge = gs["GeneSet"]["GeneExp"]
-    GeneName = gs["GeneSet"]["GeneName"]
-    Class = gs["GeneSet"]["Class"]
-
-    gene_expression = xr.DataArray(ge, coords=[GeneName, Class], dims=['GeneName', 'Class'])
-    return gene_expression
-
-
-def _normalise(df):
-    '''
-    removes columns with zero mean (ie all zeros) and then rescales so that
-    total counts remain the same.
-    :param df:
-    :return:
-    '''
-
-    # find the mean for each column
-    col_mean = df.mean(axis=0)
-
-    isZero = col_mean == 0.0
-
-    # remove column if its mean is zero
-    df2 = df.loc[:, ~isZero]
-
-    total = df.sum().sum()
-    total2 = df2.sum().sum()
-
-    # rescale df2 so that the total counts are the same
-    df2 = df2 * total/total2
-
-    # sanity check
-    assert df.sum().sum() == df2.sum().sum()
-
-    return df2
-
-
-
-def geneSet(config, genes):
-    ge = _load_geneset(config)
-
-    # make a dataframe from the xarray
-    df = pd.DataFrame(ge.data, index=ge.GeneName, columns=ge.Class, dtype='float64')
-    df = df.loc[genes]
-
-    df = _normalise(df)
-
-    # take the transpose, ie classes-by-genes
-    dft = df.T
-
-    # loop over genes and calc the mean expression within each cell type
-    mean_expression = config['Inefficiency'] * dft.groupby(level=0).mean().T
-
-    # sort the dataframe
-    mean_expression = mean_expression.sort_index(axis=1).sort_index(axis=0)
-
-    # append the zero cell
-    mean_expression['Zero'] = np.zeros([mean_expression.shape[0], 1])
-
-    log_mean_expression = np.log(mean_expression + config['SpotReg'])
-
-
-    #
-    # log_mean_expression = np.log(mean_expression + config['SpotReg'])
-
-    return mean_expression, log_mean_expression
-
-
-def closestCell(spotYX, cellYX, config):
-    nN = config['nNeighbors']
-    # for each spot find the closest cell (in fact the top nN-closest cells...)
-    nbrs = NearestNeighbors(n_neighbors=nN, algorithm='ball_tree').fit(cellYX)
-    Dist, Neighbors = nbrs.kneighbors(spotYX)
-
 
 
