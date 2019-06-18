@@ -3,6 +3,7 @@ from systemData import Spots
 from utils import loadmat
 from singleCell import geneSet
 import source.config as config
+import callCells
 import starfish as sf
 import xarray as xr
 import os
@@ -40,10 +41,20 @@ spots = Spots(sa.data)
 geneUniv = spots.geneUniv()
 geneSet(geneUniv, config.DEFAULT)
 
-spots.collection[0].closestCell(cells.coords())
-spots.closestCell(cells.coords())
+logger.info('step1')
+spots.collection[0].closestCell(cells.nn())
+# spots.closestCell(cells.coords())
+
+logger.info('step2')
 spots.myClosest(cells.nn())
 
+logger.info('step3')
+callCells.closestCell(spots.coords(), cells.coords(), config.DEFAULT)
 
-print('Done')
+
+logger.info('step4')
+for s in spots.collection:
+    s.closestCell(cells.nn())
+
+logger.info('Done')
 
