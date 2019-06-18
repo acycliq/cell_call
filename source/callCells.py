@@ -13,12 +13,5 @@ logging.basicConfig(
     )
 
 
-def closestCell(spotYX, cellYX, config):
-    n = config['nNeighbors']
-    # for each spot find the closest cell (in fact the top nN-closest cells...)
-    nbrs = NearestNeighbors(n_neighbors=n, algorithm='ball_tree').fit(cellYX)
-    dist, neighbors = nbrs.kneighbors(spotYX)
-
-    return dist, neighbors
 
 
