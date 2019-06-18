@@ -45,16 +45,11 @@ logger.info('step1')
 spots.collection[0].closestCell(cells.nn())
 # spots.closestCell(cells.coords())
 
+
 logger.info('step2')
-spots.myClosest(cells.nn())
+spots.neighborCells(cells, config.DEFAULT)
+spots.cellProb(label_image, config.DEFAULT)
 
-logger.info('step3')
-callCells.closestCell(spots.coords(), cells.coords(), config.DEFAULT)
-
-
-logger.info('step4')
-for s in spots.collection:
-    s.closestCell(cells.nn())
-
+print(spots.collection[0].parentCell)
 logger.info('Done')
 

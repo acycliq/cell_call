@@ -1,6 +1,7 @@
 import numpy as np
 from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
+import utils
 import os
 import config
 import logging
@@ -106,14 +107,17 @@ class Cells(object):
     def collection(self):
         return self._collection
 
-    def coords(self):
-        def xy(d): return d.x, d.y
-        return list(map(xy, self.collection))
+    def yxCoords(self):
+        def yx(d): return d.y, d.x
+        return list(map(yx, self.collection))
+
+    def icoords(self):
+        return ((d.x, d.y) for d in self.collection)
 
     def nn(self):
         n = config.DEFAULT['nNeighbors']
         # for each spot find the closest cell (in fact the top nN-closest cells...)
-        nbrs = NearestNeighbors(n_neighbors=n, algorithm='auto').fit(self.coords())
+        nbrs = NearestNeighbors(n_neighbors=n, algorithm='ball_tree').fit(self.yxCoords())
         return nbrs
 
 
@@ -125,6 +129,7 @@ class Spot(object):
         self._y = y
         self._geneName = geneName
         self._cellAssignment = None
+        self._parentCell = None
 
     @property
     def Id(self):
@@ -158,6 +163,14 @@ class Spot(object):
     def geneName(self, value):
         self._geneName = value
 
+    @property
+    def parentCell(self):
+        return self._parentCell
+
+    @parentCell.setter
+    def parentCell(self, value):
+        self._parentCell = value
+
     def closestCell(self, nbrs):
         _, neighbors = nbrs.kneighbors([[self.x, self.y]])
 
@@ -166,31 +179,58 @@ class Spot(object):
 
 class Spots(object):
     def __init__(self, df):
+        self._neighbors = None
         self.collection = []
         for r in zip(df.index, df.x, df.y, df.target):
             self.collection.append(Spot(r[0], r[1], r[2], r[3]))
 
-    def coords(self):
-        def xy(d): return d.x, d.y
-        return list(map(xy, self.collection))
+    @property
+    def neighbors(self):
+        return self._neighbors
+
+    @neighbors.setter
+    def neighbors(self, value):
+        self._neighbors = value
+
+    def yxCoords(self):
+        def yx(d): return d.y, d.x
+        return list(map(yx, self.collection))
+
+    def icoords(self):
+        return ((d.x, d.y) for d in self.collection)
 
     def geneUniv(self):
         _map = map(lambda d: d.geneName, self.collection)
         return set(_map)
 
-    def closestCell(self, cellXY):
-        n = config.DEFAULT['nNeighbors']
+    def neighborCells(self, cells, config):
+        n = config['nNeighbors']
+        spotYX = self.yxCoords()
         # for each spot find the closest cell (in fact the top nN-closest cells...)
-        nbrs = NearestNeighbors(n_neighbors=n, algorithm='auto').fit(cellXY)
-        _, neighbors = nbrs.kneighbors(self.coords())
-        return neighbors
+        nbrs = cells.nn()
+        _, neighbors = nbrs.kneighbors(spotYX)
 
-    def myClosest(self, nbrs):
-        _map = map(lambda d: d.closestCell(nbrs), self.collection)
-        return list(_map)
+        logger.info('Populating parent cells')
+        for i, d in enumerate(neighbors):
+            self.collection[i].parentCell = d
+        logger.info('Parent cells filled')
+        self._neighbors = neighbors
 
+    def cellProb(self, label_image, config):
+        roi = config['roi']
+        x0 = roi["x0"]
+        y0 = roi["y0"]
+        yxCoords = self.yxCoords()
+        nS = len(yxCoords)
+        nN = config['nNeighbors'] + 1
+        idx = np.array(yxCoords) - np.array([y0, x0])  # First move the origin at (0, 0)
 
-
+        SpotInCell = utils.label_spot(label_image, idx.T)
+        neighbors = self.neighbors
+        pSpotNeighb = np.zeros([nS, nN])
+        pSpotNeighb[neighbors + 1 == SpotInCell[:, None]] = 1
+        pSpotNeighb[SpotInCell == 0, -1] = 1
+        return pSpotNeighb
 
 
 
