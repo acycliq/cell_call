@@ -127,9 +127,11 @@ class Cells(object):
         nG = len(spots.geneUniv())
         nN = spots.neighborCells["id"].shape[1]
         CellGeneCount = np.zeros([nC, nG])
+        geneNames = spots.geneNames()
+        [_, ispot, _] = np.unique(geneNames, return_inverse=True, return_counts=True)
         for n in range(nN - 1):
             c = spots.neighborCells["id"][:, n]
-            group_idx = np.vstack((c[None, :], spots.spotId()[None, :]))
+            group_idx = np.vstack((c[None, :], ispot[None, :]))
             a = spots.neighborCells["prob"][:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
@@ -221,6 +223,9 @@ class Spots(object):
     def geneUniv(self):
         _map = map(lambda d: d.geneName, self.collection)
         return set(_map)
+
+    def geneNames(self):
+        return list(map(lambda d: d.geneName, self.collection))
 
     def spotId(self):
         temp = list(map(lambda d: d.Id, self.collection))
