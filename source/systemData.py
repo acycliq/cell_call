@@ -4,6 +4,7 @@ from sklearn.neighbors import NearestNeighbors
 import utils
 import os
 import config
+import numpy_groupies as npg
 import logging
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -120,6 +121,23 @@ class Cells(object):
         nbrs = NearestNeighbors(n_neighbors=n, algorithm='ball_tree').fit(self.yxCoords())
         return nbrs
 
+    def geneCount(self, spots):
+        # start = time.time()
+        nC = len(self.yxCoords())
+        nG = len(spots.geneUniv())
+        nN = spots.neighborCells["id"].shape[1]
+        CellGeneCount = np.zeros([nC, nG])
+        for n in range(nN - 1):
+            c = spots.neighborCells["id"][:, n]
+            group_idx = np.vstack((c[None, :], spots.spotId()[None, :]))
+            a = spots.neighborCells["prob"][:, n]
+            accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
+            CellGeneCount = CellGeneCount + accumarray
+        # end = time.time()
+        # print('time in geneCount: ', end - start)
+        return CellGeneCount
+
+
 
 
 class Spot(object):
@@ -181,6 +199,7 @@ class Spots(object):
     def __init__(self, df):
         self._neighbors = None
         self.collection = []
+        self.neighborCells = dict()
         for r in zip(df.index, df.x, df.y, df.target):
             self.collection.append(Spot(r[0], r[1], r[2], r[3]))
 
@@ -203,7 +222,11 @@ class Spots(object):
         _map = map(lambda d: d.geneName, self.collection)
         return set(_map)
 
-    def neighborCells(self, cells, config):
+    def spotId(self):
+        temp = list(map(lambda d: d.Id, self.collection))
+        return np.array(temp)
+
+    def _neighborCells(self, cells, config):
         spotYX = self.yxCoords()
         n = config['nNeighbors']
         numCells = len(cells.collection)
@@ -224,24 +247,33 @@ class Spots(object):
             self.collection[i].parentCell = d
         logger.info('Parent cells filled')
 
-        # finally update the attribute
-        self._neighbors = neighbors
+        # finally return
+        return neighbors
 
-    def cellProb(self, label_image, config):
+    def _cellProb(self, label_image, config):
         roi = config['roi']
         x0 = roi["x0"]
         y0 = roi["y0"]
         yxCoords = self.yxCoords()
+        neighbors = self.neighborCells['id']
         nS = len(yxCoords)
         nN = config['nNeighbors'] + 1
-        idx = np.array(yxCoords) - np.array([y0, x0]) # First move the origin at (0, 0)
 
+        idx = np.array(yxCoords) - np.array([y0, x0]) # First move the origin at (0, 0)
         SpotInCell = utils.label_spot(label_image, idx.T)
-        neighbors = self.neighbors
+        # sanity check
+        sanity_check = neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
+        assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
+
         pSpotNeighb = np.zeros([nS, nN])
         pSpotNeighb[neighbors + 1 == SpotInCell[:, None]] = 1
         pSpotNeighb[SpotInCell == 0, -1] = 1
         return pSpotNeighb
+
+    def neighCells(self, cells, label_image, config):
+        self.neighborCells['id'] = self._neighborCells(cells, config)
+        self.neighborCells['prob'] = self._cellProb(label_image, config)
+        # self.neighborCells = _neighborCells
 
 
 

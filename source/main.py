@@ -55,8 +55,11 @@ spots.collection[0].closestCell(cells.nn())
 
 
 logger.info('step2')
-spots.neighborCells(cells, config.DEFAULT)
-spots.cellProb(label_image, config.DEFAULT)
+# spots._neighborCells(cells, config.DEFAULT)
+# spots._cellProb(label_image, config.DEFAULT)
+# cells.geneCount(spots)
+spots.neighCells(cells, label_image, config.DEFAULT)
+cells.geneCount(spots)
 
 print(spots.collection[0].parentCell)
 logger.info('Done')
