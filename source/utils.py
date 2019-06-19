@@ -86,7 +86,7 @@ def label_spot(a, idx):
     dim[:len(a.shape)] = a.shape
 
     # output array
-    out = np.nan * np.ones(idx.shape[1])
+    out = np.nan * np.ones(idx.shape[1], dtype=int)
 
     # find the ones within bounds:
     is_within = np.all(idx.T <= dim-1, axis=1)
