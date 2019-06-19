@@ -204,16 +204,27 @@ class Spots(object):
         return set(_map)
 
     def neighborCells(self, cells, config):
-        n = config['nNeighbors']
         spotYX = self.yxCoords()
+        n = config['nNeighbors']
+        numCells = len(cells.collection)
+        numSpots = len(spotYX)
+        neighbors = np.zeros((numSpots, n+1), dtype=int
+                        )
         # for each spot find the closest cell (in fact the top nN-closest cells...)
         nbrs = cells.nn()
-        _, neighbors = nbrs.kneighbors(spotYX)
+        _, _neighbors = nbrs.kneighbors(spotYX)
 
+        # populate temp with the neighbours
+        neighbors[:, :-1] = _neighbors
+        # last column is for misreads. Id is dummy id and set to the
+        # number of cells (which so-far should always be unallocated)
+        neighbors[:, -1] = numCells
         logger.info('Populating parent cells')
         for i, d in enumerate(neighbors):
             self.collection[i].parentCell = d
         logger.info('Parent cells filled')
+
+        # finally update the attribute
         self._neighbors = neighbors
 
     def cellProb(self, label_image, config):
@@ -223,7 +234,7 @@ class Spots(object):
         yxCoords = self.yxCoords()
         nS = len(yxCoords)
         nN = config['nNeighbors'] + 1
-        idx = np.array(yxCoords) - np.array([y0, x0])  # First move the origin at (0, 0)
+        idx = np.array(yxCoords) - np.array([y0, x0]) # First move the origin at (0, 0)
 
         SpotInCell = utils.label_spot(label_image, idx.T)
         neighbors = self.neighbors
@@ -254,8 +265,8 @@ def _parse(label_image, config):
     rp = regionprops(label_image)
     cellYX = np.array([x.centroid for x in rp]) + np.array([y0, x0])
 
-    logger.info(' Shifting the centroids of the cells one pixel on each dimension')
-    cellYX = cellYX + 1.0
+    # logger.info(' Shifting the centroids of the cells one pixel on each dimension')
+    # cellYX = cellYX + 1.0
 
     cellArea0 = np.array([x.area for x in rp])
     meanCellRadius = np.mean(np.sqrt(cellArea0 / np.pi)) * 0.5;

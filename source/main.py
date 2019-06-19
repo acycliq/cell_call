@@ -37,7 +37,15 @@ c = cells.collection[0]
 logger.info('********* Getting spotattributes from %s **********', saFile)
 sa = sf.types.SpotAttributes(xr.open_dataset(saFile).to_dataframe())
 
+logger.warning('** WARNING WARNING WARNING ***')
+logger.warning('** Spot coordinates are populated from a matlab file (ie 1-based) ***')
+logger.warning('** Removing one pixel from both X and Y coordinates ***')
+sa.data['x'] = sa.data.x - 1
+sa.data['y'] = sa.data.y - 1
+logger.warning('** REMOVE this adjustment in the LIVE CODE ***')
+
 spots = Spots(sa.data)
+
 geneUniv = spots.geneUniv()
 geneSet(geneUniv, config.DEFAULT)
 
