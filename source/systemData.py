@@ -5,6 +5,7 @@ import utils
 import os
 import config
 import numpy_groupies as npg
+import time
 import logging
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -122,7 +123,13 @@ class Cells(object):
         return nbrs
 
     def geneCount(self, spots):
-        # start = time.time()
+        '''
+        Produces a matrix numCells-by-numGenes where element at position (c,g) keeps the expected
+        number of gene g  in cell c.
+        :param spots:
+        :return:
+        '''
+        start = time.time()
         nC = len(self.yxCoords())
         nG = len(spots.geneUniv())
         nN = spots.neighborCells["id"].shape[1]
@@ -135,9 +142,36 @@ class Cells(object):
             a = spots.neighborCells["prob"][:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
-        # end = time.time()
-        # print('time in geneCount: ', end - start)
+        end = time.time()
+        print('time in geneCount: ', end - start)
         return CellGeneCount
+
+    # def cellTypeProb(self, spots, meanExpression, config):
+    #     '''
+    #     return a an array of size numCells-by-numCellTypes where element in position [i,j]
+    #     keeps the probability that cell i has cell type j
+    #     :param spots:
+    #     :param config:
+    #     :return:
+    #     '''
+    #     spots.calcGamma(ini, self, genes, klasses)
+    #
+    #     ScaledExp = genes.expression * genes.expectedGamma[None, :, None] * self.areaFactor[:, None, None] + ini[
+    #         'SpotReg']
+    #     pNegBin = ScaledExp / (ini['rSpot'] + ScaledExp)
+    #     CellGeneCount = self.geneCount(spots, genes)
+    #     # contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
+    #     contr = utils.negBinLoglik(CellGeneCount[:, :, None], ini['rSpot'], pNegBin)
+    #     # assert np.all(nb_contr == contr)
+    #     wCellClass = np.sum(contr, axis=1) + klasses.logPrior
+    #     pCellClass = utils.softmax(wCellClass)
+    #
+    #     self.classProb = pCellClass
+    #     logger.info('Cell 0 is classified as %s with prob %4.8f' % (
+    #     klasses.name[np.argmax(wCellClass[0, :])], pCellClass[0, np.argmax(wCellClass[0, :])]))
+    #     logger.info('cell ---> klass probabilities updated')
+    #     return pCellClass
+
 
 
 
@@ -236,8 +270,7 @@ class Spots(object):
         n = config['nNeighbors']
         numCells = len(cells.collection)
         numSpots = len(spotYX)
-        neighbors = np.zeros((numSpots, n+1), dtype=int
-                        )
+        neighbors = np.zeros((numSpots, n+1), dtype=int)
         # for each spot find the closest cell (in fact the top nN-closest cells...)
         nbrs = cells.nn()
         _, _neighbors = nbrs.kneighbors(spotYX)

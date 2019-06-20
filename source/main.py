@@ -49,7 +49,14 @@ logger.warning('*******************************')
 spots = Spots(sa.data)
 
 geneUniv = spots.geneUniv()
-geneSet(geneUniv, config.DEFAULT)
+mean_expression, log_mean_expression = geneSet(geneUniv, config.DEFAULT)
+classNames = mean_expression.columns.values
+geneNames = mean_expression.index.values
+ds = xr.Dataset(
+    data_vars={'mean_expression': (('geneName', 'className'), mean_expression)},
+    coords={'geneName': geneNames,
+            'classname': classNames}
+)
 
 logger.info('step1')
 spots.collection[0].closestCell(cells.nn())
@@ -61,8 +68,9 @@ logger.info('step2')
 # spots._cellProb(label_image, config.DEFAULT)
 # cells.geneCount(spots)
 spots.neighCells(cells, label_image, config.DEFAULT)
-cells.geneCount(spots)
+CellGeneCount = cells.geneCount(spots)
 
+# cells.cellTypeProb(spots, meanExpression, config)
 print(spots.collection[0].parentCell)
 logger.info('Done')
 
