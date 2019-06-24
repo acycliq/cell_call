@@ -1,4 +1,6 @@
 import numpy as np
+import  pandas as pd
+import xarray as xr
 from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
 import utils
@@ -89,9 +91,10 @@ class Cell(object):
 class Cells(object):
     def __init__(self, label_image, config):
         self._collection, _stats = _parse(label_image, config)
-        self._areaFactor = _stats['areaFactor']
+        _id = self.Id()
+        self._areaFactor = xr.DataArray(_stats['areaFactor'], coords=[_id], dims=['cell_id'])
         self._meanRadius = _stats['meanRadius']
-        self._relativeRadius = _stats['relativeRadius']
+        self._relativeRadius = xr.DataArray(_stats['relativeRadius'], coords=[_id], dims=['cell_id'])
 
     @property
     def areaFactor(self):
@@ -110,8 +113,12 @@ class Cells(object):
         return self._collection
 
     def yxCoords(self):
-        def yx(d): return d.y, d.x
-        return list(map(yx, self.collection))
+        # def yx(d): return d.y, d.x
+        # return [(d.x, d.y) for d in self.collection if np.nan not in (d.x, d.y)]
+        return [(d.y, d.x) for d in self.collection]
+
+    def Id(self):
+        return [d.Id for d in self.collection]
 
     def icoords(self):
         return ((d.x, d.y) for d in self.collection)
@@ -119,7 +126,8 @@ class Cells(object):
     def nn(self):
         n = config.DEFAULT['nNeighbors']
         # for each spot find the closest cell (in fact the top nN-closest cells...)
-        nbrs = NearestNeighbors(n_neighbors=n, algorithm='ball_tree').fit(self.yxCoords())
+        coords = [d for d in self.yxCoords() if np.nan not in d]
+        nbrs = NearestNeighbors(n_neighbors=n, algorithm='ball_tree').fit(coords)
         return nbrs
 
     def geneCount(self, spots):
@@ -132,10 +140,11 @@ class Cells(object):
         start = time.time()
         nC = len(self.yxCoords())
         nG = len(spots.geneUniv())
+        _id = self.Id()
         nN = spots.neighborCells["id"].shape[1]
         CellGeneCount = np.zeros([nC, nG])
         geneNames = spots.geneNames()
-        [_, ispot, _] = np.unique(geneNames, return_inverse=True, return_counts=True)
+        [name, ispot, _] = np.unique(geneNames, return_inverse=True, return_counts=True)
         for n in range(nN - 1):
             c = spots.neighborCells["id"][:, n]
             group_idx = np.vstack((c[None, :], ispot[None, :]))
@@ -144,35 +153,42 @@ class Cells(object):
             CellGeneCount = CellGeneCount + accumarray
         end = time.time()
         print('time in geneCount: ', end - start)
+        CellGeneCount = xr.DataArray(CellGeneCount, coords=[_id, name], dims=['cell_id', 'gene_name'])
+        self.CellGeneCount = CellGeneCount
         return CellGeneCount
 
-    # def cellTypeProb(self, spots, meanExpression, config):
-    #     '''
-    #     return a an array of size numCells-by-numCellTypes where element in position [i,j]
-    #     keeps the probability that cell i has cell type j
-    #     :param spots:
-    #     :param config:
-    #     :return:
-    #     '''
-    #     spots.calcGamma(ini, self, genes, klasses)
-    #
-    #     ScaledExp = genes.expression * genes.expectedGamma[None, :, None] * self.areaFactor[:, None, None] + ini[
-    #         'SpotReg']
-    #     pNegBin = ScaledExp / (ini['rSpot'] + ScaledExp)
-    #     CellGeneCount = self.geneCount(spots, genes)
-    #     # contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
-    #     contr = utils.negBinLoglik(CellGeneCount[:, :, None], ini['rSpot'], pNegBin)
-    #     # assert np.all(nb_contr == contr)
-    #     wCellClass = np.sum(contr, axis=1) + klasses.logPrior
-    #     pCellClass = utils.softmax(wCellClass)
-    #
-    #     self.classProb = pCellClass
-    #     logger.info('Cell 0 is classified as %s with prob %4.8f' % (
-    #     klasses.name[np.argmax(wCellClass[0, :])], pCellClass[0, np.argmax(wCellClass[0, :])]))
-    #     logger.info('cell ---> klass probabilities updated')
-    #     return pCellClass
+    def assignType(self, spots, prior, ds, cfg):
+        '''
+        return a an array of size numCells-by-numCellTypes where element in position [i,j]
+        keeps the probability that cell i has cell type j
+        :param spots:
+        :param config:
+        :return:
+        '''
+        expected_gamma, expected_loggamma = spots.calcGamma(self, ds, cfg)
+
+        ScaledExp = ds.expression * spots.expectedGamma[None, :, None] * self.areaFactor[:, None, None] + cfg['SpotReg']
+        pNegBin = ScaledExp / (cfg['rSpot'] + ScaledExp)
+        # contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
+        contr = utils.negBinLoglik(spots.CellGeneCount[:, :, None], cfg['rSpot'], pNegBin)
+        # assert np.all(nb_contr == contr)
+        wCellClass = np.sum(contr, axis=1) + prior.logvalues
+        pCellClass = utils.softmax(wCellClass)
+
+        self.classProb = pCellClass
+        logger.info('Cell 0 is classified as %s with prob %4.8f' % (
+        prior.name[np.argmax(wCellClass[0, :])], pCellClass[0, np.argmax(wCellClass[0, :])]))
+        logger.info('cell ---> klass probabilities updated')
+        return pCellClass
 
 
+class Prior(object):
+    def __init__(self, cell_type):
+        # list(dict.fromkeys(cell_type_name))
+        self.name = cell_type
+        self.nK = self.name.shape[0]
+        self.value = np.append([.5 * np.ones(self.nK - 1) / self.nK], 0.5)
+        self.logvalue = np.log(self.value)
 
 
 
@@ -265,9 +281,9 @@ class Spots(object):
         temp = list(map(lambda d: d.Id, self.collection))
         return np.array(temp)
 
-    def _neighborCells(self, cells, config):
+    def _neighborCells(self, cells, cfg):
         spotYX = self.yxCoords()
-        n = config['nNeighbors']
+        n = cfg['nNeighbors']
         numCells = len(cells.collection)
         numSpots = len(spotYX)
         neighbors = np.zeros((numSpots, n+1), dtype=int)
@@ -288,14 +304,14 @@ class Spots(object):
         # finally return
         return neighbors
 
-    def _cellProb(self, label_image, config):
-        roi = config['roi']
+    def _cellProb(self, label_image, cfg):
+        roi = cfg['roi']
         x0 = roi["x0"]
         y0 = roi["y0"]
         yxCoords = self.yxCoords()
         neighbors = self.neighborCells['id']
         nS = len(yxCoords)
-        nN = config['nNeighbors'] + 1
+        nN = cfg['nNeighbors'] + 1
 
         idx = np.array(yxCoords) - np.array([y0, x0]) # First move the origin at (0, 0)
         SpotInCell = utils.label_spot(label_image, idx.T)
@@ -312,6 +328,15 @@ class Spots(object):
         self.neighborCells['id'] = self._neighborCells(cells, config)
         self.neighborCells['prob'] = self._cellProb(label_image, config)
         # self.neighborCells = _neighborCells
+
+    def calcGamma(self, cells, ds, ini):
+        scaled_mean = ds.mean_expression * cells.areaFactor
+        rho = ini['rSpot'] + cells.geneCount(self)
+        beta = ini['rSpot'] + scaled_mean
+        expected_gamma = utils.gammaExpectation(rho[:, :, None], beta)
+        expected_loggamma = utils.logGammaExpectation(rho[:, :, None], beta)
+
+        return expected_gamma, expected_loggamma
 
 
 
@@ -342,6 +367,8 @@ def _parse(label_image, config):
     meanCellRadius = np.mean(np.sqrt(cellArea0 / np.pi)) * 0.5;
 
     relCellRadius = np.sqrt(cellArea0 / np.pi) / meanCellRadius
+
+    # append 1 for the misreads
     relCellRadius = np.append(relCellRadius, 1)
 
     nom = np.exp(-relCellRadius ** 2 / 2) * (1 - np.exp(config['InsideCellBonus'])) + np.exp(config['InsideCellBonus'])
@@ -356,6 +383,11 @@ def _parse(label_image, config):
         c.areaFactor = areaFactor[i]
 
         my_list.append(c)
+
+    missread = Cell(np.nan, np.nan, len(cellYX))
+    missread.relativeRadius = relCellRadius[i]
+    missread.areaFactor = areaFactor[i]
+    my_list.append(missread)
 
     stats = dict()
     stats['areaFactor'] = areaFactor

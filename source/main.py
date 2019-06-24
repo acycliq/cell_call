@@ -1,5 +1,6 @@
 from source.systemData import Cells
 from systemData import Spots
+from systemData import Prior
 from utils import loadmat
 from singleCell import geneSet
 import source.config as config
@@ -53,10 +54,12 @@ mean_expression, log_mean_expression = geneSet(geneUniv, config.DEFAULT)
 classNames = mean_expression.columns.values
 geneNames = mean_expression.index.values
 ds = xr.Dataset(
-    data_vars={'mean_expression': (('geneName', 'className'), mean_expression)},
-    coords={'geneName': geneNames,
-            'classname': classNames}
+    data_vars={'mean_expression': (('gene_name', 'class_name'), mean_expression)},
+    coords={'gene_name': geneNames,
+            'class_name': classNames}
 )
+
+prior = Prior(classNames)
 
 logger.info('step1')
 spots.collection[0].closestCell(cells.nn())
@@ -70,7 +73,7 @@ logger.info('step2')
 spots.neighCells(cells, label_image, config.DEFAULT)
 CellGeneCount = cells.geneCount(spots)
 
-# cells.cellTypeProb(spots, meanExpression, config)
+cells.assignType(spots, prior, ds, config.DEFAULT)
 print(spots.collection[0].parentCell)
 logger.info('Done')
 
