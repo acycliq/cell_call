@@ -1,4 +1,6 @@
 import numpy as np
+import numexpr as ne
+import scipy
 from skimage.measure import regionprops
 import scipy.io as spio
 import os
@@ -100,3 +102,85 @@ def label_spot(a, idx):
     out[is_within & is_positive] = a.ravel()[flat_idx]
 
     return out
+
+
+def gammaExpectation(r, b):
+    '''
+    :param r:
+    :param b:
+    :return: Expectetation of a rv X following a Gamma(r,b) distribution with pdf
+    f(x;\alpha ,\beta )= \frac{\beta^r}{\Gamma(r)} x^{r-1}e^{-\beta x}
+    '''
+    out = np.empty(b.shape)
+    return ne.evaluate('r/b', out=out)
+
+
+def logGammaExpectation(r, b):
+    '''
+    :param r:
+    :param b:
+    :return: Expectetation of a rv log(X) where X follows a Gamma(r,b) distribution
+    '''
+    # start = time.time()
+    # out = scipy.special.psi(r) - np.log(b)
+    # end = time.time()
+    # print('time in logGammaExpectation:', end - start)
+    # start = time.time()
+    logb = np.empty(b.shape)
+    ne.evaluate("log(b)", out=logb)
+    out = scipy.special.psi(r) - logb
+    # end = time.time()
+    # print('time in logGammaExpectation ne:', end - start)
+    return out
+
+
+def negBinLoglik(x, r, p):
+    '''
+    Negative Binomial loglikehood
+    :param x:
+    :param r:
+    :param p:
+    :return:
+    '''
+    out=np.zeros(p.shape)
+    # start = time.time()
+    # out = x * np.log(p, where=x.astype(bool)) + r * np.log(1-p)
+    # end = time.time()
+    # print('time in negBinLoglik:', end - start)
+    # start = time.time()
+    ne.evaluate("x * log(p) + r * log(1 - p)", out=out)
+    # end = time.time()
+    # print('time in negBinLoglik - ne:', end - start)
+    return out
+
+@nb.njit(parallel=True, fastmath=True)
+def nb_negBinLoglik(x, r, p):
+    '''
+    Negative Binomial loglikehood
+    :param x:
+    :param r:
+    :param p:
+    :return:
+    '''
+    out = np.empty(p.shape,p.dtype)
+
+    for i in nb.prange(p.shape[0]):
+        for j in range(p.shape[1]):
+            if x[i, j, 0] != 0.:
+                x_ = x[i, j, 0]
+                for k in range(p.shape[2]):
+                    out[i, j, k] = x_ * np.log(p[i, j, k]) + r * np.log(1.-p[i, j, k])
+            else:
+                for k in range(p.shape[2]):
+                    out[i, j, k] = r * np.log(1.-p[i, j, k])
+
+    return out
+
+
+def isConverged(spots, p0, tol):
+    p1 = spots.neighbors['prob']
+    if p0 is None:
+        p0 = np.zeros(p1.shape)
+    delta = np.max(np.abs(p1 - p0))
+    converged = (delta < tol)
+    return converged, delta
