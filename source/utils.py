@@ -1,5 +1,6 @@
 import numpy as np
 import numexpr as ne
+import numba as nb
 import scipy
 from skimage.measure import regionprops
 import scipy.io as spio
