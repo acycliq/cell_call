@@ -330,11 +330,11 @@ class Spots(object):
         # self.neighborCells = _neighborCells
 
     def calcGamma(self, cells, ds, ini):
-        scaled_mean = ds.mean_expression * cells.areaFactor
+        scaled_mean = cells.areaFactor * ds.mean_expression
         rho = ini['rSpot'] + cells.geneCount(self)
         beta = ini['rSpot'] + scaled_mean
-        expected_gamma = utils.gammaExpectation(rho[:, :, None], beta)
-        expected_loggamma = utils.logGammaExpectation(rho[:, :, None], beta)
+        expected_gamma = utils.gammaExpectation(rho.data[:, :, None], beta.data)
+        expected_loggamma = utils.logGammaExpectation(rho.data[:, :, None], beta.data)
 
         return expected_gamma, expected_loggamma
 
