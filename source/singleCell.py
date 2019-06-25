@@ -73,14 +73,21 @@ def geneSet(genes, config):
     dft = df.T
 
     # loop over genes and calc the mean expression within each cell type
-    mean_expression = config['Inefficiency'] * dft.groupby(level=0).mean().T
+    mean_expression = config['Inefficiency'] * dft.groupby(level=0, sort=False).mean().T
 
-    # sort the dataframe
-    mean_expression = mean_expression.sort_index(axis=1).sort_index(axis=0)
+    # sort the dataframe (the index only)
+    mean_expression = mean_expression.sort_index(axis=0)
 
     # append the zero cell
     mean_expression['Zero'] = np.zeros([mean_expression.shape[0], 1])
 
     log_mean_expression = np.log(mean_expression + config['SpotReg'])
 
-    return mean_expression, log_mean_expression
+    ds = xr.Dataset(
+        data_vars={'mean_expression': (('gene_name', 'class_name'), mean_expression),
+                   'log_mean_expression': (('gene_name', 'class_name'), log_mean_expression)},
+        coords={'gene_name': mean_expression.index.values,
+                'class_name': mean_expression.columns.values}
+    )
+
+    return ds
