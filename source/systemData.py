@@ -90,44 +90,12 @@ class Cell(object):
 
 class Cells(object):
     def __init__(self, label_image, config):
-        self._collection, _stats = _parse(label_image, config)
-        _id = self.Id()
-        self._areaFactor = xr.DataArray(_stats['areaFactor'], coords=[_id], dims=['cell_id'])
-        self._meanRadius = _stats['meanRadius']
-        self._relativeRadius = xr.DataArray(_stats['relativeRadius'], coords=[_id], dims=['cell_id'])
-
-    @property
-    def areaFactor(self):
-        return self._areaFactor
-
-    @property
-    def meanRadius(self):
-        return self._meanRadius
-
-    @property
-    def relativeRadius(self):
-        return self._relativeRadius
-
-    @property
-    def collection(self):
-        return self._collection
-
-    def yxCoords(self):
-        # def yx(d): return d.y, d.x
-        # return [(d.x, d.y) for d in self.collection if np.nan not in (d.x, d.y)]
-        return [(d.y, d.x) for d in self.collection]
-
-    def Id(self):
-        return [d.Id for d in self.collection]
-
-    def icoords(self):
-        return ((d.x, d.y) for d in self.collection)
+        self.yx_coords, self.stats = _parse(label_image, config)
 
     def nn(self):
         n = config.DEFAULT['nNeighbors']
         # for each spot find the closest cell (in fact the top nN-closest cells...)
-        coords = [d for d in self.yxCoords() if np.nan not in d]
-        nbrs = NearestNeighbors(n_neighbors=n, algorithm='ball_tree').fit(coords)
+        nbrs = NearestNeighbors(n_neighbors=n, algorithm='ball_tree').fit(self.yx_coords.data)
         return nbrs
 
     def geneCount(self, spots):
@@ -138,9 +106,10 @@ class Cells(object):
         :return:
         '''
         start = time.time()
-        nC = len(self.yxCoords())
+        nC = self.yx_coords.shape[0] + 1
         nG = len(spots.geneUniv())
-        _id = self.Id()
+        cell_id = self.yx_coords.cell_id.values
+        _id = np.append(cell_id, cell_id.max()+1)
         nN = spots.neighborCells["id"].shape[1]
         CellGeneCount = np.zeros([nC, nG])
         geneNames = spots.geneNames()
@@ -167,7 +136,7 @@ class Cells(object):
         '''
         expected_gamma, expected_loggamma = spots.calcGamma(self, ds, cfg)
 
-        ScaledExp = ds.expression * spots.expectedGamma[None, :, None] * self.areaFactor[:, None, None] + cfg['SpotReg']
+        ScaledExp = ds.mean_expression * spots.expectedGamma[None, :, None] * self.areaFactor[:, None, None] + cfg['SpotReg']
         pNegBin = ScaledExp / (cfg['rSpot'] + ScaledExp)
         # contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
         contr = utils.negBinLoglik(spots.CellGeneCount[:, :, None], cfg['rSpot'], pNegBin)
@@ -284,7 +253,7 @@ class Spots(object):
     def _neighborCells(self, cells, cfg):
         spotYX = self.yxCoords()
         n = cfg['nNeighbors']
-        numCells = len(cells.collection)
+        numCells = len(cells.yx_coords)
         numSpots = len(spotYX)
         neighbors = np.zeros((numSpots, n+1), dtype=int)
         # for each spot find the closest cell (in fact the top nN-closest cells...)
@@ -330,11 +299,20 @@ class Spots(object):
         # self.neighborCells = _neighborCells
 
     def calcGamma(self, cells, ds, ini):
-        scaled_mean = cells.areaFactor * ds.mean_expression
+        scaled_mean = cells.stats.sel(columns='area_factor') * ds.mean_expression
         rho = ini['rSpot'] + cells.geneCount(self)
         beta = ini['rSpot'] + scaled_mean
+        start = time.time()
         expected_gamma = utils.gammaExpectation(rho.data[:, :, None], beta.data)
+        end = time.time()
+        print('time in gammaExpectation: ', end - start)
+
         expected_loggamma = utils.logGammaExpectation(rho.data[:, :, None], beta.data)
+
+        start = time.time()
+        junk = rho / beta
+        end = time.time()
+        print('time in gammaExpectation 2: ', end - start)
 
         return expected_gamma, expected_loggamma
 
@@ -376,23 +354,25 @@ def _parse(label_image, config):
     CellAreaFactor = nom / denom
     areaFactor = CellAreaFactor
 
-    my_list = []
-    for i, val in enumerate(cellYX):
-        c = Cell(val[1], val[0], i)
-        c.relativeRadius = relCellRadius[i]
-        c.areaFactor = areaFactor[i]
 
-        my_list.append(c)
+    # ds = xr.Dataset(
+    #     data_vars={'yx_coords': (('cell_id', 'yx'), np.array(cellYX))},
+    #     coords={'yx': ['y', 'x'],
+    #             'cell_id': list(range(len(cellYX)))}
+    # )
 
-    missread = Cell(np.nan, np.nan, len(cellYX))
-    missread.relativeRadius = relCellRadius[i]
-    missread.areaFactor = areaFactor[i]
-    my_list.append(missread)
+    temp = np.vstack((areaFactor, relCellRadius)).T
+    stats = xr.DataArray(temp,
+                 coords={'cell_id': np.arange(temp.shape[0]),
+                         'columns': ['area_factor', 'rel_radius'],
+                         'mean_radius': meanCellRadius},
+                 dims=['cell_id', 'columns'])
 
-    stats = dict()
-    stats['areaFactor'] = areaFactor
-    stats['meanRadius'] = meanCellRadius
-    stats['relativeRadius'] = relCellRadius
-    return my_list, stats
+    da = xr.DataArray(cellYX,
+                         coords={'cell_id': np.arange(cellYX.shape[0]),
+                                 'columns': ['y', 'x']},
+                         dims=['cell_id', 'columns'])
+
+    return da, stats
 
 
