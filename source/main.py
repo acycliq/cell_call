@@ -32,7 +32,6 @@ saFile = "../data_preprocessed/spot_attributes.nc"
 
 
 cells = Cells(label_image, config.DEFAULT)
-c = cells.collection[0]
 
 
 logger.info('********* Getting spotattributes from %s **********', saFile)
@@ -50,30 +49,15 @@ logger.warning('*******************************')
 spots = Spots(sa.data)
 
 geneUniv = spots.geneUniv()
-mean_expression, log_mean_expression = geneSet(geneUniv, config.DEFAULT)
-classNames = mean_expression.columns.values
-geneNames = mean_expression.index.values
-ds = xr.Dataset(
-    data_vars={'mean_expression': (('gene_name', 'class_name'), mean_expression)},
-    coords={'gene_name': geneNames,
-            'class_name': classNames}
-)
-
-prior = Prior(classNames)
-
-logger.info('step1')
-spots.collection[0].closestCell(cells.nn())
-# spots.closestCell(cells.coords())
+single_cell = geneSet(geneUniv, config.DEFAULT)
 
 
-logger.info('step2')
-# spots._neighborCells(cells, config.DEFAULT)
-# spots._cellProb(label_image, config.DEFAULT)
-# cells.geneCount(spots)
+prior = Prior(single_cell.coords['class_name'].values)
+
 spots.neighCells(cells, label_image, config.DEFAULT)
 CellGeneCount = cells.geneCount(spots)
 
-cells.assignType(spots, prior, ds, config.DEFAULT)
+cells.assignType(spots, prior, single_cell, config.DEFAULT)
 print(spots.collection[0].parentCell)
 logger.info('Done')
 
