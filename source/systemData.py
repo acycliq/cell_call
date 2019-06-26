@@ -107,7 +107,7 @@ class Cells(object):
         '''
         start = time.time()
         nC = self.yx_coords.shape[0] + 1
-        nG = len(spots.geneUniv())
+        nG = len(spots.geneUniv.gene_name)
         cell_id = self.yx_coords.cell_id.values
         _id = np.append(cell_id, cell_id.max()+1)
         nN = spots.neighborCells["id"].shape[1]
@@ -126,29 +126,6 @@ class Cells(object):
         self.CellGeneCount = CellGeneCount
         return CellGeneCount
 
-    def assignType(self, spots, prior, ds, cfg):
-        '''
-        return a an array of size numCells-by-numCellTypes where element in position [i,j]
-        keeps the probability that cell i has cell type j
-        :param spots:
-        :param config:
-        :return:
-        '''
-        expected_gamma, expected_loggamma = spots.calcGamma(self, ds, cfg)
-
-        ScaledExp = ds.mean_expression * spots.expectedGamma[None, :, None] * self.areaFactor[:, None, None] + cfg['SpotReg']
-        pNegBin = ScaledExp / (cfg['rSpot'] + ScaledExp)
-        # contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
-        contr = utils.negBinLoglik(spots.CellGeneCount[:, :, None], cfg['rSpot'], pNegBin)
-        # assert np.all(nb_contr == contr)
-        wCellClass = np.sum(contr, axis=1) + prior.logvalues
-        pCellClass = utils.softmax(wCellClass)
-
-        self.classProb = pCellClass
-        logger.info('Cell 0 is classified as %s with prob %4.8f' % (
-        prior.name[np.argmax(wCellClass[0, :])], pCellClass[0, np.argmax(wCellClass[0, :])]))
-        logger.info('cell ---> klass probabilities updated')
-        return pCellClass
 
 
 class Prior(object):
@@ -223,6 +200,10 @@ class Spots(object):
         self.neighborCells = dict()
         for r in zip(df.index, df.x, df.y, df.target):
             self.collection.append(Spot(r[0], r[1], r[2], r[3]))
+        self.geneUniv = xr.DataArray(np.ones((len(sorted(self.geneUniv())), 1)),
+                                     coords={'gene_name': sorted(self.geneUniv()),
+                                             'columns': ['expected_gamma']},
+                                     dims=['gene_name', 'columns'])
 
     @property
     def neighbors(self):
@@ -298,24 +279,13 @@ class Spots(object):
         self.neighborCells['prob'] = self._cellProb(label_image, config)
         # self.neighborCells = _neighborCells
 
-    def calcGamma(self, cells, ds, ini):
-        scaled_mean = cells.stats.sel(columns='area_factor') * ds.mean_expression
-        rho = ini['rSpot'] + cells.geneCount(self)
-        beta = ini['rSpot'] + scaled_mean
-        start = time.time()
-        expected_gamma = utils.gammaExpectation(rho.data[:, :, None], beta.data)
-        end = time.time()
-        print('time in gammaExpectation: ', end - start)
 
-        expected_loggamma = utils.logGammaExpectation(rho.data[:, :, None], beta.data)
-
-        start = time.time()
-        junk = rho / beta
-        end = time.time()
-        print('time in gammaExpectation 2: ', end - start)
-
-        return expected_gamma, expected_loggamma
-
+class Genes(object):
+    def __init__(self, genes):
+        self.array = xr.DataArray(np.ones((len(genes), 1)),
+                     coords={'gene_name': genes,
+                             'columns': ['expected_gamma']},
+                     dims=['gene_name', 'columns'])
 
 
 def _parse(label_image, config):
