@@ -78,7 +78,7 @@ class Cell(object):
         return CellGeneCount
 
     def klassAssignment(self, spots, genes, klasses, ini):
-        spots.calcGamma(ini, self, genes, klasses)
+        expected_gamma, expected_loggamma = spots.calcGamma(ini, self, genes, klasses)
 
         ScaledExp = genes.expression * genes.expectedGamma[None, :, None]*self.areaFactor[:, None, None] + ini['SpotReg']
         pNegBin = ScaledExp / (ini['rSpot'] + ScaledExp)
