@@ -5,11 +5,12 @@ var cookie = sessionStorage['myvariable'],
     cookie3 = sessionStorage['myvariable3'],
     cookie4 = sessionStorage['myvariable4'],
     cookie5 = sessionStorage['myvariable5'],
+    cookie6 = sessionStorage['myvariable6'],
     cellData,
     geneData;
 
 
-if ((!cookie) && (!cookie2) && (!cookie3) && (!cookie4) && (!cookie5)  ){ // if you dont have cookie, run the default selection
+if ((!cookie) && (!cookie2) && (!cookie3) && (!cookie4) && (!cookie5)&& (!cookie6)  ){ // if you dont have cookie, run the default selection
     console.log('No cookie, starting with default dataset')
     var configSettings = config().get('98 gene panel')
 }
@@ -34,10 +35,15 @@ else {
         console.log('Found cookie: ' + cookie4);
         var configSettings = config().get(cookie4)
     }
-    else
+    else if (cookie5)
     {
         console.log('Found cookie: ' + cookie5);
         var configSettings = config().get(cookie5)
+    }
+    else
+    {
+        console.log('Found cookie: ' + cookie6);
+        var configSettings = config().get(cookie6)
     }
 
 }
@@ -64,6 +70,7 @@ function dispatcher(x){
     sessionStorage.removeItem('myvariable3');
     sessionStorage.removeItem('myvariable4');
     sessionStorage.removeItem('myvariable5');
+    sessionStorage.removeItem('myvariable6');
 
     //reload page
     location.reload(true);
@@ -81,6 +88,7 @@ function dispatcher2(x2){
     sessionStorage.removeItem('myvariable3');
     sessionStorage.removeItem('myvariable4');
     sessionStorage.removeItem('myvariable5');
+    sessionStorage.removeItem('myvariable6');
 
     //reload page
     location.reload(true);
@@ -98,6 +106,7 @@ function dispatcher3(x3){
     sessionStorage.removeItem('myvariable2');
     sessionStorage.removeItem('myvariable4');
     sessionStorage.removeItem('myvariable5');
+    sessionStorage.removeItem('myvariable6');
 
     //reload page
     location.reload(true);
@@ -114,7 +123,8 @@ function dispatcher4(x4){
     sessionStorage.removeItem('myvariable');
     sessionStorage.removeItem('myvariable2');
     sessionStorage.removeItem('myvariable3');
-    sessionStorage.removeItem('myvariable5');
+    sessionStorage.removeItem('myvariable5')
+    sessionStorage.removeItem('myvariable6');
 
     //reload page
     location.reload(true);
@@ -132,6 +142,25 @@ function dispatcher5(x5){
     sessionStorage.removeItem('myvariable2');
     sessionStorage.removeItem('myvariable3');
     sessionStorage.removeItem('myvariable4');
+    sessionStorage.removeItem('myvariable6');
+
+    //reload page
+    location.reload(true);
+
+}
+
+function dispatcher6(x6){
+    console.log('you clicked '+ x6)
+
+    // save a cookie
+    sessionStorage['myvariable6'] = x6;
+
+    // delete the cookie from other dropdowns
+    sessionStorage.removeItem('myvariable');
+    sessionStorage.removeItem('myvariable2');
+    sessionStorage.removeItem('myvariable3');
+    sessionStorage.removeItem('myvariable4');
+    sessionStorage.removeItem('myvariable5');
 
     //reload page
     location.reload(true);

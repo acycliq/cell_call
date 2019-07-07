@@ -419,6 +419,38 @@
                         </li>
                     </ul>
 
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="#" id="myDropdown6" class="myDropdown dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">
+                                Select Data
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" id="myDropdown-menu6">
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 5)")'>Random genes (N = 5)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 10)")'>Random genes (N = 10)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 15)")'>Random genes (N = 15)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 20)")'>Random genes (N = 20)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 25)")'>Random genes (N = 25)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 30)")'>Random genes (N = 30)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 35)")'>Random genes (N = 35)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 40)")'>Random genes (N = 40)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 45)")'>Random genes (N = 45)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 50)")'>Random genes (N = 50)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 55)")'>Random genes (N = 55)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 60)")'>Random genes (N = 60)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 65)")'>Random genes (N = 65)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 70)")'>Random genes (N = 70)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 75)")'>Random genes (N = 75)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 80)")'>Random genes (N = 80)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 85)")'>Random genes (N = 85)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 90)")'>Random genes (N = 90)</a></li>
+                                <li><a class="dropdown-item" href="#" onclick='dispatcher6("Random genes (N = 95)")'>Random genes (N = 95)</a></li>
+
+                            </ul>
+                        </li>
+                    </ul>
+
                     <script>
                         // start with the inefficiency dropdown hidden
                         // $('#dropdown-inefficiency').hide()
@@ -1079,6 +1111,10 @@
             if (cookie5) {
                 d3.select('#myDropdown5').node().text = cookie5 + '  ';
                 $('#myDropdown5').append("<span class='caret'></span>");
+            }
+            if (cookie6) {
+                d3.select('#myDropdown6').node().text = cookie6 + '  ';
+                $('#myDropdown6').append("<span class='caret'></span>");
             }
         });
 
