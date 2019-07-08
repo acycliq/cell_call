@@ -282,7 +282,7 @@ def app(N):
 
     subfolder = 'N' + str(N)
     fName = 'N' + str(N)  + '_iss.json'
-    N_DATA = os.path.join(PATH, 'random_genes', 'pool_99', subfolder, fName)
+    N_DATA = os.path.join(PATH, 'random_genes', 'pool_99', 'constrained', subfolder, fName)
 
 
     model_data = pd.read_json(MODEL_DATA)
@@ -292,7 +292,7 @@ def app(N):
     avg, median = analytics(cm)
     # mi = mutual_information(raw_data)
 
-    root = r'D:\Dimitris\Dropbox\random_genes'
+    root = r'D:\Dimitris\Dropbox\random_genes\cm\constrained'
     subfolder = 'N' + str(N)
     fName = 'N' + str(N) + '_cm_raw_data.csv'
     target = os.path.join(root, subfolder, fName)
