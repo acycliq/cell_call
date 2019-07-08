@@ -381,6 +381,31 @@ $('#layers-base-7 input').change(function () {
     renderHeatmapTab(target)
 });
 
+$('#layers-base-9 input').change(function () {
+    console.log('Select case study changed value')
+    if (document.case_study.button.value === "0"){
+        $("#layers-base-4").show();
+        $("#layers-base-5").show();
+        $("#layers-base-3").show();
+        $("#layers-base-10").hide();
+    }
+    if (document.case_study.button.value === "1"){
+        $("#layers-base-4").hide();
+        $("#layers-base-5").hide();
+        $("#layers-base-3").hide();
+        $("#layers-base-10").show();
+    }
+
+    var target = submitHelper();
+    renderHeatmapTab(target)
+});
+
+$('#layers-base-10 input').change(function () {
+    console.log('Number of genes changed value')
+    var target = submitHelper();
+    renderHeatmapTab(target)
+});
+
 
 
 // listener on the Confusion matrix tab
@@ -394,6 +419,7 @@ $('#confusion-table-tab').on('shown.bs.tab', function (e) {
     $('#myDropdown5').hide();
     $("#fold_row2").hide();
     $("#unfold_row2").hide();
+    $("#layers-base-10").hide();
     var target = submitHelper();
     renderHeatmapTab(target)
 });
@@ -420,6 +446,8 @@ $('#map-tab').on('shown.bs.tab', function (e) {
 
 function submitHelper(){
     menuSelection = [];
+    var caseStudy = document.case_study.button.value;
+    var gene_n = document.gene_n.button.value;
     var norm = document.ConfusionMatrixRadioButton.norm.value;
     var foldVal = document.cm_fold_level.button.value;
     var unfoldVal = document.cm_unfold_level.button.value;
@@ -427,10 +455,12 @@ function submitHelper(){
     var alphaVal = document.cm_alpha.button.value;
     var mode = document.getElementById("constrained").checked? "constrained": "unconstrained"
     var useBinaryClasses = document.getElementById("binaryClasses").checked? true: false;
-    var target_file = './dashboard/data/confusion_matrix/grid/' + mode
-                        + '/alpha' + alphaVal + '_beta' + betaVal
-                        + '/alpha' + alphaVal + '_beta' + betaVal + '_cm_raw_data.csv'
+    // var target_file = './dashboard/data/confusion_matrix/grid/' + mode
+    //                     + '/alpha' + alphaVal + '_beta' + betaVal
+    //                     + '/alpha' + alphaVal + '_beta' + betaVal + '_cm_raw_data.csv'
 
+    menuSelection.caseStudy = caseStudy;
+    menuSelection.gene_n = gene_n;
     menuSelection.norm = norm;
     menuSelection.mode = mode;
     menuSelection.useBinaryClasses = useBinaryClasses;
@@ -438,10 +468,30 @@ function submitHelper(){
     menuSelection.unfoldVal = unfoldVal; //drilling down
     menuSelection.alphaVal = alphaVal;
     menuSelection.betaVal = betaVal;
-    menuSelection.target_file = target_file;
+    // menuSelection.target_file = target_file;
+    menuSelection.target_file = mkTarget(menuSelection);
+    // var my_target_file = mkTarget(menuSelection)
     return menuSelection
 }
 
+function mkTarget(menuSelection){
+    var target_file
+    if (menuSelection.caseStudy === "0"){
+        target_file = './dashboard/data/confusion_matrix/grid/' + menuSelection.mode
+                        + '/alpha' + menuSelection.alphaVal + '_beta' + menuSelection.betaVal
+                        + '/alpha' + menuSelection.alphaVal + '_beta' + menuSelection.betaVal + '_cm_raw_data.csv'
+    }
+    else if (menuSelection.caseStudy === "1"){
+        target_file = './dashboard/data/confusion_matrix/random_genes/'
+                        + '/N' + menuSelection.gene_n
+                        + '/N' + menuSelection.gene_n + '_cm_raw_data.csv'
+    }
+    else {
+        target_file = ''  // you shouldnt be here amyway!
+    }
+
+    return target_file
+}
 
 function use_binary_classes(data) {
 
