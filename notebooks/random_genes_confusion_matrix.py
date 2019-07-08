@@ -282,7 +282,7 @@ def app(N):
 
     subfolder = 'N' + str(N)
     fName = 'N' + str(N)  + '_iss.json'
-    N_DATA = os.path.join(PATH, 'random_genes', '99pool', subfolder, fName)
+    N_DATA = os.path.join(PATH, 'random_genes', 'pool_99', subfolder, fName)
 
 
     model_data = pd.read_json(MODEL_DATA)
