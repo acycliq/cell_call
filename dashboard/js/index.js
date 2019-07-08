@@ -386,13 +386,11 @@ $('#layers-base-9 input').change(function () {
     if (document.case_study.button.value === "0"){
         $("#layers-base-4").show();
         $("#layers-base-5").show();
-        $("#layers-base-3").show();
         $("#layers-base-10").hide();
     }
     if (document.case_study.button.value === "1"){
         $("#layers-base-4").hide();
         $("#layers-base-5").hide();
-        $("#layers-base-3").hide();
         $("#layers-base-10").show();
     }
 
@@ -482,7 +480,7 @@ function mkTarget(menuSelection){
                         + '/alpha' + menuSelection.alphaVal + '_beta' + menuSelection.betaVal + '_cm_raw_data.csv'
     }
     else if (menuSelection.caseStudy === "1"){
-        target_file = './dashboard/data/confusion_matrix/random_genes/'
+        target_file = './dashboard/data/confusion_matrix/random_genes/pool_99/' + menuSelection.mode
                         + '/N' + menuSelection.gene_n
                         + '/N' + menuSelection.gene_n + '_cm_raw_data.csv'
     }
