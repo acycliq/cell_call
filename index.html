@@ -677,6 +677,20 @@
                                         <div class="chart-stage" div id="heat-controls">
                                         <div data-panel="layers" class="layer-control-2">
                                             <!-- basemaps: radio buttons, see initMapLayerControl() -->
+                                            <div id="layers-base-9">
+                                                Choose case study
+                                                <form name="case_study" style="margin-top:5px">
+                                                    <div>
+                                                        <input value="0" type="radio" name="button" checked/>
+                                                        <span> False positives, false negatives</span>
+                                                    </div>
+                                                    <div style="margin-top:5px">
+                                                        <input value="1" type="radio" name="button"/>
+                                                        <span> Randomly chosen genes (Pool of 99)</span>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <hr>
                                             <div id="layers-base">
                                                 <form name="ConfusionMatrixRadioButton">
                                                     <input value="avg" type="radio" name="norm" checked/>
@@ -700,8 +714,8 @@
                                                     <input type="checkbox" id="constrained" checked>
                                                     <span> Range same as domain </span>
                                                 </label>
+                                                <hr>
                                             </div>
-                                            <hr>
                                             <div id="layers-base-8">
                                                 <label>
                                                     <input type="checkbox" id="binaryClasses">
@@ -743,8 +757,9 @@
                                                         <span> 3.0 &nbsp &nbsp</span>
                                                     </div>
                                                 </form>
+                                                <hr>
                                             </div>
-                                            <hr>
+                                            <!--<hr>-->
                                             <div id="layers-base-5">
                                                 Beta
                                                 <form name="cm_beta" style="margin-top:5px">
@@ -778,8 +793,62 @@
                                                     </div>
 
                                                 </form>
+                                                <hr>
                                             </div>
-                                            <hr>
+                                            <div id="layers-base-10">
+                                                Number of genes
+                                                <form name="gene_n" style="margin-top:5px">
+                                                    <div>
+                                                        <input value="5" type="radio" name="button"/>
+                                                        <span> 5 &nbsp &nbsp &nbsp</span>
+                                                        <input value="10" type="radio" name="button"/>
+                                                        <span> 10 &nbsp &nbsp</span>
+                                                        <input value="15" type="radio" name="button"/>
+                                                        <span> 15 &nbsp &nbsp</span>
+                                                        <input value="20" type="radio" name="button"/>
+                                                        <span> 20 &nbsp &nbsp</span>
+                                                        <input value="25" type="radio" name="button"/>
+                                                        <span> 25 &nbsp &nbsp</span>
+                                                    </div>
+                                                    <div style="margin-top:5px">
+                                                        <input value="30" type="radio" name="button"/>
+                                                        <span> 30 &nbsp &nbsp</span>
+                                                        <input value="35" type="radio" name="button"/>
+                                                        <span> 35 &nbsp &nbsp</span>
+                                                        <input value="40" type="radio" name="button" />
+                                                        <span> 40 &nbsp &nbsp</span>
+                                                        <input value="45" type="radio" name="button"/>
+                                                        <span> 45 &nbsp &nbsp</span>
+                                                        <input value="50" type="radio" name="button"/>
+                                                        <span> 50 &nbsp &nbsp</span>
+                                                    </div>
+                                                    <div style="margin-top:5px">
+                                                        <input value="55" type="radio" name="button"/>
+                                                        <span> 55 &nbsp &nbsp</span>
+                                                        <input value="60" type="radio" name="button"/>
+                                                        <span> 60 &nbsp &nbsp</span>
+                                                        <input value="65" type="radio" name="button" />
+                                                        <span> 65 &nbsp &nbsp</span>
+                                                        <input value="70" type="radio" name="button"/>
+                                                        <span> 70 &nbsp &nbsp</span>
+                                                        <input value="75" type="radio" name="button"/>
+                                                        <span> 75 &nbsp &nbsp</span>
+                                                    </div>
+                                                    <div style="margin-top:5px">
+                                                        <input value="80" type="radio" name="button"/>
+                                                        <span> 80 &nbsp &nbsp</span>
+                                                        <input value="85" type="radio" name="button"/>
+                                                        <span> 85 &nbsp &nbsp</span>
+                                                        <input value="90" type="radio" name="button"/>
+                                                        <span> 90 &nbsp &nbsp</span>
+                                                        <input value="95" type="radio" name="button" checked/>
+                                                        <span> 95 &nbsp &nbsp</span>
+                                                    </div>
+
+                                                </form>
+                                                <hr>
+                                            </div>
+                                            <!--<hr>-->
                                             <div id="layers-base-6">
                                                 Levels to drill up
                                                 <form name="cm_fold_level" style="margin-top:5px">
@@ -804,8 +873,8 @@
                                                         <span> 7 &nbsp &nbsp</span>
                                                     </div>
                                                 </form>
+                                                <hr>
                                             </div>
-                                            <hr>
                                             <div id="layers-base-7">
                                                 Levels to drill down
                                                 <form name="cm_unfold_level" style="margin-top:5px">
