@@ -22,6 +22,7 @@ logging.basicConfig(
 
 
 class Cells(object):
+    # Get rid of the properties where not necessary!!
     def __init__(self, label_image, config):
         self.ds = _parse(label_image, config)
 
