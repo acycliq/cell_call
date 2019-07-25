@@ -240,6 +240,18 @@ def nb_negBinLoglik(x, r, p):
     return out
 
 
+def softmax(x):
+    '''
+    https://stackoverflow.com/questions/34968722/how-to-implement-the-softmax-function-in-python
+    :param x:
+    :return:
+    '''
+    """Compute softmax values for each sets of scores in x."""
+    assert 'class_name' in x.dims, 'There is not dimension "class_name" '
+    temp = xr.ufuncs.exp(x)
+    return temp / temp.sum('class_name')
+
+
 def isConverged(spots, p0, tol):
     p1 = spots.neighbors['prob']
     if p0 is None:

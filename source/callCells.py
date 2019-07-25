@@ -16,7 +16,7 @@ logging.basicConfig(
 
 
 def expected_gamma(cells, spots, ds, ini):
-    scaled_mean = cells.stats.sel(columns='area_factor') * ds.mean_expression
+    scaled_mean = cells.ds.area_factor * ds.mean_expression
     rho = ini['rSpot'] + cells.geneCount(spots)
     beta = ini['rSpot'] + scaled_mean
 
@@ -35,15 +35,15 @@ def celltype_assignment(cells, spots, prior, ds, cfg):
     :return:
     '''
 
-    expected_gamma = spots.geneUniv.sel(columns='expected_gamma')
-    ScaledExp = cells.stats.sel(columns='area_factor') * expected_gamma * ds.mean_expression + cfg['SpotReg']
+    gene_gamma = spots.geneUniv.gene_gamma
+    ScaledExp = cells.ds.area_factor * gene_gamma * ds.mean_expression + cfg['SpotReg']
     pNegBin = ScaledExp / (cfg['rSpot'] + ScaledExp)
     # contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
     gc = cells.geneCount(spots)
     # x * log(p) + r * log(1 - p)
     contr = utils.negBinLoglik(gc, cfg['rSpot'], pNegBin)
     # assert np.all(nb_contr == contr)
-    wCellClass = np.sum(contr, axis=1) + prior.logvalues
+    wCellClass = np.sum(contr, axis=1) + prior.logvalue
     pCellClass = utils.softmax(wCellClass)
 
     cells.classProb = pCellClass
@@ -74,3 +74,14 @@ def cell_assignment(spots, cells, genes, klasses):
     pSpotNeighb = utils.softmax(wSpotCell)
     spots.neighbors['prob'] = pSpotNeighb
     logger.info('spot ---> cell probabilities updated')
+
+
+def updateGamma(self, cells, spots, klasses, ini):
+    # pSpotZero = spots.zeroKlassProb(klasses, cells)
+    TotPredictedZ = spots.TotPredictedZ(spots.geneNo, cells.classProb[:, -1])
+
+    TotPredicted = cells.geneCountsPerKlass(self, spots, klasses, ini)
+
+    nom = ini['rGene'] + self.totalSpots - spots.TotPredictedB - TotPredictedZ
+    denom = ini['rGene'] + TotPredicted
+    self.expectedGamma = nom / denom

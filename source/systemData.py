@@ -21,76 +21,25 @@ logging.basicConfig(
     )
 
 
-class Cell(object):
-    def __init__(self, x, y, Id):
-        self._Id = Id
-        self._x = x
-        self._y = y
-        self._spots = None
-        self._cellType = None
-        self._areaFactor = None
-        self._relativeRadius = None
-
-    @property
-    def Id(self):
-        return self._Id
-
-    @Id.setter
-    def Id(self, value):
-        self._Id = value
-
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, value):
-        self._x = value
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, value):
-        self._y = value
-
-    @property
-    def spots(self):
-        return self._spots
-
-    @spots.setter
-    def spots(self, value):
-        self._spots = value
-
-    @property
-    def cellType(self):
-        return self._cellType
-
-    @cellType.setter
-    def cellType(self, value):
-        self._cellType = value
-
-    @property
-    def areaFactor(self):
-        return self._areaFactor
-
-    @areaFactor.setter
-    def areaFactor (self, value):
-        self._areaFactor = value
-
-    @property
-    def relativeRadius(self):
-        return self._relativeRadius
-
-    @relativeRadius.setter
-    def relativeRadius(self, value):
-        self._relativeRadius = value
-
-
 class Cells(object):
     def __init__(self, label_image, config):
-        self.yx_coords, self.stats = _parse(label_image, config)
+        self.ds = _parse(label_image, config)
+
+    @property
+    def yx_coords(self):
+        y_nan = np.argwhere(~np.isnan(self.ds.y.values))
+        x_nan = np.argwhere(~np.isnan(self.ds.x.values))
+
+        # coords = [self.ds.y.values, self.ds.x.values]
+        coords = [d for d in zip(self.ds.y.values, self.ds.x.values) if not np.isnan(d).any()]
+        # coords = np.array([self.ds.y.values, self.ds.x.values]).T
+
+        return np.array(coords)
+
+    @property
+    def cell_id(self):
+        mask = ~np.isnan(self.ds.y.values) & ~np.isnan(self.ds.x.values)
+        return self.ds.cell_id.values[mask]
 
     def nn(self):
         n = config.DEFAULT['nNeighbors']
@@ -108,16 +57,18 @@ class Cells(object):
         start = time.time()
         nC = self.yx_coords.shape[0] + 1
         nG = len(spots.geneUniv.gene_name)
-        cell_id = self.yx_coords.cell_id.values
+        cell_id = self.cell_id
         _id = np.append(cell_id, cell_id.max()+1)
-        nN = spots.neighborCells["id"].shape[1]
+        nN = spots.neighboring_cells["id"].shape[1]
         CellGeneCount = np.zeros([nC, nG])
-        geneNames = spots.geneNames()
+        geneNames = spots.gene_name
         [name, ispot, _] = np.unique(geneNames, return_inverse=True, return_counts=True)
+        name = spots.geneUniv.gene_name.values
+        ispot = spots.geneUniv.ispot.values
         for n in range(nN - 1):
-            c = spots.neighborCells["id"][:, n]
+            c = spots.neighboring_cells["id"][n].values
             group_idx = np.vstack((c[None, :], ispot[None, :]))
-            a = spots.neighborCells["prob"][:, n]
+            a = spots.neighboring_cells["prob"][:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
         end = time.time()
@@ -127,83 +78,29 @@ class Cells(object):
         return CellGeneCount
 
 
-
 class Prior(object):
     def __init__(self, cell_type):
         # list(dict.fromkeys(cell_type_name))
         self.name = cell_type
         self.nK = self.name.shape[0]
+        # Check this....maybe you should divide my K-1
         self.value = np.append([.5 * np.ones(self.nK - 1) / self.nK], 0.5)
         self.logvalue = np.log(self.value)
-
-
-
-class Spot(object):
-    def __init__(self, Id, x, y, geneName):
-        self._Id = Id
-        self._x = x
-        self._y = y
-        self._geneName = geneName
-        self._cellAssignment = None
-        self._parentCell = None
-
-    @property
-    def Id(self):
-        return self._Id
-
-    @Id.setter
-    def Id(self, value):
-        self._Id = value
-
-    @property
-    def x(self):
-        return self._x
-
-    @x.setter
-    def x(self, value):
-        self._x = value
-
-    @property
-    def y(self):
-        return self._y
-
-    @y.setter
-    def y(self, value):
-        self._y = value
-
-    @property
-    def geneName(self):
-        return self._geneName
-
-    @geneName.setter
-    def geneName(self, value):
-        self._geneName = value
-
-    @property
-    def parentCell(self):
-        return self._parentCell
-
-    @parentCell.setter
-    def parentCell(self, value):
-        self._parentCell = value
-
-    def closestCell(self, nbrs):
-        _, neighbors = nbrs.kneighbors([[self.x, self.y]])
-
-        return neighbors
 
 
 class Spots(object):
     def __init__(self, df):
         self._neighbors = None
         self.collection = []
-        self.neighborCells = dict()
-        for r in zip(df.index, df.x, df.y, df.target):
-            self.collection.append(Spot(r[0], r[1], r[2], r[3]))
-        self.geneUniv = xr.DataArray(np.ones((len(sorted(self.geneUniv())), 1)),
-                                     coords={'gene_name': sorted(self.geneUniv()),
-                                             'columns': ['expected_gamma']},
-                                     dims=['gene_name', 'columns'])
+        self.neighboring_cells = dict()
+        self.data = df.to_xarray().rename({'target': 'gene_name'})
+
+        [gn, ispot, _] = np.unique(self.data.gene_name.data, return_inverse=True, return_counts=True)
+        gamma = np.ones((len(gn), 1))
+        da = xr.DataArray(np.ones(gn.shape), dims=('gene_name'), coords={'gene_name': gn})
+        self.geneUniv = xr.Dataset({'gene_gamma': da,
+                                    'ispot': ispot,})
+        self.yxCoords = self.data[['y', 'x']].to_array().values.T
 
     @property
     def neighbors(self):
@@ -213,26 +110,15 @@ class Spots(object):
     def neighbors(self, value):
         self._neighbors = value
 
-    def yxCoords(self):
-        def yx(d): return d.y, d.x
-        return list(map(yx, self.collection))
-
-    def icoords(self):
-        return ((d.x, d.y) for d in self.collection)
-
-    def geneUniv(self):
-        _map = map(lambda d: d.geneName, self.collection)
-        return set(_map)
-
-    def geneNames(self):
-        return list(map(lambda d: d.geneName, self.collection))
+    def gene_name(self):
+        return self.data.gene_name.values
 
     def spotId(self):
         temp = list(map(lambda d: d.Id, self.collection))
         return np.array(temp)
 
     def _neighborCells(self, cells, cfg):
-        spotYX = self.yxCoords()
+        spotYX = self.yxCoords
         n = cfg['nNeighbors']
         numCells = len(cells.yx_coords)
         numSpots = len(spotYX)
@@ -246,20 +132,20 @@ class Spots(object):
         # last column is for misreads. Id is dummy id and set to the
         # number of cells (which so-far should always be unallocated)
         neighbors[:, -1] = numCells
-        logger.info('Populating parent cells')
-        for i, d in enumerate(neighbors):
-            self.collection[i].parentCell = d
-        logger.info('Parent cells filled')
+        # logger.info('Populating parent cells')
+        # for i, d in enumerate(neighbors):
+        #     self.collection[i].parentCell = d
+        # logger.info('Parent cells filled')
 
         # finally return
-        return neighbors
+        return pd.DataFrame(neighbors)
 
     def _cellProb(self, label_image, cfg):
         roi = cfg['roi']
         x0 = roi["x0"]
         y0 = roi["y0"]
-        yxCoords = self.yxCoords()
-        neighbors = self.neighborCells['id']
+        yxCoords = self.yxCoords
+        neighbors = self.neighboring_cells['id'].values
         nS = len(yxCoords)
         nN = cfg['nNeighbors'] + 1
 
@@ -274,18 +160,10 @@ class Spots(object):
         pSpotNeighb[SpotInCell == 0, -1] = 1
         return pSpotNeighb
 
-    def neighCells(self, cells, label_image, config):
-        self.neighborCells['id'] = self._neighborCells(cells, config)
-        self.neighborCells['prob'] = self._cellProb(label_image, config)
+    def get_neighbors(self, cells, label_image, config):
+        self.neighboring_cells['id'] = self._neighborCells(cells, config)
+        self.neighboring_cells['prob'] = self._cellProb(label_image, config)
         # self.neighborCells = _neighborCells
-
-
-class Genes(object):
-    def __init__(self, genes):
-        self.array = xr.DataArray(np.ones((len(genes), 1)),
-                     coords={'gene_name': genes,
-                             'columns': ['expected_gamma']},
-                     dims=['gene_name', 'columns'])
 
 
 def _parse(label_image, config):
@@ -324,25 +202,31 @@ def _parse(label_image, config):
     CellAreaFactor = nom / denom
     areaFactor = CellAreaFactor
 
+    num_cells = cellYX.shape[0]
+    af = xr.DataArray(areaFactor,    dims='cell_id', coords={'cell_id': np.arange(num_cells + 1)})
+    rr = xr.DataArray(relCellRadius, dims='cell_id', coords={'cell_id': np.arange(num_cells + 1)})
+    x = xr.DataArray(cellYX[:, 1],   dims='cell_id', coords={'cell_id': np.arange(num_cells)})
+    y = xr.DataArray(cellYX[:, 0],   dims='cell_id', coords={'cell_id': np.arange(num_cells)})
 
-    # ds = xr.Dataset(
-    #     data_vars={'yx_coords': (('cell_id', 'yx'), np.array(cellYX))},
-    #     coords={'yx': ['y', 'x'],
-    #             'cell_id': list(range(len(cellYX)))}
-    # )
+    ds = xr.Dataset({'area_factor': af,
+                        'rel_radius': rr,
+                        'mean_radius': meanCellRadius,
+                        'x': x,
+                        'y': y})
 
-    temp = np.vstack((areaFactor, relCellRadius)).T
-    stats = xr.DataArray(temp,
-                 coords={'cell_id': np.arange(temp.shape[0]),
-                         'columns': ['area_factor', 'rel_radius'],
-                         'mean_radius': meanCellRadius},
-                 dims=['cell_id', 'columns'])
+    # stats = xr.DataArray(temp,
+    #              coords={'cell_id': np.arange(temp.shape[0]),
+    #                      'columns': ['area_factor', 'rel_radius'],
+    #                      'mean_radius': meanCellRadius},
+    #              dims=['cell_id', 'columns'])
+
+    # da = pd.DataFrame(cellYX, columns=['y', 'x']).to_xarray()
 
     da = xr.DataArray(cellYX,
                          coords={'cell_id': np.arange(cellYX.shape[0]),
                                  'columns': ['y', 'x']},
                          dims=['cell_id', 'columns'])
 
-    return da, stats
+    return ds
 
 

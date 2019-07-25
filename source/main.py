@@ -1,13 +1,10 @@
 from source.systemData import Cells
 from systemData import Spots
-from systemData import Genes
 from systemData import Prior
 from utils import loadmat
 from singleCell import geneSet
 import source.config as config
 import callCells as cc
-import numpy as np
-import callCells
 import starfish as sf
 import xarray as xr
 import os
@@ -51,16 +48,15 @@ logger.warning('*******************************')
 
 spots = Spots(sa.data)
 
-sc_data = geneSet(spots.geneUniv.gene_name.values, config.DEFAULT)
+single_cell_data = geneSet(spots.geneUniv.gene_name.values, config.DEFAULT)
 
-prior = Prior(sc_data.coords['class_name'].values)
+prior = Prior(single_cell_data.coords['class_name'].values)
 
-spots.neighCells(cells, label_image, config.DEFAULT)
+spots.get_neighbors(cells, label_image, config.DEFAULT)
 CellGeneCount = cells.geneCount(spots)
 
-egamma, _ = cc.expected_gamma(cells, spots, sc_data, config.DEFAULT)
-cc.celltype_assignment(cells, spots, prior, sc_data, config.DEFAULT)
+egamma, _ = cc.expected_gamma(cells, spots, single_cell_data, config.DEFAULT)
+cc.celltype_assignment(cells, spots, prior, single_cell_data, config.DEFAULT)
 
-print(spots.collection[0].parentCell)
 logger.info('Done')
 
