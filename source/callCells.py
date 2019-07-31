@@ -1,6 +1,7 @@
 import os
 import utils
 import numpy as np
+import xarray as xr
 from sklearn.neighbors import NearestNeighbors
 import logging
 
@@ -53,35 +54,60 @@ def celltype_assignment(cells, spots, prior, ds, cfg):
     return pCellClass
 
 
-def cell_assignment(spots, cells, genes, klasses):
+
+def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
     # spot to cell assignment
-    nN = spots.neighbors['id'].shape[1]
-    nS = spots.nS
-    nK = klasses.nK
+    nN = spots.neighboring_cells['id'].shape[1]
+    nS = spots.data.gene_name.shape[0]
+    nK = prior.nK
     aSpotCell = np.zeros([nS, nN])
+    gn = spots.data.gene_name
+    expected_spot_counts = single_cell_data['log_mean_expression'].sel({'gene_name': gn}).data
     for n in range(nN - 1):
-        c = spots.neighbors['id'][:, n]
+        spots_name = spots.geneUniv.gene_name.values[spots.geneUniv.ispot.values]
+        single_cell_data['log_mean_expression'].sel({'gene_name': spots_name})
+
+        # get the spots' nth-closest cell
+        sn = spots.neighboring_cells['id'][n].values
+
+        # get the respective cell type probabilities
+        cp = cells.classProb.sel({'cell_id': sn}).data
+
+        # multiply and sum over cells
+        term_1 = (expected_spot_counts * cp).sum(axis=1)
+
+
         # logger.info('genes.spotNo should be something line spots.geneNo instead!!')
-        meanLogExpression = np.squeeze(genes.logExpression[:, spots.geneNo, :])
-        classProb = cells.classProb[c, :]
-        term_1 = np.sum(classProb * meanLogExpression, axis=1)
-        expectedLog = utils.bi2(spots.expectedLogGamma, [nS, nK], c[:, None], spots.geneNo[:, None])
-        term_2 = np.sum(cells.classProb[c, :] * expectedLog, axis=1)
+        expectedLog = utils.bi2(elgamma.data, [nS, nK], sn[:, None], spots.geneUniv.ispot.data[:,None])
+        term_2 = np.sum(cp * expectedLog, axis=1)
         aSpotCell[:, n] = term_1 + term_2
-    wSpotCell = aSpotCell + spots.D
+    wSpotCell = aSpotCell + spots.loglik(cells, cfg)
 
     # update the prob a spot belongs to a neighboring cell
-    pSpotNeighb = utils.softmax(wSpotCell)
-    spots.neighbors['prob'] = pSpotNeighb
+    pSpotNeighb = utils.softmax2(wSpotCell)
+    spots.neighboring_cells['prob'] = pSpotNeighb
     logger.info('spot ---> cell probabilities updated')
 
 
-def updateGamma(self, cells, spots, klasses, ini):
+def updateGamma(cells, spots, single_cell_data, egamma, ini):
+    nK = single_cell_data.class_name.shape[0]
+
     # pSpotZero = spots.zeroKlassProb(klasses, cells)
-    TotPredictedZ = spots.TotPredictedZ(spots.geneNo, cells.classProb[:, -1])
+    TotPredictedZ = spots.TotPredictedZ(spots.geneUniv.ispot.data, cells.classProb.sel({'class_name': 'Zero'}).data)
 
-    TotPredicted = cells.geneCountsPerKlass(self, spots, klasses, ini)
+    TotPredicted = geneCountsPerKlass(cells, single_cell_data, egamma, ini)
 
-    nom = ini['rGene'] + self.totalSpots - spots.TotPredictedB - TotPredictedZ
+    TotPredictedB = np.bincount(spots.geneUniv.ispot.data, spots.neighboring_cells['prob'][:, -1])
+
+    nom = ini['rGene'] + spots.geneUniv.total_spots - TotPredictedB - TotPredictedZ
     denom = ini['rGene'] + TotPredicted
-    self.expectedGamma = nom / denom
+    spots.geneUniv.gene_gamma.data = nom / denom
+    # cells.expectedGamma = nom / denom
+
+
+def geneCountsPerKlass(cells, single_cell_data, egamma, ini):
+    temp = cells.classProb * cells.ds.area_factor * egamma
+    temp = temp.sum(dim='cell_id')
+    ClassTotPredicted = temp * (single_cell_data.mean_expression + ini['SpotReg'])
+    TotPredicted = ClassTotPredicted.drop('Zero', dim='class_name').sum(dim='class_name')
+    return TotPredicted

@@ -252,10 +252,36 @@ def softmax(x):
     return temp / temp.sum('class_name')
 
 
+def softmax2(x):
+    '''
+    https://stackoverflow.com/questions/34968722/how-to-implement-the-softmax-function-in-python
+    :param x:
+    :return:
+    '''
+    """Compute softmax values for each sets of scores in x."""
+    return np.exp(x) / np.sum(np.exp(x), axis=1)[:, None]
+
+
+
 def isConverged(spots, p0, tol):
-    p1 = spots.neighbors['prob']
+    p1 = spots.neighboring_cells['prob']
     if p0 is None:
         p0 = np.zeros(p1.shape)
     delta = np.max(np.abs(p1 - p0))
     converged = (delta < tol)
     return converged, delta
+
+
+def bi2(X, dims, *args):
+    nK = dims[1]
+    inds = []
+    if len(args) == 2:
+        # print('im in!')
+        args = (*args, np.arange(0, nK))
+
+    temp = np.zeros(dims).astype(int)
+    for i in range(len(args)):
+        inds.append(temp + args[i])
+
+    # out = X[inds]
+    return X[inds]

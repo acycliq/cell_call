@@ -43,7 +43,7 @@ class Cells(object):
         return self.ds.cell_id.values[mask]
 
     def nn(self):
-        n = config.DEFAULT['nNeighbors']
+        n = config.DEFAULT['nNeighbors'] + 1
         # for each spot find the closest cell (in fact the top nN-closest cells...)
         nbrs = NearestNeighbors(n_neighbors=n, algorithm='ball_tree').fit(self.yx_coords.data)
         return nbrs
@@ -75,7 +75,7 @@ class Cells(object):
         end = time.time()
         print('time in geneCount: ', end - start)
         CellGeneCount = xr.DataArray(CellGeneCount, coords=[_id, name], dims=['cell_id', 'gene_name'])
-        self.CellGeneCount = CellGeneCount
+        # self.CellGeneCount = CellGeneCount
         return CellGeneCount
 
 
@@ -95,12 +95,14 @@ class Spots(object):
         self.collection = []
         self.neighboring_cells = dict()
         self.data = df.to_xarray().rename({'target': 'gene_name'})
+        self.SpotInCell = None
 
-        [gn, ispot, _] = np.unique(self.data.gene_name.data, return_inverse=True, return_counts=True)
+        [gn, ispot, totalSpots] = np.unique(self.data.gene_name.data, return_inverse=True, return_counts=True)
         gamma = np.ones((len(gn), 1))
         da = xr.DataArray(np.ones(gn.shape), dims=('gene_name'), coords={'gene_name': gn})
         self.geneUniv = xr.Dataset({'gene_gamma': da,
-                                    'ispot': ispot,})
+                                    'ispot': ispot,
+                                    'total_spots': xr.DataArray(totalSpots, dims=('gene_name'), coords={'gene_name': gn})})
         self.yxCoords = self.data[['y', 'x']].to_array().values.T
 
     @property
@@ -119,17 +121,15 @@ class Spots(object):
         return np.array(temp)
 
     def _neighborCells(self, cells, cfg):
+        # this needs some clean up.
         spotYX = self.yxCoords
         n = cfg['nNeighbors']
         numCells = len(cells.yx_coords)
         numSpots = len(spotYX)
-        neighbors = np.zeros((numSpots, n+1), dtype=int)
         # for each spot find the closest cell (in fact the top nN-closest cells...)
         nbrs = cells.nn()
-        _, _neighbors = nbrs.kneighbors(spotYX)
+        self.Dist, neighbors = nbrs.kneighbors(spotYX)
 
-        # populate temp with the neighbours
-        neighbors[:, :-1] = _neighbors
         # last column is for misreads. Id is dummy id and set to the
         # number of cells (which so-far should always be unallocated)
         neighbors[:, -1] = numCells
@@ -141,7 +141,7 @@ class Spots(object):
         # finally return
         return pd.DataFrame(neighbors)
 
-    def _cellProb(self, label_image, cfg):
+    def _cellProb(self, label_image, cells, cfg):
         roi = cfg['roi']
         x0 = roi["x0"]
         y0 = roi["y0"]
@@ -159,12 +159,39 @@ class Spots(object):
         pSpotNeighb = np.zeros([nS, nN])
         pSpotNeighb[neighbors + 1 == SpotInCell[:, None]] = 1
         pSpotNeighb[SpotInCell == 0, -1] = 1
-        return pSpotNeighb
+
+
+        return pSpotNeighb, SpotInCell
 
     def get_neighbors(self, cells, label_image, config):
         self.neighboring_cells['id'] = self._neighborCells(cells, config)
-        self.neighboring_cells['prob'] = self._cellProb(label_image, config)
+        self.neighboring_cells['prob'], self.SpotInCell = self._cellProb(label_image, cells, config)
         # self.neighborCells = _neighborCells
+
+    def loglik(self, cells, cfg):
+        meanCellRadius = cells.ds.mean_radius
+
+        # Assume a bivariate normal and calc the likelihood
+        mcr = meanCellRadius.data
+        D = -self.Dist ** 2 / (2 * mcr ** 2) - np.log(2 * np.pi * mcr ** 2)
+
+        # last column (nN-closest) keeps the misreads,
+        D[:, -1] = np.log(cfg['MisreadDensity'])
+
+        D[self.SpotInCell > 0, 0] = D[self.SpotInCell > 0, 0] + cfg['InsideCellBonus']
+        return D
+
+    def TotPredictedZ(self, geneNo, pCellZero):
+        '''
+        ' given a vector
+        :param spots:
+        :return:
+        '''
+        spotNeighbours = self.neighboring_cells['id'].iloc[:, :-1].values
+        neighbourProb = self.neighboring_cells['prob'][:, :-1] #well, id is a dataframe but prob is a numpy area? WTF
+        pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
+        TotPredictedZ = np.bincount(geneNo, pSpotZero)
+        return TotPredictedZ
 
 
 def _parse(label_image, config):

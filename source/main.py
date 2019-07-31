@@ -7,6 +7,7 @@ import source.config as config
 import callCells as cc
 import starfish as sf
 import xarray as xr
+import utils
 import os
 import logging
 
@@ -47,16 +48,38 @@ logger.warning('** REMOVE this adjustment in the LIVE CODE ***')
 logger.warning('*******************************')
 
 spots = Spots(sa.data)
-
 single_cell_data = geneSet(spots.geneUniv.gene_name.values, config.DEFAULT)
-
 prior = Prior(single_cell_data.coords['class_name'].values)
-
 spots.get_neighbors(cells, label_image, config.DEFAULT)
-CellGeneCount = cells.geneCount(spots)
 
-egamma, _ = cc.expected_gamma(cells, spots, single_cell_data, config.DEFAULT)
-cc.celltype_assignment(cells, spots, prior, single_cell_data, config.DEFAULT)
+spots.loglik(cells, config.DEFAULT)
+
+p0 = None
+for i in range(100):
+    # 1. calc gene counts
+    # CellGeneCount = cells.geneCount(spots)
+
+    # 2. call cell gammas
+    egamma, elgamma = cc.expected_gamma(cells, spots, single_cell_data, config.DEFAULT)
+
+    # 3 call cells
+    cc.celltype_assignment(cells, spots, prior, single_cell_data, config.DEFAULT)
+
+    # 4 call spots
+    cc.call_spots(spots, cells, single_cell_data, prior, elgamma, config.DEFAULT)
+
+    # 5 update gamma
+    cc.updateGamma(cells, spots, single_cell_data, egamma, config.DEFAULT)
+
+    converged, delta = utils.isConverged(spots, p0, config.DEFAULT['CellCallTolerance'])
+    logger.info('Iteration %d, mean prob change %f' % (i, delta))
+
+    # replace p0 with the latest probabilities
+    p0 = spots.neighboring_cells['prob']
+
+    # cc.cell_assignment(spots, cells, elgamma, prior)
+
+    # calc gene gamma (ets)
 
 logger.info('Done')
 
