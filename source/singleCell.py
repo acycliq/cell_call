@@ -60,7 +60,8 @@ def _normalise(df):
     return df2
 
 
-def geneSet(genes, config):
+def geneSet(spots, config):
+    genes = spots.gene_panel.gene_name.values
     ge = _load_geneset(config)
 
     # make a dataframe from the xarray

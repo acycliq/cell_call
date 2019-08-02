@@ -36,7 +36,7 @@ def celltype_assignment(cells, spots, prior, ds, cfg):
     :return:
     '''
 
-    gene_gamma = spots.geneUniv.gene_gamma
+    gene_gamma = spots.gene_panel.gene_gamma
     ScaledExp = cells.ds.area_factor * gene_gamma * ds.mean_expression + cfg['SpotReg']
     pNegBin = ScaledExp / (cfg['rSpot'] + ScaledExp)
     # contr = utils.nb_negBinLoglik(CellGeneCount[:,:,None], ini['rSpot'], pNegBin)
@@ -64,11 +64,11 @@ def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
     gn = spots.data.gene_name
     expected_spot_counts = single_cell_data['log_mean_expression'].sel({'gene_name': gn}).data
     for n in range(nN - 1):
-        spots_name = spots.geneUniv.gene_name.values[spots.geneUniv.ispot.values]
+        spots_name = spots.gene_panel.gene_name.values[spots.gene_panel.ispot.values]
         single_cell_data['log_mean_expression'].sel({'gene_name': spots_name})
 
         # get the spots' nth-closest cell
-        sn = spots.neighboring_cells['id'][n].values
+        sn = spots.neighboring_cells["id"][n].values
 
         # get the respective cell type probabilities
         cp = cells.classProb.sel({'cell_id': sn}).data
@@ -78,7 +78,7 @@ def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
 
 
         # logger.info('genes.spotNo should be something line spots.geneNo instead!!')
-        expectedLog = utils.bi2(elgamma.data, [nS, nK], sn[:, None], spots.geneUniv.ispot.data[:,None])
+        expectedLog = utils.bi2(elgamma.data, [nS, nK], sn[:, None], spots.gene_panel.ispot.data[:,None])
         term_2 = np.sum(cp * expectedLog, axis=1)
         aSpotCell[:, n] = term_1 + term_2
     wSpotCell = aSpotCell + spots.loglik(cells, cfg)
@@ -93,15 +93,15 @@ def updateGamma(cells, spots, single_cell_data, egamma, ini):
     nK = single_cell_data.class_name.shape[0]
 
     # pSpotZero = spots.zeroKlassProb(klasses, cells)
-    TotPredictedZ = spots.TotPredictedZ(spots.geneUniv.ispot.data, cells.classProb.sel({'class_name': 'Zero'}).data)
+    TotPredictedZ = spots.TotPredictedZ(spots.gene_panel.ispot.data, cells.classProb.sel({'class_name': 'Zero'}).data)
 
-    TotPredicted = geneCountsPerKlass(cells, single_cell_data, egamma, ini)
+    TotPredicted = cells.geneCountsPerKlass(single_cell_data, egamma, ini)
 
-    TotPredictedB = np.bincount(spots.geneUniv.ispot.data, spots.neighboring_cells['prob'][:, -1])
+    TotPredictedB = np.bincount(spots.gene_panel.ispot.data, spots.neighboring_cells['prob'][:, -1])
 
-    nom = ini['rGene'] + spots.geneUniv.total_spots - TotPredictedB - TotPredictedZ
+    nom = ini['rGene'] + spots.gene_panel.total_spots - TotPredictedB - TotPredictedZ
     denom = ini['rGene'] + TotPredicted
-    spots.geneUniv.gene_gamma.data = nom / denom
+    spots.gene_panel.gene_gamma.data = nom / denom
     # cells.expectedGamma = nom / denom
 
 

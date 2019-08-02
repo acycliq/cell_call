@@ -1,5 +1,6 @@
 from source.systemData import Cells
 from systemData import Spots
+from systemData import Genes
 from systemData import Prior
 from utils import loadmat
 from singleCell import geneSet
@@ -48,11 +49,10 @@ logger.warning('** REMOVE this adjustment in the LIVE CODE ***')
 logger.warning('*******************************')
 
 spots = Spots(sa.data)
-single_cell_data = geneSet(spots.geneUniv.gene_name.values, config.DEFAULT)
+single_cell_data = geneSet(spots, config.DEFAULT)
 prior = Prior(single_cell_data.coords['class_name'].values)
 spots.get_neighbors(cells, label_image, config.DEFAULT)
 
-spots.loglik(cells, config.DEFAULT)
 
 p0 = None
 for i in range(100):

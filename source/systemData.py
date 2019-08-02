@@ -57,17 +57,17 @@ class Cells(object):
         '''
         start = time.time()
         nC = self.yx_coords.shape[0] + 1
-        nG = len(spots.geneUniv.gene_name)
+        nG = len(spots.gene_panel.gene_name)
         cell_id = self.cell_id
         _id = np.append(cell_id, cell_id.max()+1)
         nN = spots.neighboring_cells["id"].shape[1]
         CellGeneCount = np.zeros([nC, nG])
-        geneNames = spots.gene_name
-        [name, ispot, _] = np.unique(geneNames, return_inverse=True, return_counts=True)
-        name = spots.geneUniv.gene_name.values
-        ispot = spots.geneUniv.ispot.values
+
+        name = spots.gene_panel.gene_name.values
+        ispot = spots.gene_panel.ispot.values
         for n in range(nN - 1):
             c = spots.neighboring_cells["id"][n].values
+            # c = spots.neighboring_cells['id'].sel(neighbor=n).values
             group_idx = np.vstack((c[None, :], ispot[None, :]))
             a = spots.neighboring_cells["prob"][:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
@@ -77,6 +77,13 @@ class Cells(object):
         CellGeneCount = xr.DataArray(CellGeneCount, coords=[_id, name], dims=['cell_id', 'gene_name'])
         # self.CellGeneCount = CellGeneCount
         return CellGeneCount
+
+    def geneCountsPerKlass(self, single_cell_data, egamma, ini):
+        temp = self.classProb * self.ds.area_factor * egamma
+        temp = temp.sum(dim='cell_id')
+        ClassTotPredicted = temp * (single_cell_data.mean_expression + ini['SpotReg'])
+        TotPredicted = ClassTotPredicted.drop('Zero', dim='class_name').sum(dim='class_name')
+        return TotPredicted
 
 
 class Prior(object):
@@ -89,6 +96,30 @@ class Prior(object):
         self.logvalue = np.log(self.value)
 
 
+class Genes(object):
+    def __init__(self, spots):
+        [gn, ispot, total_spots] = np.unique(spots.data.gene_name.data, return_inverse=True, return_counts=True)
+        self.panel = xr.Dataset({'gene_gamma': xr.DataArray(np.ones(gn.shape), coords=[('gene_name', gn)]),
+                                 'total_spots': xr.DataArray(total_spots, [('gene_name', gn)]),
+                                 'ispot': ispot,
+                                 },)
+
+    def update_gamma(self, cells, spots, single_cell_data, egamma, ini):
+        nK = single_cell_data.class_name.shape[0]
+
+        # pSpotZero = spots.zeroKlassProb(klasses, cells)
+        TotPredictedZ = spots.TotPredictedZ(self.panel.ispot.data,
+                                                cells.classProb.sel({'class_name': 'Zero'}).data)
+
+        TotPredicted = cells.geneCountsPerKlass(single_cell_data, egamma, ini)
+        TotPredictedB = np.bincount(spots.geneUniv.ispot.data, spots.neighboring_cells['prob'][:, -1])
+
+        nom = ini['rGene'] + spots.geneUniv.total_spots - TotPredictedB - TotPredictedZ
+        denom = ini['rGene'] + TotPredicted
+        self.panel.gene_gamma.data = nom / denom
+
+
+
 class Spots(object):
     def __init__(self, df):
         self._neighbors = None
@@ -97,12 +128,8 @@ class Spots(object):
         self.data = df.to_xarray().rename({'target': 'gene_name'})
         self.SpotInCell = None
 
-        [gn, ispot, totalSpots] = np.unique(self.data.gene_name.data, return_inverse=True, return_counts=True)
-        gamma = np.ones((len(gn), 1))
-        da = xr.DataArray(np.ones(gn.shape), dims=('gene_name'), coords={'gene_name': gn})
-        self.geneUniv = xr.Dataset({'gene_gamma': da,
-                                    'ispot': ispot,
-                                    'total_spots': xr.DataArray(totalSpots, dims=('gene_name'), coords={'gene_name': gn})})
+        self._genes = Genes(self)
+        self.gene_panel = self._genes.panel
         self.yxCoords = self.data[['y', 'x']].to_array().values.T
 
     @property
@@ -123,9 +150,8 @@ class Spots(object):
     def _neighborCells(self, cells, cfg):
         # this needs some clean up.
         spotYX = self.yxCoords
-        n = cfg['nNeighbors']
         numCells = len(cells.yx_coords)
-        numSpots = len(spotYX)
+
         # for each spot find the closest cell (in fact the top nN-closest cells...)
         nbrs = cells.nn()
         self.Dist, neighbors = nbrs.kneighbors(spotYX)
@@ -133,12 +159,11 @@ class Spots(object):
         # last column is for misreads. Id is dummy id and set to the
         # number of cells (which so-far should always be unallocated)
         neighbors[:, -1] = numCells
-        # logger.info('Populating parent cells')
-        # for i, d in enumerate(neighbors):
-        #     self.collection[i].parentCell = d
-        # logger.info('Parent cells filled')
 
         # finally return
+        rows = neighbors.shape[0]
+        cols = neighbors.shape[1]
+        # out = xr.DataArray(neighbors, coords=[('spot_id', range(rows)), ('neighbor', range(cols))])
         return pd.DataFrame(neighbors)
 
     def _cellProb(self, label_image, cells, cfg):
@@ -187,6 +212,21 @@ class Spots(object):
         :param spots:
         :return:
         '''
+        spotNeighbours = self.neighboring_cells['id'].iloc[:, :-1].values
+        neighbourProb = self.neighboring_cells['prob'][:, :-1] #well, id is a dataframe but prob is a numpy area? WTF
+        pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
+        TotPredictedZ = np.bincount(geneNo, pSpotZero)
+        return TotPredictedZ
+
+    def total_predicted_zero(self, genes, cells):
+        '''
+        ' given a vector
+        :param spots:
+        :return:
+        '''
+        geneNo = genes.panel.ispot.values
+        pCellZero = cells.classProb.sel({'class_name': 'Zero'}).values
+
         spotNeighbours = self.neighboring_cells['id'].iloc[:, :-1].values
         neighbourProb = self.neighboring_cells['prob'][:, :-1] #well, id is a dataframe but prob is a numpy area? WTF
         pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
