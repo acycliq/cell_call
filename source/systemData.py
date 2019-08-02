@@ -122,31 +122,11 @@ class Genes(object):
 
 class Spots(object):
     def __init__(self, df):
-        self._neighbors = None
-        self.collection = []
-        # self.neighboring_cells = dict()
         self.data = df.to_xarray().rename({'target': 'gene_name'})
-        self.SpotInCell = None
         self.call = None
-
         self._genes = Genes(self)
         self.gene_panel = self._genes.panel
         self.yxCoords = self.data[['y', 'x']].to_array().values.T
-
-    @property
-    def neighbors(self):
-        return self._neighbors
-
-    @neighbors.setter
-    def neighbors(self, value):
-        self._neighbors = value
-
-    def gene_name(self):
-        return self.data.gene_name.values
-
-    def spotId(self):
-        temp = list(map(lambda d: d.Id, self.collection))
-        return np.array(temp)
 
     def _neighborCells(self, cells, cfg):
         # this needs some clean up.
@@ -166,7 +146,6 @@ class Spots(object):
         cols = neighbors.shape[1]
         out = xr.DataArray(neighbors, coords=[('spot_id', range(rows)), ('neighbor', range(cols))])
         return out
-
 
     def _cellProb(self, label_image, neighbors, cells, cfg):
         roi = cfg['roi']
@@ -190,7 +169,6 @@ class Spots(object):
         da_1 = xr.DataArray(pSpotNeighb, coords=[('spot_id', range(nS)), ('neighbor', range(nN))])
         da_2 = xr.DataArray(SpotInCell, coords=[('spot_id', range(nS))])
         out = xr.Dataset({'cell_prob': da_1, 'label': da_2})
-
         return out
 
     def init_call(self, cells, label_image, config):
@@ -223,22 +201,7 @@ class Spots(object):
         neighbourProb = self.call.cell_prob.loc[:, [0, 1, 2]].values
         pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
         TotPredictedZ = np.bincount(geneNo, pSpotZero)
-        return TotPredictedZ
-
-    def total_predicted_zero(self, genes, cells):
-        '''
-        ' given a vector
-        :param spots:
-        :return:
-        '''
-        geneNo = genes.panel.ispot.values
-        pCellZero = cells.classProb.sel({'class_name': 'Zero'}).values
-
-        spotNeighbours = self.neighboring_cells['id'].iloc[:, :-1].values
-        neighbourProb = self.neighboring_cells['prob'][:, :-1] #well, id is a dataframe but prob is a numpy area? WTF
-        pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
-        TotPredictedZ = np.bincount(geneNo, pSpotZero)
-        return TotPredictedZ
+        return TotPredictedZwwwww
 
 
 def _parse(label_image, config):
