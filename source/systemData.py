@@ -60,16 +60,16 @@ class Cells(object):
         nG = len(spots.gene_panel.gene_name)
         cell_id = self.cell_id
         _id = np.append(cell_id, cell_id.max()+1)
-        nN = spots.neighboring_cells["id"].shape[1]
+        nN = spots.call.neighbors.shape[1]
         CellGeneCount = np.zeros([nC, nG])
 
         name = spots.gene_panel.gene_name.values
         ispot = spots.gene_panel.ispot.values
         for n in range(nN - 1):
-            c = spots.neighboring_cells["id"][n].values
+            c = spots.call.neighbors.loc[:, n].values
             # c = spots.neighboring_cells['id'].sel(neighbor=n).values
             group_idx = np.vstack((c[None, :], ispot[None, :]))
-            a = spots.neighboring_cells["prob"][:, n]
+            a = spots.call.cell_prob.loc[:, n]
             accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
             CellGeneCount = CellGeneCount + accumarray
         end = time.time()
@@ -124,9 +124,10 @@ class Spots(object):
     def __init__(self, df):
         self._neighbors = None
         self.collection = []
-        self.neighboring_cells = dict()
+        # self.neighboring_cells = dict()
         self.data = df.to_xarray().rename({'target': 'gene_name'})
         self.SpotInCell = None
+        self.call = None
 
         self._genes = Genes(self)
         self.gene_panel = self._genes.panel
@@ -163,15 +164,16 @@ class Spots(object):
         # finally return
         rows = neighbors.shape[0]
         cols = neighbors.shape[1]
-        # out = xr.DataArray(neighbors, coords=[('spot_id', range(rows)), ('neighbor', range(cols))])
-        return pd.DataFrame(neighbors)
+        out = xr.DataArray(neighbors, coords=[('spot_id', range(rows)), ('neighbor', range(cols))])
+        return out
+        # return pd.DataFrame(neighbors)
 
-    def _cellProb(self, label_image, cells, cfg):
+    def _cellProb(self, label_image, neighbors, cells, cfg):
         roi = cfg['roi']
         x0 = roi["x0"]
         y0 = roi["y0"]
         yxCoords = self.yxCoords
-        neighbors = self.neighboring_cells['id'].values
+        # neighbors = self.neighboring_cells['id'].values
         nS = len(yxCoords)
         nN = cfg['nNeighbors'] + 1
 
@@ -185,12 +187,25 @@ class Spots(object):
         pSpotNeighb[neighbors + 1 == SpotInCell[:, None]] = 1
         pSpotNeighb[SpotInCell == 0, -1] = 1
 
+        da_1 = xr.DataArray(pSpotNeighb, coords=[('spot_id', range(nS)), ('neighbor', range(nN))])
+        da_2 = xr.DataArray(SpotInCell, coords=[('spot_id', range(nS))])
+        out = xr.Dataset({'cell_prob': da_1, 'label': da_2})
 
-        return pSpotNeighb, SpotInCell
+        return pSpotNeighb, SpotInCell, out
 
     def get_neighbors(self, cells, label_image, config):
-        self.neighboring_cells['id'] = self._neighborCells(cells, config)
-        self.neighboring_cells['prob'], self.SpotInCell = self._cellProb(label_image, cells, config)
+        neighbors = self._neighborCells(cells, config)
+        _, _, my_ds = self._cellProb(label_image, neighbors, cells, config)
+        # self.neighboring_cells['id'] = neighbors
+        my_ds['neighbors'] = neighbors
+        self.call = my_ds
+        # self.neighborCells = _neighborCells
+
+    def get_neighbors2(self, cells, label_image, config):
+        neighbors = self._neighborCells(cells, config)
+        # self.neighboring_cells['prob'], self.SpotInCell = self._cellProb(label_image, cells, config)
+        my_ds = self._cellProb(label_image, neighbors, cells, config)
+        my_ds['new_da'] = self.neighboring_cells['id']
         # self.neighborCells = _neighborCells
 
     def loglik(self, cells, cfg):
@@ -203,7 +218,8 @@ class Spots(object):
         # last column (nN-closest) keeps the misreads,
         D[:, -1] = np.log(cfg['MisreadDensity'])
 
-        D[self.SpotInCell > 0, 0] = D[self.SpotInCell > 0, 0] + cfg['InsideCellBonus']
+        D[self.call.label.values > 0, 0] = D[self.call.label.values > 0, 0] + cfg['InsideCellBonus']
+        print('in loglik')
         return D
 
     def TotPredictedZ(self, geneNo, pCellZero):
@@ -212,8 +228,8 @@ class Spots(object):
         :param spots:
         :return:
         '''
-        spotNeighbours = self.neighboring_cells['id'].iloc[:, :-1].values
-        neighbourProb = self.neighboring_cells['prob'][:, :-1] #well, id is a dataframe but prob is a numpy area? WTF
+        spotNeighbours = self.call.neighbors.loc[:, [0, 1, 2]].values
+        neighbourProb = self.call.cell_prob.loc[:, [0, 1, 2]] #well, id is a dataframe but prob is a numpy area? WTF
         pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
         TotPredictedZ = np.bincount(geneNo, pSpotZero)
         return TotPredictedZ

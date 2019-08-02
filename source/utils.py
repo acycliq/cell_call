@@ -103,6 +103,8 @@ def label_spot(a, idx):
     flat_idx = np.ravel_multi_index(arr, dims=dim, order='C')
     out[is_within & is_positive] = a.ravel()[flat_idx]
 
+    print('in label_spot')
+
     return out
 
 
@@ -264,7 +266,7 @@ def softmax2(x):
 
 
 def isConverged(spots, p0, tol):
-    p1 = spots.neighboring_cells['prob']
+    p1 = spots.call.cell_prob
     if p0 is None:
         p0 = np.zeros(p1.shape)
     delta = np.max(np.abs(p1 - p0))

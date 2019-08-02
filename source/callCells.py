@@ -57,7 +57,7 @@ def celltype_assignment(cells, spots, prior, ds, cfg):
 
 def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
     # spot to cell assignment
-    nN = spots.neighboring_cells['id'].shape[1]
+    nN = spots.call.neighbors.shape[1]
     nS = spots.data.gene_name.shape[0]
     nK = prior.nK
     aSpotCell = np.zeros([nS, nN])
@@ -68,7 +68,7 @@ def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
         single_cell_data['log_mean_expression'].sel({'gene_name': spots_name})
 
         # get the spots' nth-closest cell
-        sn = spots.neighboring_cells["id"][n].values
+        sn = spots.call.neighbors.loc[:, n].values
 
         # get the respective cell type probabilities
         cp = cells.classProb.sel({'cell_id': sn}).data
@@ -85,7 +85,7 @@ def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
 
     # update the prob a spot belongs to a neighboring cell
     pSpotNeighb = utils.softmax2(wSpotCell)
-    spots.neighboring_cells['prob'] = pSpotNeighb
+    spots.call.cell_prob.data = pSpotNeighb
     logger.info('spot ---> cell probabilities updated')
 
 
@@ -97,7 +97,7 @@ def updateGamma(cells, spots, single_cell_data, egamma, ini):
 
     TotPredicted = cells.geneCountsPerKlass(single_cell_data, egamma, ini)
 
-    TotPredictedB = np.bincount(spots.gene_panel.ispot.data, spots.neighboring_cells['prob'][:, -1])
+    TotPredictedB = np.bincount(spots.gene_panel.ispot.data, spots.call.cell_prob.loc[:, 3].data)
 
     nom = ini['rGene'] + spots.gene_panel.total_spots - TotPredictedB - TotPredictedZ
     denom = ini['rGene'] + TotPredicted

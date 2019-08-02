@@ -75,7 +75,7 @@ for i in range(100):
     logger.info('Iteration %d, mean prob change %f' % (i, delta))
 
     # replace p0 with the latest probabilities
-    p0 = spots.neighboring_cells['prob']
+    p0 = spots.call.cell_prob.values
 
     # cc.cell_assignment(spots, cells, elgamma, prior)
 
