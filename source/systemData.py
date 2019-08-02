@@ -166,7 +166,7 @@ class Spots(object):
         cols = neighbors.shape[1]
         out = xr.DataArray(neighbors, coords=[('spot_id', range(rows)), ('neighbor', range(cols))])
         return out
-        # return pd.DataFrame(neighbors)
+
 
     def _cellProb(self, label_image, neighbors, cells, cfg):
         roi = cfg['roi']
@@ -191,22 +191,13 @@ class Spots(object):
         da_2 = xr.DataArray(SpotInCell, coords=[('spot_id', range(nS))])
         out = xr.Dataset({'cell_prob': da_1, 'label': da_2})
 
-        return pSpotNeighb, SpotInCell, out
+        return out
 
-    def get_neighbors(self, cells, label_image, config):
+    def init_call(self, cells, label_image, config):
         neighbors = self._neighborCells(cells, config)
-        _, _, my_ds = self._cellProb(label_image, neighbors, cells, config)
-        # self.neighboring_cells['id'] = neighbors
+        my_ds = self._cellProb(label_image, neighbors, cells, config)
         my_ds['neighbors'] = neighbors
         self.call = my_ds
-        # self.neighborCells = _neighborCells
-
-    def get_neighbors2(self, cells, label_image, config):
-        neighbors = self._neighborCells(cells, config)
-        # self.neighboring_cells['prob'], self.SpotInCell = self._cellProb(label_image, cells, config)
-        my_ds = self._cellProb(label_image, neighbors, cells, config)
-        my_ds['new_da'] = self.neighboring_cells['id']
-        # self.neighborCells = _neighborCells
 
     def loglik(self, cells, cfg):
         meanCellRadius = cells.ds.mean_radius
@@ -229,7 +220,7 @@ class Spots(object):
         :return:
         '''
         spotNeighbours = self.call.neighbors.loc[:, [0, 1, 2]].values
-        neighbourProb = self.call.cell_prob.loc[:, [0, 1, 2]] #well, id is a dataframe but prob is a numpy area? WTF
+        neighbourProb = self.call.cell_prob.loc[:, [0, 1, 2]].values
         pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
         TotPredictedZ = np.bincount(geneNo, pSpotZero)
         return TotPredictedZ

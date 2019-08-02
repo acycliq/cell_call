@@ -266,7 +266,7 @@ def softmax2(x):
 
 
 def isConverged(spots, p0, tol):
-    p1 = spots.call.cell_prob
+    p1 = spots.call.cell_prob.values
     if p0 is None:
         p0 = np.zeros(p1.shape)
     delta = np.max(np.abs(p1 - p0))
