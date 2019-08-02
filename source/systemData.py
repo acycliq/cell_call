@@ -201,7 +201,7 @@ class Spots(object):
         neighbourProb = self.call.cell_prob.loc[:, [0, 1, 2]].values
         pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
         TotPredictedZ = np.bincount(geneNo, pSpotZero)
-        return TotPredictedZwwwww
+        return TotPredictedZ
 
 
 def _parse(label_image, config):
