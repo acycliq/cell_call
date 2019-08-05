@@ -75,6 +75,8 @@ for i in range(100):
     p0 = spots.call.cell_prob.values
 
     if converged:
+        cells.iss_summary(spots)
+        spots.summary()
         print("Success!!")
         break
 

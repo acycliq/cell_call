@@ -25,6 +25,7 @@ class Cells(object):
     # Get rid of the properties where not necessary!!
     def __init__(self, label_image, config):
         self.ds = _parse(label_image, config)
+        self.classProb = None
 
     @property
     def yx_coords(self):
@@ -85,6 +86,45 @@ class Cells(object):
         TotPredicted = ClassTotPredicted.drop('Zero', dim='class_name').sum(dim='class_name')
         return TotPredicted
 
+    def iss_summary(self, spots):
+        '''
+        returns a datafram summarising the main feaures of each cell, ie gene counts and cell types
+        :param spots:
+        :return:
+        '''
+        x = self.ds.x.values
+        y = self.ds.y.values
+
+        gene_count = self.geneCount(spots)
+        class_prob = self.classProb
+
+        # data = [x[:, None], y[:, None]]
+        # df = pd.DataFrame(data)
+
+        tol = 0.001
+        data = []
+        logger.info('starting collecting data...')
+        for i in range(len(x)):
+            temp = []
+            temp.append(i)
+            temp.append(x[i])
+            temp.append(y[i])
+            mask = gene_count[i] > tol
+            temp.append(gene_count.gene_name[mask].values)
+            temp.append(gene_count.loc[i, mask].values)
+
+            mask_2 = class_prob[i] > tol
+            temp.append(class_prob.class_name[mask_2].values)
+            temp.append(class_prob.loc[i, mask_2].values)
+
+            data.append(temp)
+
+        logger.info('finished!')
+        iss_df = pd.DataFrame(data, columns=['Cell_Num', 'x', 'y', 'Genenames', 'CellGeneCount', 'ClassName', 'Prob'])
+        iss_df.set_index(['Cell_Num'])
+        return iss_df
+
+
 
 class Prior(object):
     def __init__(self, cell_type):
@@ -122,11 +162,11 @@ class Genes(object):
 
 class Spots(object):
     def __init__(self, df):
-        self.data = df.to_xarray().rename({'target': 'gene_name'})
+        self.data = df.rename(columns={'target': 'gene_name'})
         self.call = None
         self._genes = Genes(self)
         self.gene_panel = self._genes.panel
-        self.yxCoords = self.data[['y', 'x']].to_array().values.T
+        self.yxCoords = self.data[['y', 'x']].values
 
     def _neighborCells(self, cells, cfg):
         # this needs some clean up.
@@ -203,6 +243,48 @@ class Spots(object):
         TotPredictedZ = np.bincount(geneNo, pSpotZero)
         return TotPredictedZ
 
+    def summary(self):
+        # check for duplicates (ie spots with the same coordinates with or without the same gene name).
+        # I dont know why but it can happen. Misfire during spot calling maybe?
+        is_duplicate = self.data.duplicated(subset=['x', 'y'])
+
+        p = []
+        nbrs = []
+        max_nbrs = []
+        num_rows = self.data.shape[0]
+        # for i in range(num_rows):
+        #     if i%1000 == 0:
+        #         logger.info('Spot %d out of %d' % (i, num_rows))
+        #     _cp = self.call.cell_prob.loc[i, :].values
+        #     _nbrs = self.call.neighbors.loc[i, :].values
+        #     p.append(_cp)
+        #     nbrs.append(_nbrs)
+        #     max_nbrs.append(_nbrs[np.argmax(_cp)])
+
+        cell_prob = self.call.cell_prob.values
+        neighbors = self.call.neighbors.values
+        logger.info('One')
+        p = [cell_prob[i, :] for i in range(num_rows)]
+        logger.info('Two')
+        nbrs = [neighbors[i, :] for i in range(num_rows)]
+        logger.info('Three')
+        max_nbrs = [neighbors[i, idx] for i in range(num_rows) for idx in [np.argmax(cell_prob[i, :])]]
+        logger.info('ok')
+
+        out = pd.DataFrame()
+        out['Gene'] = self.data.gene_name
+        out['Expt'] = self.gene_panel.ispot
+        out['x'] = self.data.x
+        out['y'] = self.data.y
+        out['neighbour'] = max_nbrs
+        out['neighbour_array'] = nbrs
+        out['neighbour_prob'] = p
+
+        return out
+
+
+
+
 
 def _parse(label_image, config):
     '''
@@ -251,6 +333,10 @@ def _parse(label_image, config):
                         'mean_radius': meanCellRadius,
                         'x': x,
                         'y': y})
+
+    # sanity check
+    assert ds.x.shape[0] == num_cells + 1 & ds.y.shape[0] == num_cells + 1, 'Dataset should have one extra (dummy) cell'
+    assert np.isnan(ds.x[-1].values) & np.isnan(ds.y[-1].values), 'Last cell is a dummy cell, assigned to misreads. Should have nan coordinates!'
 
     # stats = xr.DataArray(temp,
     #              coords={'cell_id': np.arange(temp.shape[0]),

@@ -61,7 +61,7 @@ def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
     nS = spots.data.gene_name.shape[0]
     nK = prior.nK
     aSpotCell = np.zeros([nS, nN])
-    gn = spots.data.gene_name
+    gn = spots.data.gene_name.values
     expected_spot_counts = single_cell_data['log_mean_expression'].sel({'gene_name': gn}).data
     for n in range(nN - 1):
         spots_name = spots.gene_panel.gene_name.values[spots.gene_panel.ispot.values]
