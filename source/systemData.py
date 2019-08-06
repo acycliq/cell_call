@@ -94,34 +94,38 @@ class Cells(object):
         '''
         x = self.ds.x.values
         y = self.ds.y.values
+        cell_id = self.ds.cell_id.values
 
         gene_count = self.geneCount(spots)
         class_prob = self.classProb
-
-        # data = [x[:, None], y[:, None]]
-        # df = pd.DataFrame(data)
+        gene_names = gene_count.gene_name.values
+        class_names = class_prob.class_name.values
 
         tol = 0.001
-        data = []
-        logger.info('starting collecting data...')
-        for i in range(len(x)):
-            temp = []
-            temp.append(i)
-            temp.append(x[i])
-            temp.append(y[i])
-            mask = gene_count[i] > tol
-            temp.append(gene_count.gene_name[mask].values)
-            temp.append(gene_count.loc[i, mask].values)
 
-            mask_2 = class_prob[i] > tol
-            temp.append(class_prob.class_name[mask_2].values)
-            temp.append(class_prob.loc[i, mask_2].values)
+        logger.info('starting collecting data (alt)...')
+        N = len(cell_id)
+        isCount_nonZero = [gene_count.values[n, :] > tol for n in range(N)]
+        name_list = [gene_names[isCount_nonZero[n]] for n in range(N)]
+        count_list = [gene_count[n, isCount_nonZero[n]].values for n in range(N)]
 
-            data.append(temp)
+        isProb_nonZero = [class_prob.values[n, :] > tol for n in range(N)]
+        class_name_list = [class_names[isProb_nonZero[n]] for n in range(N)]
+        prob_list = [class_prob.values[n, isProb_nonZero[n]] for n in range(N)]
 
-        logger.info('finished!')
-        iss_df = pd.DataFrame(data, columns=['Cell_Num', 'x', 'y', 'Genenames', 'CellGeneCount', 'ClassName', 'Prob'])
+        iss_df = pd.DataFrame({'Cell_Num': self.ds.cell_id.values,
+                                'x': self.ds.x.values,
+                                'y': self.ds.y.values,
+                                'Genenames': name_list,
+                                'CellGeneCount': count_list,
+                                'ClassName': class_name_list,
+                                'Prob': prob_list
+                                },
+                               columns=['Cell_Num', 'x', 'y', 'Genenames', 'CellGeneCount', 'ClassName', 'Prob']
+                               )
         iss_df.set_index(['Cell_Num'])
+        logger.info('finished!')
+
         return iss_df
 
 
