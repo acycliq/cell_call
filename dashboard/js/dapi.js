@@ -322,7 +322,8 @@ function dapi(config) {
                 "Cell_Num": origin.Cell_Num,
                 "fromPoint": fromPoint,
                 "toPoint": toPoint,
-                "color": getColor(glyphMap.get(gene).taxonomy),
+                "color": getColor(getTaxonomy(gene)),
+                // "color": getColor(glyphMap.get(gene).taxonomy),
             };
 
             //create features with proper geojson structure
