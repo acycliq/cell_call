@@ -1,4 +1,5 @@
-function SearchAndFilterThingy() {
+function SearchAndFilterThingy(argin) {
+  console.log('I passed in' + argin)
   var input, filter, table, tr, td, x;
   input = document.getElementById("UserInput");
   filter = input.value.toUpperCase();

@@ -1,0 +1,8 @@
+<html>
+    <head>
+         <script type="text/javascript" {{ url_for('static', filename='app.js')}}></script>
+         <script type="text/javascript">
+            myVar = myFunc({{vars|tojson}})
+         </script>
+    </head>
+</html>
