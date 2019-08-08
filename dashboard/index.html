@@ -101,7 +101,7 @@
     <script src='dashboard/js/exporter.js'></script>
     <!--<script src='./js/index.js'></script>-->
     <script src='dashboard/js/config.js'></script>
-    <script src='dashboard/js/app.js'></script> <!--Keep that at the bottom. below all other js files-->
+{#    <script src='dashboard/js/app.js'></script> <!--Keep that at the bottom. below all other js files-->#}
     <!--There is also a index.js which I am reference further down, inside <body></body> towards its end-->
 
     <link rel="stylesheet" href="dashboard/css/index.css">
@@ -362,7 +362,39 @@
 
     <!--Another user script. Needs to be here, after all the divs have been read-->
     <script src='dashboard/js/index.js'></script>
-    <script var graphData = {{ data.chart_data | safe }} ></script>
+    <script>
+
+        function getMinZoom(str) {
+            return str === 'default' ? 4 : 2;
+        }
+
+
+        var config = []
+        config.name = '98 gene panel';
+        var graphData = {{ data.chart_data | safe }};
+        config.geneData = {{ data.geneData | safe }};
+        config.cellData = {{ data.cellData | safe }};
+        config.roi = {{ data.roi | safe }};
+        config.imageSize = {{ data.imageSize | safe }};
+        tiles = {{ data.tiles | safe }};
+        config.tiles = tiles[0]
+
+        for (i = 0; i < config.cellData.length; ++i) {
+            // make sure Prob and ClassName are arrays
+            config.cellData[i].myProb = Array.isArray(config.cellData[i].Prob)? config.cellData[i].Prob: [config.cellData[i].Prob];
+            config.cellData[i].myClassName = Array.isArray(config.cellData[i].ClassName)? config.cellData[i].ClassName: [config.cellData[i].ClassName];
+
+            config.cellData[i].Cell_Num = +config.cellData[i].Cell_Num;
+            config.cellData[i].x = +config.cellData[i].X;
+            config.cellData[i].y = +config.cellData[i].Y;
+        }
+
+        //render now the charts
+        var issData = sectionChart(config.cellData);
+        dapiChart(config.cellData, config.geneData, config);
+        landingPoint(config.name)
+
+    </script>
 
 
     <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->

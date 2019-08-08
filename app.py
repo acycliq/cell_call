@@ -15,7 +15,17 @@ def index():
     # chart_data = df.to_dict(orient='records')
     # chart_data = json.dumps(chart_data, indent=2)
     chart_data = df.to_json(orient='records')
-    data = {'chart_data': chart_data}
+    cellData = pd.read_json('iss.json').to_json(orient='records')
+    geneData = pd.read_json('genes.json').to_json(orient='records')
+    data = {'chart_data': chart_data,
+            'cellData': cellData,
+            'geneData': geneData,
+            'name': '98 gene panel',
+            'roi': '{x0: 6150, x1: 13751, y0: 12987, y1: 18457}',
+            'imageSize': '[16384, 11791]',
+            'tiles': ['./dashboard/data/img/default_98genes/16384px/{z}/{x}/{y}.png'],
+            'someText': 'this is some text'
+            }
     return render_template("index.html", data=data)
 
 
