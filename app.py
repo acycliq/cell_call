@@ -11,10 +11,6 @@ app = Flask(__name__,
 
 @app.route("/")
 def index():
-    # df = pd.read_csv('data.csv').drop('Open', axis=1)
-    # chart_data = df.to_dict(orient='records')
-    # chart_data = json.dumps(chart_data, indent=2)
-    # chart_data = df.to_json(orient='records')
     cellData = pd.read_json('iss.json').to_dict(orient='records')
     geneData = pd.read_json('genes.json').to_dict(orient='records')
     data = {'cellData': cellData,
