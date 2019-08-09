@@ -23,7 +23,7 @@ def index():
             'name': '98 gene panel',
             'roi': '{x0: 6150, x1: 13751, y0: 12987, y1: 18457}',
             'imageSize': '[16384, 11791]',
-            'tiles': ['./dashboard/data/img/default_98genes/16384px/{z}/{x}/{y}.png'],
+            'tiles': '"./dashboard/data/img/default_98genes/16384px/{z}/{x}/{y}.png"', # Needs to be like that, ie single quote, then double quote
             'someText': 'this is some text'
             }
     return render_template("index.html", data=data)
