@@ -29,7 +29,7 @@ print("reading CellMap from %s" % label_image_path)
 label_image = loadmat(os.path.join(label_image_path))
 label_image = label_image["CellMap"]
 
-saFile = "../data_preprocessed/spot_attributes.nc"
+saFile = config.DEFAULT['saFile']
 
 
 
