@@ -8,7 +8,8 @@ DEFAULT = {
     'nNeighbors': 3,
     'rGene': 20,
     'rSpot': 2,
-    'label_image': '../cached_data/default/CellMap.mat',
+    'label_image': '../demo_data/CellMap.mat',
     'roi': {"x0": 6150, "x1": 13751, "y0": 12987, "y1": 18457},
-    'geneset': '../cached_data/GeneSet.mat',
+    'geneset': '../demo_data/GeneSet.mat',
+    'saFile': "../demo_data/spot_attributes.nc", # Spot attributes, contains spots x,y coordinates and their gene names
 }
