@@ -8,6 +8,7 @@ import source.config as config
 import callCells as cc
 import starfish as sf
 import xarray as xr
+import pandas as pd
 import utils
 import os
 import logging
@@ -37,7 +38,7 @@ cells = Cells(label_image, config.DEFAULT)
 
 
 logger.info('********* Getting spotattributes from %s **********', saFile)
-sa = sf.core.types.SpotAttributes(xr.open_dataset(saFile).to_dataframe())
+sa = sf.core.types.SpotAttributes(pd.read_csv(saFile))
 
 logger.warning('*******************************')
 logger.warning('** WARNING WARNING WARNING ***')
