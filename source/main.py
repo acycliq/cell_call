@@ -37,7 +37,7 @@ cells = Cells(label_image, config.DEFAULT)
 
 
 logger.info('********* Getting spotattributes from %s **********', saFile)
-sa = sf.types.SpotAttributes(xr.open_dataset(saFile).to_dataframe())
+sa = sf.core.types.SpotAttributes(xr.open_dataset(saFile).to_dataframe())
 
 logger.warning('*******************************')
 logger.warning('** WARNING WARNING WARNING ***')
