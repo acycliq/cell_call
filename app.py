@@ -30,15 +30,16 @@ def index():
     return render_template("index.html", data=data)
 
 
-def get_browser(url):
+def get_browser():
+    url = 'http://127.0.0.1:5000/'
     my_os = platform.system()
 
     if my_os == 'Windows':
-        chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s'
+        chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
     elif my_os == 'Darwin':
-        chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+        chrome_path = 'open -a /Applications/Google\ Chrome.app'
     elif my_os == 'Linux':
-        chrome_path = '/usr/bin/google-chrome %s'
+        chrome_path = '/usr/bin/google-chrome'
     else:
         chrome_path = None
 
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     # webbrowser.open_new('http://127.0.0.1:5000/')
     # app.run(debug=True)
 
-    threading.Timer(1, open_browser).start();
-    # threading.Timer(1, get_browser('http://127.0.0.1:5000/')).start();
+    # threading.Timer(1, open_browser).start();
+    threading.Timer(1, get_browser).start();
     app.run(port=5000)
     print('Done')
