@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # webbrowser.open_new('http://127.0.0.1:5000/')
     # app.run(debug=True)
 
-    # threading.Timer(1, open_browser).start();
-    threading.Timer(1, get_browser).start();
+    threading.Timer(1, open_browser).start();
+    # threading.Timer(1, get_browser).start();
     app.run(port=5000)
     print('Done')
