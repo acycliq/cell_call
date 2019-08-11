@@ -10,14 +10,15 @@ logging.basicConfig(
     )
 
 dim = 32768
-roi = {"x0": 6150, "x1": 13751, "y0": 12987, "y1": 18457}
+# roi = {"x0": 6150, "x1": 13751, "y0": 12987, "y1": 18457}
+roi = {"y0": 6150, "y1": 13751, "x0": 12987, "x1": 18457}
 
-img_path = 'background_boundaries.tif'
+img_path = 'background_boundaries2.tif'
 out_dir = str(dim) + 'px'
 
-im = pyvips.Image.new_from_file('background_boundaries.tif', access='sequential')
-# im = im.colourspace('srgb')
-# im = im.addalpha()
+im = pyvips.Image.new_from_file(img_path, access='sequential')
+im = im.colourspace('srgb')
+im = im.addalpha()
 
 assert im.width == roi['x1']-roi['x0']+1 and im.height == roi['y1']-roi['y0']+1, \
     "The size of the image is %d by %d but the ROI implies that the size is %d by %d" % (im.width, im.height, roi['x1']-roi['x0']+1, roi['y1']-roi['y0']+1)
