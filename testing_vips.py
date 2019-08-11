@@ -20,7 +20,7 @@ im = pyvips.Image.new_from_file('background_boundaries.tif', access='sequential'
 # im = im.addalpha()
 
 assert im.width == roi['x1']-roi['x0']+1 and im.height == roi['y1']-roi['y0']+1, \
-    "The size of image is %d by %d but the roi implies that the size is  %d by %d" % (im.width, im.height, roi['x1']-roi['x0']+1, roi['y1']-roi['y0']+1)
+    "The size of the image is %d by %d but the ROI implies that the size is %d by %d" % (im.width, im.height, roi['x1']-roi['x0']+1, roi['y1']-roi['y0']+1)
 
 
 logger.info('Resising image: %s' % img_path)
