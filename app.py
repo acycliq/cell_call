@@ -43,7 +43,7 @@ def get_browser():
 
     if my_os == 'Windows':
         chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
-    elif my_os == 'Darwin':
+    elif my_os == 'Darwin':  # Is this always the case for MacOS?
         chrome_path = 'open -a /Applications/Google\ Chrome.app'
     elif my_os == 'Linux':
         chrome_path = '/usr/bin/google-chrome'
