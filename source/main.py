@@ -8,6 +8,7 @@ import source.config as config
 import callCells as cc
 import starfish as sf
 import xarray as xr
+import pandas as pd
 import utils
 import os
 import logging
@@ -29,7 +30,7 @@ print("reading CellMap from %s" % label_image_path)
 label_image = loadmat(os.path.join(label_image_path))
 label_image = label_image["CellMap"]
 
-saFile = "../data_preprocessed/spot_attributes.nc"
+saFile = config.DEFAULT['saFile']
 
 
 
@@ -37,7 +38,7 @@ cells = Cells(label_image, config.DEFAULT)
 
 
 logger.info('********* Getting spotattributes from %s **********', saFile)
-sa = sf.types.SpotAttributes(xr.open_dataset(saFile).to_dataframe())
+sa = sf.core.types.SpotAttributes(pd.read_csv(saFile))
 
 logger.warning('*******************************')
 logger.warning('** WARNING WARNING WARNING ***')

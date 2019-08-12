@@ -1,4 +1,6 @@
 venv/
 .vscode/
-.idea
+.idea/
+__pycache__/
+source/__pycache__/
 .xml

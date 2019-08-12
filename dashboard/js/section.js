@@ -207,7 +207,7 @@ function dataManager(sectionFeatures, data) {
     for (var i = 0; i < data.length; ++i) {
         var temp = [];
         for (var j = 0; j < data[i].ClassName.length; ++j) {
-            console.log(data[i].ClassName[j])
+            // console.log(data[i].ClassName[j])
             temp.push({
                 IdentifiedType: sectionFeatures.colorMap.get(data[i].ClassName[j]).IdentifiedType,
                 color: sectionFeatures.colorMap.get(data[i].ClassName[j]).color,
@@ -564,7 +564,7 @@ function sectionChart(data) {
                     .attr('cy', sectionFeatures.scale.y(d.y))
                     .attr("r", 1.2 * Math.sqrt(d.managedData.GeneCountTotal));
 
-                // If event has be triggered from the scatter chart, so a tooltip
+                // If event has been triggered from the scatter chart, do a tooltip
                 if (d3.event && d3.event.pageX) {
 
                     var myHtml = '<h4 style="margin-top:0px; margin-bottom:1px"><b>' + d.managedData.IdentifiedType + '</b></h4>' +
@@ -598,7 +598,7 @@ function sectionChart(data) {
 
 
     // use that to check counts per IdentifiedType and then set the renderOrder in such a manner that
-    // names which smaller counts (ie rarer) will be rendered on top of more frequent ones
+    // names with smaller counts (ie rarer) will be rendered on top of more frequent ones
     var countData = d3.nest()
         .key(function (d) {
             return d.managedData.IdentifiedType

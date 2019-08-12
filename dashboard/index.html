@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-128060564-3"></script>
+    <script>
+        var host = window.location.hostname;
+        if (host != 'localhost') {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', 'UA-128060564-4');
+        }
+    </script>
+
+    <meta charset='utf-8'>
+
+    <title>Dashboard</title>
+
+    <meta name="description" content="A d3.js dashboard for data visualisation">
+
+    <!-- the favicon -->
+    <link rel="shortcut icon" href="dashboard/data/img/favicon.ico" type="image/x-icon" />
+
+    <!--jquery v3.3.1 -->
+    <script src="dashboard/lib/js/jquery-3.3.1.js"></script>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="dashboard/lib/css/bootstrap.min.css">
+    <script src="dashboard/lib/js/bootstrap.min.js"></script>
+
+    <!-- bootstrap switch -->
+    <link rel="stylesheet" href="dashboard/lib/css/bootstrap-switch.css">
+    <script src="dashboard/lib/js/bootstrap-switch.js"></script>
+
+    <!-- bootstrap toggle-->
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+    <!-- keen.io -->
+    <link rel="stylesheet" href="dashboard/lib/css/keen-dashboards.css">
+    <script src="dashboard/lib/js/keen.min.js"></script>
+
+    <!-- d3 -->
+    <script src='dashboard/lib/js/d3.v4.min.js'></script>
+    <script src="dashboard/lib/js/d3-delaunay.min.js"></script>
+
+    <!-- leaflet v1.3.1 -->
+    <link rel="stylesheet" href="dashboard/lib/css/leaflet.css"/>
+    <script src="dashboard/lib/js/leaflet.js"></script>
+
+{#    <!-- leaflet Fullscreen v1.0.1-->#}
+{#    <link href='dashboard/lib/css/leaflet.fullscreen.css' rel='stylesheet'/>#}
+{#    <script src='dashboard/lib/js/Leaflet.fullscreen.min.js'></script>#}
+
+    <!-- leaflet Fullscreen -->
+    <link rel="stylesheet" href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'/>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+
+    <!-- minimap -->
+    <link rel="stylesheet" href='dashboard/lib/css/Control.MiniMap.min.css'/>
+    <script src='dashboard/lib/js/Control.MiniMap.min.js'></script>
+
+    <!-- leaflet Coordinates v0.1.3 -->
+    <link rel="stylesheet" href="dashboard/lib/css/Leaflet.Coordinates-0.1.3.css"/>
+    <script src="dashboard/lib/js/Leaflet.Coordinates-0.1.3.src.js"></script>
+
+    <!-- datatables v1.10.19 -->
+    <link rel="stylesheet" href="dashboard/lib/css/jquery.dataTables.min.css">
+    <script src="dashboard/lib/js/jquery.dataTables.min.js"></script>
+
+    <!-- Leaflet Coordinates v0.1.5-->
+    <link rel="stylesheet" href="dashboard/lib/css/Leaflet.Coordinates-0.1.5.css">
+    <script src="dashboard//lib/js/Leaflet.Coordinates-0.1.5.min.js"></script>
+
+    <!-- Page loader -->
+    <link rel="stylesheet" href="dashboard/css/normalize.css">
+    <link rel="stylesheet" href="dashboard/css/main.css">
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>-->
+
+    <!-- Font Awesome v5.3.1 -->
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">-->
+    <link rel="stylesheet" href="dashboard/lib/css/font_awesome_all.css">
+
+    <!-- User scripts  -->
+    <script src="dashboard/js/glyphs.js"></script>
+    <script src="dashboard/js/utils.js"></script>
+    <script src='dashboard/js/classColors.js'></script>
+    <script src='dashboard/js/updater.js'></script>
+    <script src='dashboard/js/section.js'></script>
+    <script src='dashboard/js/barchart.js'></script>
+    <script src='dashboard/js/donut.js'></script>
+    <script src='dashboard/js/dt.js'></script>
+    <script src='dashboard/js/spotPopup.js'></script>
+    <script src='dashboard/js/dapi.js'></script>
+    <script src='dashboard/js/glyphAssignment.js'></script>
+    <script src='dashboard/js/heatmap.js'></script>
+    <script src='dashboard/js/exporter.js'></script>
+    <!--<script src='./js/index.js'></script>-->
+    <script src='dashboard/js/config.js'></script>
+{#    <script src='dashboard/js/app.js'></script> <!--Keep that at the bottom. below all other js files-->#}
+    <!--There is also a index.js which I am reference further down, inside <body></body> towards its end-->
+
+    <link rel="stylesheet" href="dashboard/css/index.css">
+
+
+</head>
+
+<body class="application" id="body">
+
+<div id="loader-wrapper">
+    <div id="loader"></div>
+
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+    <!--        <p id='status'>Loading...</p>-->
+
+</div>
+
+<form id="mapCenterForm">
+    <input type="hidden" id="xValue"/>
+    <input type="hidden" id="yValue"/>
+</form>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title">Transcriptomics viewer</h2>
+            </div>
+            <div class="modal-body">
+
+                <p>
+                    For comments, bugs, etc: <a href="mailto:dimitris.nicoloutsopoulos@gmail.com"> dimitris.nicoloutsopoulos@gmail.com </a>
+                </p>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- main page container, holding the nav tabs and content -->
+<div id="container">
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Cell Mapping Visualization</a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a data-target="#myModal" data-toggle="modal" href="#myModal">About</a></li>
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div><!--/.container-fluid -->
+
+        </div>
+    </div>
+
+
+
+    <!-- map content tab -->
+    <div class="tab-pane active fade in" id="map-content">
+            <div class="container-fluid">
+                <div class="row" style="margin-top:5px">
+                    <!--//top row-->
+                    <div class="row" style="margin-top:5px">
+                        <div class="col-sm-12">
+                            <!-- Map -->
+                            <div class="col-sm-7">
+                                <div class="chart-wrapper">
+                                    <div class="chart-title">
+                                        Gene Map
+                                    </div>
+                                    <div class="chart-stage">
+                                        <div id="leafletmap">
+                                            <div id="mymap" style="width: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Map -->
+
+
+                            <div class="col-sm-5">
+                                <div class="row">
+                                    <div class="chart-wrapper">
+                                        <div class="chart-title">
+                                            Section Overview
+                                        </div>
+                                        <div class="chart-stage">
+                                            <!-- Scatter Plot -->
+                                            <div class="col-sm-8">
+                                                <div id="scatter-plot" class="display compact custom" ; width=100%>
+                                                    <svg></svg>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <table class="no-spacing" id="section-chart-controls" width="100%">
+                                                    <!--<div id = "section-chart-controls">-->
+                                                    <!--<label>-->
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>Select All</td>
+                                                        <td><input type="checkbox" name="cb:select-all"/></td>
+                                                        <td class="checkBoxLabel">Clear All</td>
+                                                        <td><input type="checkbox" name="cb:clear-all"/></td>
+                                                    </tr>
+                                                    <tr style="width:95px; border-top:1px solid #8a9597;">
+                                                        <td>Axo-axonic</td>
+                                                        <td><input type="checkbox" name="Axo-axonic"/></td>
+                                                        <td class="checkBoxLabel">NGF/I-S transition</td>
+                                                        <td><input type="checkbox" name="NGF/I-S transition"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Backprojection</td>
+                                                        <td><input type="checkbox" name="Backprojection"/></td>
+                                                        <td class="checkBoxLabel">Non Neuron</td>
+                                                        <td><input type="checkbox" name="Non Neuron"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Basket</td>
+                                                        <td><input type="checkbox" name="Basket"/></td>
+                                                        <td class="checkBoxLabel">O/LM</td>
+                                                        <td><input type="checkbox" name="O/LM"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Bistratified</td>
+                                                        <td><input type="checkbox" name="Bistratified"/></td>
+                                                        <td class="checkBoxLabel">O-Bi</td>
+                                                        <td><input type="checkbox" name="O-Bi"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Cck</td>
+                                                        <td><input type="checkbox" name="Cck"/></td>
+                                                        <td class="checkBoxLabel">PC</td>
+                                                        <td><input type="checkbox" name="PC"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>CGE NGF</td>
+                                                        <td><input type="checkbox" name="CGE NGF"/></td>
+                                                        <td class="checkBoxLabel">Radiatum retrohip</td>
+                                                        <td><input type="checkbox" name="Radiatum retrohip"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Hippocamposeptal</td>
+                                                        <td><input type="checkbox" name="Hippocamposeptal"/></td>
+                                                        <td class="checkBoxLabel">Trilaminar</td>
+                                                        <td><input type="checkbox" name="Trilaminar"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>IS</td>
+                                                        <td><input type="checkbox" name="IS"/></td>
+                                                        <td class="checkBoxLabel">Unidentified</td>
+                                                        <td><input type="checkbox" name="Unidentified"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Ivy</td>
+                                                        <td><input type="checkbox" name="Ivy"/></td>
+                                                        <td class="checkBoxLabel">Zero</td>
+                                                        <td><input type="checkbox" name="Zero"/></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>MGE NGF</td>
+                                                        <td><input type="checkbox" name="MGE NGF"/></td
+
+                                                    </tr>
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <!-- Bar and Pie Chart -->
+                                    <div class="chart-wrapper">
+                                        <div class="chart-title">
+                                            Cell Type Probabilities
+                                        </div>
+                                        <div class="chart-stage">
+                                            <div class="col-sm-7">
+                                                <div class="chart-stage" id="bar-chart">
+                                                    <svg width="400" height="200">
+                                                        <!-- Add a clip path -->
+                                                        <defs>
+                                                            <clipPath id="my-clip-path">
+                                                                <rect></rect>
+                                                            </clipPath>
+                                                        </defs>
+                                                        <g class="focus">
+                                                            <g class="axis"></g>
+                                                            <g class="axis axis--y"></g>
+                                                        </g>
+                                                        <g class="context">
+                                                            <g class="axis2"></g>
+                                                            <g class="brush"></g>
+                                                        </g>
+                                                    </svg>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-5">
+                                                <div class="chart-stage" id="pie">
+                                                    <svg width="280" height="200"></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="chart-wrapper">
+                                        <div class="chart-title" id="dtTitle">
+                                            Title
+                                        </div>
+                                        <div class="chart-stage">
+                                            <div class="col-sm-6">
+                                                <div class="chart-stage">
+                                                    <table id="dtTable" class="display compact custom"
+                                                           data-page-length='5' width=100%></table>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="chart-stage">
+                                                    <table id="dtTable2" class="display compact custom"
+                                                           data-page-length='5' width=100%></table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    <!--<hr>-->
+
+    <div id="footnote" style="margin-top:-15px;">
+        <p class="small text-muted" id="alignleft">University College London - <a href="http://www.ucl.ac.uk/cortexlab">Cortexlab</a>  | Stockholm University - <a href="https://www.scilifelab.se/researchers/mats-nilsson/">SciLifeLab</a> </p>
+        <p class="small text-muted" id="alignright">Best viewed with <img src="./dashboard/data/img/if_chrome_87865.png" class="chromeIcon" alt="Warning!"></p>
+    </div>
+    <!--<div style="clear: both;"></div>-->
+
+
+    <!--Another user script. Needs to be here, after all the divs have been read-->
+    <script src='dashboard/js/index.js'></script>
+    <script>
+
+        function getMinZoom(str) {
+            return str === 'default' ? 4 : 2;
+        }
+
+
+        var config = []
+        config.name = '98 gene panel';
+        config.geneData = {{ data.geneData | safe }};
+        config.cellData = {{ data.cellData | safe }};
+        config.roi = {{ data.roi | safe }};
+        config.imageSize = {{ data.imageSize | safe }};
+        config.tiles = {{ data.tiles | safe }};
+
+        for (i = 0; i < config.cellData.length; ++i) {
+            // make sure Prob and ClassName are arrays
+            config.cellData[i].myProb = Array.isArray(config.cellData[i].Prob)? config.cellData[i].Prob: [config.cellData[i].Prob];
+            config.cellData[i].myClassName = Array.isArray(config.cellData[i].ClassName)? config.cellData[i].ClassName: [config.cellData[i].ClassName];
+
+            config.cellData[i].Cell_Num = +config.cellData[i].Cell_Num;
+            config.cellData[i].x = +config.cellData[i].X;
+            config.cellData[i].y = +config.cellData[i].Y;
+        }
+
+        //render now the charts
+        var issData = sectionChart(config.cellData);
+        dapiChart(config.cellData, config.geneData, config);
+        landingPoint(config.name)
+
+    </script>
+
+
+    <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
+    <script>
+        setTimeout(function () {
+            $('body').addClass('loaded');
+            $('h1').css('color', '#222222');
+        }, 3000);
+    </script>
+
+</div>
+
+</body>
+
+</html>
