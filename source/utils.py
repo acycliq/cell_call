@@ -13,10 +13,10 @@ CONFIG_FILE = dir_path + '/config.yml'
 # yaml = ruamel.yaml.YAML(typ='safe')
 
 logger = logging.getLogger()
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s:%(levelname)s:%(message)s"
-    )
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format="%(asctime)s:%(levelname)s:%(message)s"
+#     )
 
 
 

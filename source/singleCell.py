@@ -10,10 +10,10 @@ CONFIG_FILE = dir_path + '/config.yml'
 
 
 logger = logging.getLogger()
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s:%(levelname)s:%(message)s"
-    )
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format="%(asctime)s:%(levelname)s:%(message)s"
+#     )
 
 
 def _load_geneset(config):
@@ -65,7 +65,10 @@ def geneSet(spots, config):
     ge = _load_geneset(config)
 
     # make a dataframe from the xarray
-    df = pd.DataFrame(ge.data, index=ge.GeneName, columns=ge.Class, dtype='float64')
+    logger.info('Renaming subclasses PC.CA2 and PC.CA3 to be PC.Other1 and PC.Other2')
+    class_name = ['PC.Other1' if x == 'PC.CA2' else x for x in ge.Class.values]
+    class_name = ['PC.Other2' if x == 'PC.CA3' else x for x in class_name]
+    df = pd.DataFrame(ge.data, index=ge.GeneName.values, columns=class_name, dtype='float64')
     df = df.loc[genes]
 
     df = _normalise(df)

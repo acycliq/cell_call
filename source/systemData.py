@@ -5,7 +5,7 @@ from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
 import source.utils as utils
 import os
-import source.config as config
+import config
 import numpy_groupies as npg
 import time
 import logging
@@ -15,10 +15,10 @@ CONFIG_FILE = dir_path + '/config.yml'
 
 
 logger = logging.getLogger()
-logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s:%(levelname)s:%(message)s"
-    )
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format="%(asctime)s:%(levelname)s:%(message)s"
+#     )
 
 
 class Cells(object):
