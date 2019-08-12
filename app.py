@@ -5,6 +5,7 @@ import pandas as pd
 import webbrowser
 import platform
 from threading import Timer
+from source.run import varBayes
 import logging
 
 logger = logging.getLogger()
@@ -67,6 +68,7 @@ def open_browser():
 
 if __name__ == "__main__":
     # Timer(1, open_browser).start()
+    varBayes()
     Timer(1, get_browser).start()
     app.run(port=5000)
     print('Done')

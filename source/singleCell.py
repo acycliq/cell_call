@@ -21,7 +21,7 @@ def _load_geneset(config):
     :param config:
     :return:
     '''
-    genesetPath = config['geneset']
+    genesetPath = os.path.join(dir_path, config['geneset'])
     gs = loadmat(genesetPath)
     logger.info('Loading geneset from %s' % genesetPath)
     ge = gs["GeneSet"]["GeneExp"]

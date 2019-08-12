@@ -38,7 +38,7 @@ cells = Cells(label_image, config.DEFAULT)
 
 
 logger.info('********* Getting spotattributes from %s **********', saFile)
-sa = sf.core.types.SpotAttributes(pd.read_csv(saFile))
+sa = sf.types.SpotAttributes(pd.read_csv(saFile))
 
 logger.warning('*******************************')
 logger.warning('** WARNING WARNING WARNING ***')

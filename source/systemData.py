@@ -3,9 +3,9 @@ import  pandas as pd
 import xarray as xr
 from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
-import utils
+import source.utils as utils
 import os
-import config
+import source.config as config
 import numpy_groupies as npg
 import time
 import logging
