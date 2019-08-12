@@ -4,7 +4,14 @@ from flask import Flask, render_template
 import pandas as pd
 import webbrowser
 import platform
-import threading
+from threading import Timer
+import logging
+
+logger = logging.getLogger()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s:%(levelname)s:%(message)s"
+    )
 
 template_dir = os.path.abspath('./dashboard')
 app = Flask(__name__,
@@ -43,8 +50,13 @@ def get_browser():
     else:
         chrome_path = None
 
-    if os.path.isfile(chrome_path):
-        webbrowser.get(chrome_path).open_new(url)
+    logger.info('Platform is %s' % my_os)
+    if chrome_path:
+        logger.info('Chrome path: %s' % chrome_path)
+
+    if chrome_path and os.path.isfile(chrome_path):
+        webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path), 1)
+        webbrowser.get('chrome').open_new_tab(url)
     else:
         webbrowser.open_new(url)
 
@@ -54,12 +66,7 @@ def open_browser():
 
 
 if __name__ == "__main__":
-    # threading.Timer(1.25, lambda: get_browser('index.html')).start()
-    # # get_browser('./dashboard/index.html')
-    # webbrowser.open_new('http://127.0.0.1:5000/')
-    # app.run(debug=True)
-
-    threading.Timer(1, open_browser).start();
-    # threading.Timer(1, get_browser).start();
+    # Timer(1, open_browser).start()
+    Timer(1, get_browser).start()
     app.run(port=5000)
     print('Done')
