@@ -32,7 +32,7 @@ def varBayes():
                           'zc': 'z',
                           'Gene': 'target'}
                  )
-    sa = sf.types.SpotAttributes(sa_df)
+    sa = sf.core.types.SpotAttributes(sa_df)
 
     logger.warning('*******************************')
     logger.warning('** WARNING WARNING WARNING ***')
