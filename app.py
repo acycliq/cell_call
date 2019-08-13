@@ -66,13 +66,17 @@ def app_start(config):
 
 
 def tile_maker(roi):
-    dim = 32768
+    dim = 32768 # DO NOT change this!
 
     img_path = os.path.join(dir_path, 'demo_data', 'background_boundaries.tif')
     out_dir = os.path.join(dir_path, 'dashboard', 'data', 'img', 'default', str(dim) + 'px')
     # remove the dir if it exists
     if os.path.exists(out_dir):
         shutil.rmtree(out_dir)
+
+    # now make a fresh one
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
 
     im = pyvips.Image.new_from_file(img_path, access='sequential')
 
