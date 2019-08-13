@@ -25,13 +25,7 @@ class Cells(object):
 
     @property
     def yx_coords(self):
-        y_nan = np.argwhere(~np.isnan(self.ds.y.values))
-        x_nan = np.argwhere(~np.isnan(self.ds.x.values))
-
-        # coords = [self.ds.y.values, self.ds.x.values]
         coords = [d for d in zip(self.ds.y.values, self.ds.x.values) if not np.isnan(d).any()]
-        # coords = np.array([self.ds.y.values, self.ds.x.values]).T
-
         return np.array(coords)
 
     @property
@@ -82,49 +76,6 @@ class Cells(object):
         TotPredicted = ClassTotPredicted.drop('Zero', dim='class_name').sum(dim='class_name')
         return TotPredicted
 
-    def iss_summary(self, spots):
-        '''
-        returns a datafram summarising the main feaures of each cell, ie gene counts and cell types
-        :param spots:
-        :return:
-        '''
-        x = self.ds.x.values
-        y = self.ds.y.values
-        cell_id = self.ds.cell_id.values
-
-        gene_count = self.geneCount(spots)
-        class_prob = self.classProb
-        gene_names = gene_count.gene_name.values
-        class_names = class_prob.class_name.values
-
-        tol = 0.001
-
-        logger.info('starting collecting data (alt)...')
-        N = len(cell_id)
-        isCount_nonZero = [gene_count.values[n, :] > tol for n in range(N)]
-        name_list = [gene_names[isCount_nonZero[n]] for n in range(N)]
-        count_list = [gene_count[n, isCount_nonZero[n]].values for n in range(N)]
-
-        isProb_nonZero = [class_prob.values[n, :] > tol for n in range(N)]
-        class_name_list = [class_names[isProb_nonZero[n]] for n in range(N)]
-        prob_list = [class_prob.values[n, isProb_nonZero[n]] for n in range(N)]
-
-        iss_df = pd.DataFrame({'Cell_Num': self.ds.cell_id.values,
-                                'x': self.ds.x.values,
-                                'y': self.ds.y.values,
-                                'Genenames': name_list,
-                                'CellGeneCount': count_list,
-                                'ClassName': class_name_list,
-                                'Prob': prob_list
-                                },
-                               columns=['Cell_Num', 'x', 'y', 'Genenames', 'CellGeneCount', 'ClassName', 'Prob']
-                               )
-        iss_df.set_index(['Cell_Num'])
-        logger.info('finished!')
-
-        return iss_df
-
-
 
 class Prior(object):
     def __init__(self, cell_type):
@@ -157,7 +108,6 @@ class Genes(object):
         nom = ini['rGene'] + spots.geneUniv.total_spots - TotPredictedB - TotPredictedZ
         denom = ini['rGene'] + TotPredicted
         self.panel.gene_gamma.data = nom / denom
-
 
 
 class Spots(object):
@@ -242,48 +192,6 @@ class Spots(object):
         pSpotZero = np.sum(neighbourProb * pCellZero[spotNeighbours], axis=1)
         TotPredictedZ = np.bincount(geneNo, pSpotZero)
         return TotPredictedZ
-
-    def summary(self):
-        # check for duplicates (ie spots with the same coordinates with or without the same gene name).
-        # I dont know why but it can happen. Misfire during spot calling maybe?
-        is_duplicate = self.data.duplicated(subset=['x', 'y'])
-
-        p = []
-        nbrs = []
-        max_nbrs = []
-        num_rows = self.data.shape[0]
-        # for i in range(num_rows):
-        #     if i%1000 == 0:
-        #         logger.info('Spot %d out of %d' % (i, num_rows))
-        #     _cp = self.call.cell_prob.loc[i, :].values
-        #     _nbrs = self.call.neighbors.loc[i, :].values
-        #     p.append(_cp)
-        #     nbrs.append(_nbrs)
-        #     max_nbrs.append(_nbrs[np.argmax(_cp)])
-
-        cell_prob = self.call.cell_prob.values
-        neighbors = self.call.neighbors.values
-        logger.info('One')
-        p = [cell_prob[i, :] for i in range(num_rows)]
-        logger.info('Two')
-        nbrs = [neighbors[i, :] for i in range(num_rows)]
-        logger.info('Three')
-        max_nbrs = [neighbors[i, idx] for i in range(num_rows) for idx in [np.argmax(cell_prob[i, :])]]
-        logger.info('ok')
-
-        out = pd.DataFrame()
-        out['Gene'] = self.data.gene_name
-        out['Expt'] = self.gene_panel.ispot
-        out['x'] = self.data.x
-        out['y'] = self.data.y
-        out['neighbour'] = max_nbrs
-        out['neighbour_array'] = nbrs
-        out['neighbour_prob'] = p
-
-        return out
-
-
-
 
 
 def _parse(label_image, config):
