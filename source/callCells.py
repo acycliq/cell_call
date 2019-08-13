@@ -5,10 +5,8 @@ import pandas as pd
 import logging
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-CONFIG_FILE = dir_path + '/config.yml'
-
-
 logger = logging.getLogger()
+
 
 def expected_gamma(cells, spots, ds, ini):
     scaled_mean = cells.ds.area_factor * ds.mean_expression
@@ -149,13 +147,12 @@ def iss_summary(cells, spots):
     # Sanity check. Only the dummy cell where the misreads are going to be assigned to should not have
     # proper coordinates
     mask = np.isnan(iss_df.X.values) & np.isnan(iss_df.Y.values)
-    print(sum(mask))
     assert sum(mask) == 1, 'You should have exactly one dummy cell with nan valued coordinates. ' \
                            'It will be used to assign the misreads'
 
     # Remove that dummy cell from data to be rendered by the viewer
     iss_df = iss_df[~mask]
-    logger.info('finished!')
+    logger.info('Data collected!')
 
     return iss_df
 
@@ -169,13 +166,9 @@ def summary(spots):
 
     cell_prob = spots.call.cell_prob.values
     neighbors = spots.call.neighbors.values
-    logger.info('One')
     p = [cell_prob[i, :] for i in range(num_rows)]
-    logger.info('Two')
     nbrs = [neighbors[i, :] for i in range(num_rows)]
-    logger.info('Three')
     max_nbrs = [neighbors[i, idx] for i in range(num_rows) for idx in [np.argmax(cell_prob[i, :])]]
-    logger.info('ok')
 
     out = pd.DataFrame()
     out['Gene'] = spots.data.gene_name
