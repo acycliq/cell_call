@@ -1,7 +1,6 @@
 import json
 import os
 from flask import Flask, render_template
-import pandas as pd
 import webbrowser
 import platform
 from threading import Timer
@@ -20,7 +19,7 @@ logging.basicConfig(
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 def get_browser():
-    url = 'http://127.0.0.1:5005/'
+    url = 'http://127.0.0.1:5006/'
     my_os = platform.system()
 
     if my_os == 'Windows':
@@ -47,42 +46,24 @@ def open_browser():
     webbrowser.open_new('http://127.0.0.1:5000/')
 
 
-def app_start(cellData, geneData, pixel_dims, roi):
+def app_start(config):
     template_dir = os.path.abspath('./dashboard')
-    # image_size = ",".join([str(x) for x in pixel_dims])
-    image_size = '[' + str(pixel_dims[0]) + "," + str(pixel_dims[1]) + ']'
 
     app = Flask(__name__,
                 static_url_path='',  # remove the static folder path
                 static_folder='./',  # set here the path of the folder to be served
                 template_folder='dashboard')  # set here the path to the folder where your html page lives
 
-    # cellData = pd.read_json('iss.json').to_dict(orient='records')
-    # geneData = pd.read_json('genes.json').to_dict(orient='records')
-    cellData = cellData.to_json(orient='records')
-    geneData = geneData.to_json(orient='records')
-    data = {'cellData': cellData,
-            'geneData': geneData,
-            'name': 'default',
-            'roi': roi,
-            'imageSize': image_size,
-            'tiles': '"./dashboard/data/img/default/32768px/{z}/{y}/{x}.png"',
-            # Needs to be like that, ie single quote, then double quote
-            'someText': 'this is some text'
-            }
-
     @app.route("/")
     def index():
-        return render_template("index.html", data=data)
+        return render_template("index.html", data=config)
 
     Timer(1, get_browser).start()
-    app.run(port=5005)
+    app.run(port=5006)
 
 
 def tile_maker(roi):
-    dim = 32768  # DO NOT change this!
-    # roi = {"x0": 6150, "x1": 13751, "y0": 12987, "y1": 18457}
-    # roi = {"y0": 6150, "y1": 13751, "x0": 12987, "x1": 18457}
+    dim = 32768
 
     img_path = os.path.join(dir_path, 'demo_data', 'background_boundaries.tif')
     out_dir = os.path.join(dir_path, 'dashboard', 'data', 'img', 'default', str(dim) + 'px')
@@ -120,20 +101,32 @@ def tile_maker(roi):
     im.dzsave(out_dir, layout='google', suffix='.png', background=0, skip_blanks=0)
     logger.info('Done. Pyramid of tiles saved at: %s' % out_dir)
 
-    return pixel_dims, roi
+    return pixel_dims
+
+
+def mk_ini(cellData, geneData, pixel_dims):
+    ini = {}
+    ini['name'] = json.dumps('98 gene panel')
+    ini['roi'] = json.dumps(config.DEFAULT['roi'])
+    ini['imageSize'] = json.dumps(pixel_dims)
+    ini['cellData'] = cellData.to_json(orient='records')
+    ini['geneData'] = geneData.to_json(orient='records')
+    ini['tiles'] = json.dumps(config.DEFAULT['tiles'])
+
+    return ini
 
 
 if __name__ == "__main__":
-    # Timer(1, open_browser).start()
+    # 1. run the cell calling algo
     cellData, geneData = varBayes()
-    roi = config.DEFAULT['roi']
-    ini = {}
-    ini['cellData'] = cellData.to_json(orient='records')
-    ini['geneData'] = geneData.to_json(orient='records')
-    ini['roi'] = json.dumps(roi)
-    ini['tiles'] = '"./dashboard/data/img/default/32768px/{z}/{y}/{x}.png"'
+
+    # 2. start the viewer
     if cellData is not None and geneData is not None:
-        pixel_dims, roi = tile_maker(roi)
-        ini['imageSize']: json.dumps(pixel_dims)
-        app_start(cellData, geneData, pixel_dims, roi)
+        pixel_dims = tile_maker(config.DEFAULT['roi'])
+
+        # 2a. First make a dict to keep the configuration
+        ini = mk_ini(cellData, geneData, pixel_dims)
+
+        # 2b. Now push everything into the viewer
+        app_start(ini)
         print('Done')

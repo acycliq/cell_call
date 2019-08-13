@@ -10,10 +10,6 @@ CONFIG_FILE = dir_path + '/config.yml'
 
 
 logger = logging.getLogger()
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     format="%(asctime)s:%(levelname)s:%(message)s"
-#     )
 
 
 def _load_geneset(config):

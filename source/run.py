@@ -1,13 +1,11 @@
 from source.systemData import Cells
 from source.systemData import Spots
-from source.systemData import Genes
 from source.systemData import Prior
 from source.utils import loadmat
 from source.singleCell import geneSet
 import config
 import source.callCells as cc
 import starfish as sf
-import xarray as xr
 import pandas as pd
 import source.utils as utils
 import os
@@ -17,10 +15,7 @@ import logging
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 logger = logging.getLogger()
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     format="%(asctime)s:%(levelname)s:%(message)s"
-#     )
+
 
 def varBayes():
     roi = config.DEFAULT['roi']
@@ -33,7 +28,7 @@ def varBayes():
     cells = Cells(label_image, config.DEFAULT)
 
     logger.info('********* Getting spotattributes from %s **********', saFile)
-    sa = sf.core.types.SpotAttributes(pd.read_csv(saFile))
+    sa = sf.types.SpotAttributes(pd.read_csv(saFile))
 
     logger.warning('*******************************')
     logger.warning('** WARNING WARNING WARNING ***')

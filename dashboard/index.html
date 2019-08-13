@@ -370,7 +370,7 @@
 
 
         var config = []
-        config.name = '98 gene panel';
+        config.name = {{ data.name | safe }};
         config.geneData = {{ data.geneData | safe }};
         config.cellData = {{ data.cellData | safe }};
         config.roi = {{ data.roi | safe }};

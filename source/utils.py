@@ -3,21 +3,15 @@ import numexpr as ne
 import numba as nb
 import scipy
 import xarray as xr
-from skimage.measure import regionprops
 import scipy.io as spio
 import os
 import logging
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 CONFIG_FILE = dir_path + '/config.yml'
-# yaml = ruamel.yaml.YAML(typ='safe')
+
 
 logger = logging.getLogger()
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     format="%(asctime)s:%(levelname)s:%(message)s"
-#     )
-
 
 
 def loadmat(filename):

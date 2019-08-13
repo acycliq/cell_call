@@ -1,5 +1,5 @@
 import numpy as np
-import  pandas as pd
+import pandas as pd
 import xarray as xr
 from skimage.measure import regionprops
 from sklearn.neighbors import NearestNeighbors
@@ -15,10 +15,6 @@ CONFIG_FILE = dir_path + '/config.yml'
 
 
 logger = logging.getLogger()
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     format="%(asctime)s:%(levelname)s:%(message)s"
-#     )
 
 
 class Cells(object):

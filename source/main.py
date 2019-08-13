@@ -17,11 +17,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 logger = logging.getLogger()
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     format="%(asctime)s:%(levelname)s:%(message)s"
-#     )
-
 
 roi = config.DEFAULT['roi']
 

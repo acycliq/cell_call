@@ -2,8 +2,6 @@ import os
 import source.utils as utils
 import numpy as np
 import pandas as pd
-import xarray as xr
-from sklearn.neighbors import NearestNeighbors
 import logging
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -11,11 +9,6 @@ CONFIG_FILE = dir_path + '/config.yml'
 
 
 logger = logging.getLogger()
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     format="%(asctime)s:%(levelname)s:%(message)s"
-#     )
-
 
 def expected_gamma(cells, spots, ds, ini):
     scaled_mean = cells.ds.area_factor * ds.mean_expression
@@ -172,18 +165,7 @@ def summary(spots):
     # I dont know why but it can happen. Misfire during spot calling maybe?
     is_duplicate = spots.data.duplicated(subset=['x', 'y'])
 
-    p = []
-    nbrs = []
-    max_nbrs = []
     num_rows = spots.data.shape[0]
-    # for i in range(num_rows):
-    #     if i%1000 == 0:
-    #         logger.info('Spot %d out of %d' % (i, num_rows))
-    #     _cp = self.call.cell_prob.loc[i, :].values
-    #     _nbrs = self.call.neighbors.loc[i, :].values
-    #     p.append(_cp)
-    #     nbrs.append(_nbrs)
-    #     max_nbrs.append(_nbrs[np.argmax(_cp)])
 
     cell_prob = spots.call.cell_prob.values
     neighbors = spots.call.neighbors.values
