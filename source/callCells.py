@@ -46,7 +46,6 @@ def celltype_assignment(cells, spots, prior, ds, cfg):
     return pCellClass
 
 
-
 def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
     # spot to cell assignment
     nN = spots.call.neighbors.shape[1]
@@ -67,7 +66,6 @@ def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
 
         # multiply and sum over cells
         term_1 = (expected_spot_counts * cp).sum(axis=1)
-
 
         # logger.info('genes.spotNo should be something line spots.geneNo instead!!')
         expectedLog = utils.bi2(elgamma.data, [nS, nK], sn[:, None], spots.gene_panel.ispot.data[:,None])
