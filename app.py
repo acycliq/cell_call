@@ -21,7 +21,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 def get_browser(port_num):
-    # port = 5000 + random.randint(0, 999)
     url = 'http://127.0.0.1:%s' % str(port_num)
     my_os = platform.system()
 
