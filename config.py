@@ -13,5 +13,5 @@ DEFAULT = {
     'geneset': '../demo_data/GeneSet.mat',
     'saFile': '../demo_data/spots.csv',  # Spot attributes, contains x,y coordinates for the spots and their gene names
     'tiles_path': './dashboard/data/img',
-    'dataset_id': 'default'  # should not have spaces. You can use .replace(" ", "") to make strip all whitespaces
+    'dataset_id': 'default'  # should not have spaces. You can use .replace(" ", "") to strip all whitespaces
 }
