@@ -5,7 +5,7 @@ function spotPopup(d) {
     var data = d.feature.properties.neighbours;
 
     for (var i = 0; i < data.length; i++){
-        if (!(data[i].Cell_Num in d3.range(cellData.length))){
+        if (!(data[i].Cell_Num in d3.range(config.cellData.length))){
             data[i].Cell_Num = 'Misread'
         }
     }
