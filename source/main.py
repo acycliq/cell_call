@@ -1,15 +1,11 @@
-from source.systemData import Cells
-from systemData import Spots
-from systemData import Genes
-from systemData import Prior
-from utils import loadmat
-from singleCell import geneSet
+from source.systemData import Spots, Cells, Prior
+from source.utils import loadmat
+from source.singleCell import geneSet
 import source.config as config
-import callCells as cc
+import source.common as common
 import starfish as sf
-import xarray as xr
 import pandas as pd
-import utils
+import source.utils as utils
 import os
 import logging
 
@@ -53,16 +49,16 @@ spots.init_call(cells, label_image, config.DEFAULT)
 p0 = None
 for i in range(100):
     # 1. call cell gammas
-    egamma, elgamma = cc.expected_gamma(cells, spots, single_cell_data, config.DEFAULT)
+    egamma, elgamma = common.expected_gamma(cells, spots, single_cell_data, config.DEFAULT)
 
     # 2 call cells
-    cc.celltype_assignment(cells, spots, prior, single_cell_data, config.DEFAULT)
+    common.celltype_assignment(cells, spots, prior, single_cell_data, config.DEFAULT)
 
     # 3 call spots
-    cc.call_spots(spots, cells, single_cell_data, prior, elgamma, config.DEFAULT)
+    common.call_spots(spots, cells, single_cell_data, prior, elgamma, config.DEFAULT)
 
     # 4 update gamma
-    cc.updateGamma(cells, spots, single_cell_data, egamma, config.DEFAULT)
+    common.updateGamma(cells, spots, single_cell_data, egamma, config.DEFAULT)
 
     converged, delta = utils.isConverged(spots, p0, config.DEFAULT['CellCallTolerance'])
     logger.info('Iteration %d, mean prob change %f' % (i, delta))

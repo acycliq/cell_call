@@ -1,10 +1,8 @@
-from source.systemData import Cells
-from source.systemData import Spots
-from source.systemData import Prior
+from source.systemData import Cells, Spots, Prior
 from source.utils import loadmat
 from source.singleCell import geneSet
 import config
-import source.callCells as cc
+import source.common as common
 import starfish as sf
 import pandas as pd
 import source.utils as utils
@@ -27,7 +25,7 @@ def varBayes():
 
     cells = Cells(label_image, config.DEFAULT)
 
-    logger.info('********* Getting spotattributes from %s **********', saFile)
+    logger.info('********* Getting spot attributes from %s **********', saFile)
     sa_df = pd.read_csv(saFile)
     sa_df = sa_df.rename(columns={'xc': 'x',
                           'yc': 'y',
@@ -56,16 +54,16 @@ def varBayes():
     gene_df = None
     for i in range(100):
         # 1. call cell gammas
-        egamma, elgamma = cc.expected_gamma(cells, spots, single_cell_data, config.DEFAULT)
+        egamma, elgamma = common.expected_gamma(cells, spots, single_cell_data, config.DEFAULT)
 
         # 2 call cells
-        cc.celltype_assignment(cells, spots, prior, single_cell_data, config.DEFAULT)
+        common.celltype_assignment(cells, spots, prior, single_cell_data, config.DEFAULT)
 
         # 3 call spots
-        cc.call_spots(spots, cells, single_cell_data, prior, elgamma, config.DEFAULT)
+        common.call_spots(spots, cells, single_cell_data, prior, elgamma, config.DEFAULT)
 
         # 4 update gamma
-        cc.updateGamma(cells, spots, single_cell_data, egamma, config.DEFAULT)
+        common.updateGamma(cells, spots, single_cell_data, egamma, config.DEFAULT)
 
         converged, delta = utils.isConverged(spots, p0, config.DEFAULT['CellCallTolerance'])
         logger.info('Iteration %d, mean prob change %f' % (i, delta))
@@ -76,7 +74,7 @@ def varBayes():
         if converged:
             # cells.iss_summary(spots)
             # spots.summary()
-            iss_df, gene_df = cc.collect_data(cells, spots)
+            iss_df, gene_df = common.collect_data(cells, spots)
             print("Success!!")
             break
 
