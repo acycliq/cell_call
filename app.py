@@ -3,6 +3,7 @@ import os
 from flask import Flask, render_template
 import webbrowser
 import platform
+import random
 from threading import Timer
 from source.run import varBayes
 import pyvips
@@ -18,8 +19,10 @@ logging.basicConfig(
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-def get_browser():
-    url = 'http://127.0.0.1:5006/'
+
+def get_browser(port_num):
+    # port = 5000 + random.randint(0, 999)
+    url = 'http://127.0.0.1:%s' % str(port_num)
     my_os = platform.system()
 
     if my_os == 'Windows':
@@ -48,6 +51,7 @@ def open_browser():
 
 def app_start(config):
     template_dir = os.path.abspath('./dashboard')
+    port = 5000 + random.randint(0, 999)
 
     app = Flask(__name__,
                 static_url_path='',  # remove the static folder path
@@ -58,8 +62,8 @@ def app_start(config):
     def index():
         return render_template("index.html", data=config)
 
-    Timer(1, get_browser).start()
-    app.run(port=5006)
+    Timer(1, get_browser, [port]).start()
+    app.run(port=port)
 
 
 def tile_maker(roi):
