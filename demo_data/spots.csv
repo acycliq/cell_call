@@ -1,4 +1,4 @@
-index,target,radius,x,y,z
+index,Gene,radius,xc,yc,zc
 0,Cxcl14,,6261.0,13002.0,0
 1,Plp1,,6150.0,13724.0,0
 2,Plp1,,6150.0,13734.0,0

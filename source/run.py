@@ -20,7 +20,7 @@ logger = logging.getLogger()
 def varBayes():
     roi = config.DEFAULT['roi']
     label_image_path = os.path.join(dir_path, config.DEFAULT['label_image'])
-    print("reading CellMap from %s" % label_image_path)
+    logger.info("reading CellMap from %s" % label_image_path)
     label_image = loadmat(os.path.join(label_image_path))
     label_image = label_image["CellMap"]
     saFile = os.path.join(dir_path, config.DEFAULT['saFile'])
@@ -28,7 +28,13 @@ def varBayes():
     cells = Cells(label_image, config.DEFAULT)
 
     logger.info('********* Getting spotattributes from %s **********', saFile)
-    sa = sf.types.SpotAttributes(pd.read_csv(saFile))
+    sa_df = pd.read_csv(saFile)
+    sa_df = sa_df.rename(columns={'xc': 'x',
+                          'yc': 'y',
+                          'zc': 'z',
+                          'Gene': 'target'}
+                 )
+    sa = sf.types.SpotAttributes(sa_df)
 
     logger.warning('*******************************')
     logger.warning('** WARNING WARNING WARNING ***')
