@@ -9,6 +9,7 @@ from source.run import varBayes
 import pyvips
 import shutil
 import logging
+import config
 
 logger = logging.getLogger()
 logging.basicConfig(
@@ -46,10 +47,11 @@ def open_browser():
     webbrowser.open_new('http://127.0.0.1:5000/')
 
 
-def app_start(cellData, geneData, pixel_dims):
+def app_start(cellData, geneData, pixel_dims, roi):
     template_dir = os.path.abspath('./dashboard')
     # image_size = ",".join([str(x) for x in pixel_dims])
     image_size = '[' + str(pixel_dims[0]) + "," + str(pixel_dims[1]) + ']'
+
     app = Flask(__name__,
                 static_url_path='',  # remove the static folder path
                 static_folder='./',  # set here the path of the folder to be served
@@ -62,7 +64,7 @@ def app_start(cellData, geneData, pixel_dims):
     data = {'cellData': cellData,
             'geneData': geneData,
             'name': 'default',
-            'roi': '{x0: 6150, x1: 13751, y0: 12987, y1: 18457}',
+            'roi': roi,
             'imageSize': image_size,
             'tiles': '"./dashboard/data/img/default/32768px/{z}/{y}/{x}.png"',
             # Needs to be like that, ie single quote, then double quote
@@ -77,9 +79,9 @@ def app_start(cellData, geneData, pixel_dims):
     app.run(port=5005)
 
 
-def tile_maker():
+def tile_maker(roi):
     dim = 32768  # DO NOT change this!
-    roi = {"x0": 6150, "x1": 13751, "y0": 12987, "y1": 18457}
+    # roi = {"x0": 6150, "x1": 13751, "y0": 12987, "y1": 18457}
     # roi = {"y0": 6150, "y1": 13751, "x0": 12987, "x1": 18457}
 
     img_path = os.path.join(dir_path, 'demo_data', 'background_boundaries.tif')
@@ -99,7 +101,7 @@ def tile_maker():
         "The size of the image is %d by %d but the ROI implies that the size is %d by %d" % (
         im.width, im.height, roi['x1'] - roi['x0'] + 1, roi['y1'] - roi['y0'] + 1)
 
-    logger.info('Resising image: %s' % img_path)
+    logger.info('Resizing image: %s' % img_path)
     factor = dim / max(im.width, im.height)
     im = im.resize(factor)
     logger.info('Done! Image is now %d by %d' % (im.width, im.height))
@@ -118,13 +120,20 @@ def tile_maker():
     im.dzsave(out_dir, layout='google', suffix='.png', background=0, skip_blanks=0)
     logger.info('Done. Pyramid of tiles saved at: %s' % out_dir)
 
-    return pixel_dims
+    return pixel_dims, roi
 
 
 if __name__ == "__main__":
     # Timer(1, open_browser).start()
     cellData, geneData = varBayes()
+    roi = config.DEFAULT['roi']
+    ini = {}
+    ini['cellData'] = cellData.to_json(orient='records')
+    ini['geneData'] = geneData.to_json(orient='records')
+    ini['roi'] = json.dumps(roi)
+    ini['tiles'] = '"./dashboard/data/img/default/32768px/{z}/{y}/{x}.png"'
     if cellData is not None and geneData is not None:
-        pixel_dims = tile_maker()
-        app_start(cellData, geneData, pixel_dims)
+        pixel_dims, roi = tile_maker(roi)
+        ini['imageSize']: json.dumps(pixel_dims)
+        app_start(cellData, geneData, pixel_dims, roi)
         print('Done')
