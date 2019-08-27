@@ -80,6 +80,7 @@ def call_spots(spots, cells, single_cell_data, prior, elgamma, cfg):
 
 
 def updateGamma(cells, spots, single_cell_data, egamma, ini):
+    # Maybe I should rename that to eta (not gamma). In the paper the symbol is eta
     nK = single_cell_data.class_name.shape[0]
 
     # pSpotZero = spots.zeroKlassProb(klasses, cells)
