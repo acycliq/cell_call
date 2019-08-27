@@ -246,7 +246,7 @@ function updateManagedData(md, arr){
         var idx = arr.findIndex( el => el.key === d.IdentifiedType );
 
         // set now the renderOrder property. Cells with larger idx will be rendered on top of those with smaller idx. Hence, if
-        // two cells overlap the cell with large idx (=smaller counts) will be distingushibale and not hidden)
+        // two cells overlap the cell with large idx (=smaller counts) will be distinguishable and not hidden)
         d.renderOrder = idx>=0? idx+1: arr.length+1
 	})
 };
