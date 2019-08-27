@@ -34,7 +34,7 @@ inputs.forEach(function (input) {
         }
 
         var selected = getSelected(inputs),
-            filteredSectionData = cellData.filter(function (el) {
+            filteredSectionData = config.cellData.filter(function (el) {
                 var it = selected.includes(el.managedData.IdentifiedType);
                 if (input.name === 'Other') {
                     return !it
@@ -60,7 +60,7 @@ checkItAll.addEventListener('change', function () {
     clearItAll.checked = false;
 
     var selected = getSelected(inputs),
-        filteredSectionData = cellData.filter(function (el) {
+        filteredSectionData = config.cellData.filter(function (el) {
             return selected.includes(el.managedData.IdentifiedType);
         });
     sectionChart(filteredSectionData)
@@ -79,7 +79,7 @@ clearItAll.addEventListener('change', function () {
     clearItAll.disabled = true;
 
     var selected = getSelected(inputs),
-        filteredSectionData = cellData.filter(function (el) {
+        filteredSectionData = config.cellData.filter(function (el) {
             return selected.includes(el.managedData.IdentifiedType);
         });
     sectionChart(filteredSectionData)
