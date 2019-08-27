@@ -157,7 +157,6 @@ function section() {
     chartData.renderYAxis = renderYAxis;
     chartData.renderXGridline = renderXGridline;
     chartData.renderYGridline = renderYGridline;
-    chartData.renderOrder = renderOrder;
     chartData.tsn = tsn;
     chartData.pointRadius = pointRadius;
     chartData.scale = scale;
@@ -222,13 +221,35 @@ function dataManager(sectionFeatures, data) {
             IdentifiedType: agg[0].IdentifiedType,
             color: agg[0].color,
             Prob: agg[0].Prob,
-            renderOrder: sectionFeatures.renderOrder(agg[0].IdentifiedType),
+            renderOrder: null, // This will be set/updated later on
+            // renderOrder2: sectionFeatures.renderOrder2(countData, agg[0].IdentifiedType),
 
         })
     }
 
     return chartData
 }
+
+function updateManagedData(md, arr){
+    // arr is an array of objects. Each object looks like a dict, its properties are key and value.
+    // The key the class name and value the total counts of the cells with cell class the same as the key
+    // Hence if you add up all the values the total should the same as the total number of cells. You can do this by typing
+    // arr.map(item => item.value).reduce((prev, next) => prev + next);
+
+    // First, sort array arr in decreasing order
+    arr.sort(function (x, y) {
+        return d3.ascending(y.value, x.value);
+    });
+
+    // now loop over dm and for each element get its IdentifiedType and find its corresponding position in the sorted array arr
+    md.forEach(function(d){
+        var idx = arr.findIndex( el => el.key === d.IdentifiedType );
+
+        // set now the renderOrder property. Cells with larger idx will be rendered on top of those with smaller idx. Hence, if
+        // two cells overlap the cell with large idx (=smaller counts) will be distingushibale and not hidden)
+        d.renderOrder = idx>=0? idx+1: arr.length+1
+	})
+};
 
 var sectionFeatures; // This is now a global variable!
 function sectionChart(data) {
@@ -242,7 +263,16 @@ function sectionChart(data) {
 
     svg = sectionFeatures.svg;
 
-    var managedData = dataManager(sectionFeatures, data)
+    var managedData = dataManager(sectionFeatures, data);
+    var countsPerIdentifiedType = d3.nest()
+        .key(function (d) {
+            return d.IdentifiedType
+        })
+        .rollup(function (leaves) {
+            return leaves.length
+        })
+        .entries(managedData);
+    updateManagedData(managedData, countsPerIdentifiedType);
 
     //update now data with a managedData property
     for (var i = 0; i < data.length; ++i) {
