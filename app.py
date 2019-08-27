@@ -65,11 +65,9 @@ def app_start(config):
     app.run(port=port)
 
 
-def tile_maker(roi):
-    dim = 32768 # DO NOT change this!
-
+def tile_maker(roi, dim, out_dir):
     img_path = os.path.join(dir_path, 'demo_data', 'background_boundaries.tif')
-    out_dir = os.path.join(dir_path, 'dashboard', 'data', 'img', 'default', str(dim) + 'px')
+
     # remove the dir if it exists
     if os.path.exists(out_dir):
         shutil.rmtree(out_dir)
@@ -99,8 +97,6 @@ def tile_maker(roi):
     assert max(im.width, im.height) == dim, 'Something went wrong. Image isnt scaled up properly. ' \
                                             'It should be %d pixels in its longest side' % dim
 
-    # expand to the nearest power of two larger square ... by default, gravity will
-    # extend with 0 (transparent) pixels
     im = im.gravity('south-west', dim, dim)
 
     # now you can create a fresh one and populate it with tiles
@@ -111,28 +107,33 @@ def tile_maker(roi):
     return pixel_dims
 
 
-def mk_ini(cellData, geneData, pixel_dims):
+def mk_ini(cellData, geneData, pixel_dims, tiles_root_path):
     ini = {}
-    ini['name'] = json.dumps('98 gene panel')
+    ini['name'] = json.dumps(config.DEFAULT['dataset_id'])
     ini['roi'] = json.dumps(config.DEFAULT['roi'])
     ini['imageSize'] = json.dumps(pixel_dims)
     ini['cellData'] = cellData.to_json(orient='records')
     ini['geneData'] = geneData.to_json(orient='records')
-    ini['tiles'] = json.dumps(config.DEFAULT['tiles'])
+    ini['tiles'] = json.dumps(os.path.join(tiles_root_path, '{z}', '{y}', '{x}.png'))
 
     return ini
 
 
 if __name__ == "__main__":
+    dim = 32768  # DO NOT change this!
+
+    tiles_root = str(dim) + 'px'
+    tiles_root_path = os.path.join(config.DEFAULT['tiles_path'], config.DEFAULT['dataset_id'], tiles_root)
+
     # 1. run the cell calling algo
     cellData, geneData = varBayes()
 
     # 2. start the viewer
     if cellData is not None and geneData is not None:
-        pixel_dims = tile_maker(config.DEFAULT['roi'])
+        pixel_dims = tile_maker(config.DEFAULT['roi'], dim, tiles_root_path)
 
         # 2a. First make a dict to keep the configuration
-        ini = mk_ini(cellData, geneData, pixel_dims)
+        ini = mk_ini(cellData, geneData, pixel_dims, tiles_root_path)
 
         # 2b. Now push everything into the viewer
         app_start(ini)
