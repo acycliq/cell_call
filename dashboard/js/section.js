@@ -34,7 +34,7 @@ function section() {
     }
 
     // var colorScale = d3.scaleLinear().domain([0, 1]).range(['tomato', 'tomato']);
-    var colorRamp = classColorsCodes()
+    var colorRamp = classColorsCodes();
     var colorMap = d3.map(colorRamp, function (d) {
         return d.className;
     });
@@ -43,7 +43,7 @@ function section() {
     var container = d3.select('#scatter-plot');
 
     var zoom = d3.zoom()
-        .scaleExtent([1, 20])
+        .scaleExtent([1, 20]);
         //.on("zoom", zoomed);
 
     var tooltip = d3.select("body").append("div")
@@ -63,11 +63,11 @@ function section() {
     // grid lines group must be before the dotsGroup group so that the
     /// gridlines are rendered under the circles and not above!
     var xGrid = svg.append("g")
-        .attr("class", "grid")
+        .attr("class", "grid");
         // .call(sectionFeatures.gridlines.x);
 
     var yGrid = svg.append("g")
-        .attr("class", "grid")
+        .attr("class", "grid");
         // .call(sectionFeatures.gridlines.y);
 
     // Clip path
@@ -85,19 +85,19 @@ function section() {
 
     //Create X axis
     var renderXAxis = svg.append("g")
-        .attr("class", "x axis")
+        .attr("class", "x axis");
 
     //Create Y axis
     var renderYAxis = svg.append("g")
-        .attr("class", "y axis")
+        .attr("class", "y axis");
 
     //Create X grilines
     var renderXGridline = svg.append("g")
-        .attr("class", "x gridline")
+        .attr("class", "x gridline");
 
     //Create Y gridlines
     var renderYGridline = svg.append("g")
-        .attr("class", "y gridline")
+        .attr("class", "y gridline");
 
     // set up axis generating functions
     var xTicks = Math.round(width / 50);
@@ -113,7 +113,7 @@ function section() {
     }
 
     // voronoi
-    var voronoi = d3.voronoi()
+    var voronoi = d3.voronoi();
 
     function renderOrder(y) {
         return y === 'Zero' ? 1 :
@@ -196,7 +196,7 @@ function aggregator(data) {
     // sort in decreasing order
     out.sort(function (x, y) {
         return d3.ascending(y.Prob, x.Prob);
-    })
+    });
 
     return out
 }
@@ -249,14 +249,14 @@ function updateManagedData(md, arr){
         // two cells overlap the cell with large idx (=smaller counts) will be distinguishable and not hidden)
         d.renderOrder = idx>=0? idx+1: arr.length+1
 	})
-};
+}
 
 var sectionFeatures; // This is now a global variable!
 function sectionChart(data) {
 
-    console.log('Doing Section Overview plot')
+    console.log('Doing Section Overview plot');
 
-    var svg = d3.select('#scatter-plot').select("svg")
+    var svg = d3.select('#scatter-plot').select("svg");
     if (svg.select('#sectionChartGroup').empty()) {
         sectionFeatures = section()
     }
@@ -320,7 +320,7 @@ function sectionChart(data) {
     var gridlines = {
         x: d3.axisBottom(sectionFeatures.scale.x).tickFormat("").tickSize(sectionFeatures.height),
         y: d3.axisLeft(sectionFeatures.scale.y).tickFormat("").tickSize(-sectionFeatures.width),
-    }
+    };
 
     function updateGridlines() {
         sectionFeatures.xGrid.call(gridlines.x);
@@ -343,7 +343,7 @@ function sectionChart(data) {
         // should be rendered last. Especially when using filters on the section chart you need to guarantee
         // that these are drawn at very end, otherwise they wont work properly.
         // Draw the highlight circle
-        d3.select('#dotsGroup').select('.highlight-circle').remove()
+        d3.select('#dotsGroup').select('.highlight-circle').remove();
         if (d3.select('#dotsGroup').select('.highlight-circle').empty()){
             sectionFeatures.dotsGroup
                             .append('circle')
@@ -356,7 +356,7 @@ function sectionChart(data) {
             .attr('r', sectionFeatures.pointRadius * 2);
 
         // Now draw the overlay on top of everything to take the mouse events
-        d3.select('#dotsGroup').select('#sectionOverlay').remove()
+        d3.select('#dotsGroup').select('#sectionOverlay').remove();
         if (d3.select('#dotsGroup').select('#sectionOverlay').empty()){
             sectionFeatures.dotsGroup
                             .append('rect')
@@ -377,7 +377,7 @@ function sectionChart(data) {
         d3.select('#dotsGroup')
             .select('#sectionOverlay')
             .attr('width', sectionFeatures.width)
-            .attr('height', sectionFeatures.height)
+            .attr('height', sectionFeatures.height);
 
         //Finally return the voronoi
         return v
@@ -438,15 +438,15 @@ function sectionChart(data) {
         .attr('cx', d => sectionFeatures.scale.x(d.x))
         .attr('cy', d => sectionFeatures.scale.y(d.y))
         .attr('fill', d => d.managedData.color)
-        .attr('fill-opacity', 0.85)
+        .attr('fill-opacity', 0.85);
 
     update.exit().remove();
 
     //
-    d3.select('#dotsGroup').select('.highlight-rect').remove()
+    d3.select('#dotsGroup').select('.highlight-rect').remove();
     if (d3.select('#dotsGroup').select('.highlight-rect').empty()){
         dotsGroup.append('rect').attr('class', 'highlight-rect')
-    };
+    }
 
     var voronoiDiagram = updateVoronoi(data);
 
@@ -483,7 +483,7 @@ function sectionChart(data) {
         d3.select('.highlight-rect')
             .attr("width", 0)
             .attr("height",0)
-            .attr('opacity', 0)
+            .attr('opacity', 0);
 
         // get the current mouse position
         const [mx, my] = d3.mouse(this);
@@ -529,8 +529,8 @@ function sectionChart(data) {
 
 // callback for when the mouse moves across the overlay
     function mouseClickHandler() {
-        console.log('pageX is: ' + d3.event.pageX)
-        console.log('pageY is: ' + d3.event.pageY)
+        console.log('pageX is: ' + d3.event.pageX);
+        console.log('pageY is: ' + d3.event.pageY);
 
         // get the current mouse position
         const [mx, my] = d3.mouse(this);
@@ -544,7 +544,7 @@ function sectionChart(data) {
         highlight(site && site.data);
 
         // 2.
-        updateDashboard(site && site.data)
+        updateDashboard(site && site.data);
 
         // 3.
         drawMarker(site && site.data)
@@ -609,10 +609,10 @@ function sectionChart(data) {
                         '<td><div>' + Math.round(100 * d.managedData.GeneCountTotal) / 100 + '</div></td>' +
                         '</tr>' +
                         '</tbody>' +
-                        '</table>'
+                        '</table>';
 
                     sectionFeatures.tooltip.transition()
-                        .duration(200)
+                        .duration(200);
 
                     sectionFeatures.tooltip
                         .style("opacity", .9)
@@ -636,9 +636,9 @@ function sectionChart(data) {
         .rollup(function (leaves) {
             return leaves.length
         })
-        .entries(data)
+        .entries(data);
 
-    console.log('Finished Section Overview plot')
+    console.log('Finished Section Overview plot');
     return data
 }
 
