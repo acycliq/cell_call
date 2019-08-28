@@ -814,6 +814,7 @@ function dapiChart(cellData, geneData, config) {
         var cn = e.target.feature.properties.Cell_Num;
         if(pinnedLineStrings){
             map.removeLayer(pinnedLineStrings)
+            console.log('Pinned lines removed');
         }
         else{
             pinnedLineStrings = drawPinnedLines(e)
@@ -834,7 +835,7 @@ function dapiChart(cellData, geneData, config) {
     }
 
     function drawPinnedLines(e){
-        console.log('in drawLines')
+        console.log('Pinning the drawLines')
         var center = e.target.feature.properties;
         var spots = getCellMembers(geneData, center.Cell_Num);
         var lineFeatureCollection = dapiConfig.makeLineStringFeatures(spots, center);
