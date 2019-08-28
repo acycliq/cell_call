@@ -124,7 +124,7 @@ function glyphAssignment()
 }
 
 //create color ramp.
-function getGlyphColor(y) {
+function glyphColor(y) {
     return y === 'non_neuron' ? '#FFFFFF' : //hsv: [0 0 1]);
         y === 'pc_or_in' ? '#407F59' :      //hsv: [.4 .5 .5]);
             y === 'less_active' ? '#96B38F' :   //hsv: [.3 .2 .7]);

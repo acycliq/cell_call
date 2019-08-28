@@ -44,7 +44,7 @@ function dapi(config) {
 
     // get the svg markers
     var glyphs = glyphAssignment();
-    var getColor = getGlyphColor;
+    var getColor = glyphColor;
     var glyphMap = d3.map(glyphs, function (d) {
         return d.gene;
     });
