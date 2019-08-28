@@ -42,7 +42,7 @@ function dapi(config) {
         return out
     }
 
-    // get the svg markers
+    // get the svg markers (glyphs)
     var glyphs = glyphSettings();
     var getColor = glyphColor;
     var glyphMap = d3.map(glyphs, function (d) {
