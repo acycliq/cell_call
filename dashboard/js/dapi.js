@@ -22,7 +22,7 @@ function dapi(config) {
     // This transformation maps a point in pixel dimensions to our user defined roi
     var t = new L.Transformation(a, b, c, d);
 
-    //create color ramp
+    //create color ramp. It would be better to have that in glyphAssignment.js since this is where glyph configuration is set.
     function getColor(y) {
         return y === 'non_neuron' ? '#FFFFFF' : //hsv: [0 0 1]);
             y === 'pc_or_in' ? '#407F59' :      //hsv: [.4 .5 .5]);
