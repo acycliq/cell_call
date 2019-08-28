@@ -592,7 +592,7 @@ function sectionChart(data) {
                     .attr('fill', d.managedData.color)
                     .attr('cx', sectionFeatures.scale.x(d.x))
                     .attr('cy', sectionFeatures.scale.y(d.y))
-                    .attr("r", 1.2 * Math.sqrt(d.managedData.GeneCountTotal));
+                    .attr("r", 1.2 * Math.sqrt(d.managedData.GeneCountTotal)); // increase circle by 20% when highlighted
 
                 // If event has been triggered from the scatter chart, do a tooltip
                 if (d3.event && d3.event.pageX) {
