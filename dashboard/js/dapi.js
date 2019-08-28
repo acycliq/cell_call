@@ -22,23 +22,6 @@ function dapi(config) {
     // This transformation maps a point in pixel dimensions to our user defined roi
     var t = new L.Transformation(a, b, c, d);
 
-    //create color ramp. It would be better to have that in glyphAssignment.js since this is where glyph configuration is set.
-    function getColor(y) {
-        return y === 'non_neuron' ? '#FFFFFF' : //hsv: [0 0 1]);
-            y === 'pc_or_in' ? '#407F59' :      //hsv: [.4 .5 .5]);
-                y === 'less_active' ? '#96B38F' :   //hsv: [.3 .2 .7]);
-                    y === 'pc' ? '#00FF00' :            //hsv: [1/3 1 1]);
-                        y === 'pc2' ? '#44B300' :           //hsv: [.27 1 .7]);
-                            y === 'in_general' ? '#0000FF' :    //hsv: [2/3 1 1]);
-                                y === 'sst' ? '#00B3FF' :           //hsv: [.55 1 1]);
-                                    y === 'pvalb' ? '#5C33FF' :         //hsv: [.7 .8 1]);
-                                        y === 'ngf' ? '#FF00E6' :           //hsv: [.85 1 1]);
-                                            y === 'cnr1' ? '#FF0000' :          //hsv: [ 1 1 1]);
-                                                y === 'vip' ? '#FFC700' :           //hsv: [.13 1 1]);
-                                                    y === 'cxcl14' ? '#995C00' :        //hsv: [.1 1 .6]);
-                                                        '#FD6A02';
-    }
-
     function getTaxonomy(gene){
         if(glyphMap.get(gene)){
             out = glyphMap.get(gene).taxonomy
@@ -61,6 +44,7 @@ function dapi(config) {
 
     // get the svg markers
     var glyphs = glyphAssignment();
+    var getColor = getGlyphColor;
     var glyphMap = d3.map(glyphs, function (d) {
         return d.gene;
     });
