@@ -1,6 +1,6 @@
 
 
-function glyphAssignment()
+function glyphSettings()
 {
     var out = [
 
