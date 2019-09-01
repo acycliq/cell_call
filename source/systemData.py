@@ -88,7 +88,7 @@ class Prior(object):
 
 class Genes(object):
     def __init__(self, spots):
-        [gn, ispot, total_spots] = np.unique(spots.data.gene_name.data, return_inverse=True, return_counts=True)
+        [gn, ispot, total_spots] = np.unique(spots.data.gene_name.values, return_inverse=True, return_counts=True)
         self.panel = xr.Dataset({'gene_gamma': xr.DataArray(np.ones(gn.shape), coords=[('gene_name', gn)]),
                                  'total_spots': xr.DataArray(total_spots, [('gene_name', gn)]),
                                  'ispot': ispot,
@@ -148,7 +148,8 @@ class Spots(object):
         idx = np.array(yxCoords) - np.array([y0, x0]) # First move the origin at (0, 0)
         SpotInCell = utils.label_spot(label_image, idx.T)
         # sanity check
-        sanity_check = neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
+        mask = np.greater(SpotInCell, 0, where=~np.isnan(SpotInCell))
+        sanity_check = neighbors[mask, 0] + 1 == SpotInCell[mask]
         assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
         pSpotNeighb = np.zeros([nS, nN])
@@ -176,7 +177,8 @@ class Spots(object):
         # last column (nN-closest) keeps the misreads,
         D[:, -1] = np.log(cfg['MisreadDensity'])
 
-        D[self.call.label.values > 0, 0] = D[self.call.label.values > 0, 0] + cfg['InsideCellBonus']
+        mask = np.greater(self.call.label.values, 0, where=~np.isnan(self.call.label.values))
+        D[mask, 0] = D[mask, 0] + cfg['InsideCellBonus']
         print('in loglik')
         return D
 

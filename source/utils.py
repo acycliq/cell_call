@@ -279,5 +279,6 @@ def bi2(X, dims, *args):
     for i in range(len(args)):
         inds.append(temp + args[i])
 
+    inds = tuple(inds)
     # out = X[inds]
     return X[inds]
