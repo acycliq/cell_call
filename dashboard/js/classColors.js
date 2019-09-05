@@ -78,7 +78,7 @@ function classColorsCodes()
         {className: 'Zero',                         IdentifiedType: 'Zero',             color: '#000000'},
 
 
-        // I added this
+        // I added this. It is used in the donut chart, not in the section chart (that can be confusing, need to tide this up)
         {className: 'Other', IdentifiedType: 'Other', colorGroup: 'Other', color: '#C0C0C0'},
 
 
