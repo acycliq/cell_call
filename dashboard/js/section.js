@@ -115,37 +115,37 @@ function section() {
     // voronoi
     var voronoi = d3.voronoi();
 
-    function renderOrder(y) {
-        return y === 'Zero' ? 1 :
-            y === 'PC' ? 2 :
-                y === 'Non Neuron' ? 3 :
-                    y === 'PC Other2' ? 4 :
-                        y === 'PC Other1' ? 5 :
-                            y === 'Bistratified' ? 6 :
-                                y === 'Sst/Reln/NPY' ? 7 :
-                                    y === 'IS1' ? 8 :
-                                        y === 'CGE NGF' ? 9 :
-                                            y === 'Basket' ? 10 :
-                                                y === 'IS3' ? 11 :
-                                                    y === 'Radiatum retrohip' ? 12 :
-                                                        y === 'MGE NGF' ? 13 :
-                                                            y === 'O/LM' ? 14 :
-                                                                y === 'NGF/I-S transition' ? 15 :
-                                                                    y === 'Trilaminar' ? 16 :
-                                                                        y === 'Axo-axonic' ? 17 :
-                                                                            y === 'O-Bi' ? 18 :
-                                                                                y === 'Ivy' ? 19 :
-                                                                                    y === 'Hippocamposeptal' ? 20 :
-                                                                                        y === 'Cck Cxcl14+' ? 21 :
-                                                                                            y === 'Cck Vip Cxcl14-' ? 22 :
-                                                                                                y === 'Cck Cxcl14-' ? 23 :
-                                                                                                    y === 'Unidentified' ? 24 :
-                                                                                                        y === 'Cck Vip Cxcl14+' ? 25 :
-                                                                                                            y === 'Cck Calb1/Slc17a8*' ? 26 :
-                                                                                                                y === 'Backprojection' ? 27 :
-                                                                                                                    y === 'IS2' ? 28 :
-                                                                                                                        29;
-    }
+    // function renderOrder(y) {
+    //     return y === 'Zero' ? 1 :
+    //         y === 'PC' ? 2 :
+    //             y === 'Non Neuron' ? 3 :
+    //                 y === 'PC Other2' ? 4 :
+    //                     y === 'PC Other1' ? 5 :
+    //                         y === 'Bistratified' ? 6 :
+    //                             y === 'Sst/Reln/NPY' ? 7 :
+    //                                 y === 'IS1' ? 8 :
+    //                                     y === 'CGE NGF' ? 9 :
+    //                                         y === 'Basket' ? 10 :
+    //                                             y === 'IS3' ? 11 :
+    //                                                 y === 'Radiatum retrohip' ? 12 :
+    //                                                     y === 'MGE NGF' ? 13 :
+    //                                                         y === 'O/LM' ? 14 :
+    //                                                             y === 'NGF/I-S transition' ? 15 :
+    //                                                                 y === 'Trilaminar' ? 16 :
+    //                                                                     y === 'Axo-axonic' ? 17 :
+    //                                                                         y === 'O-Bi' ? 18 :
+    //                                                                             y === 'Ivy' ? 19 :
+    //                                                                                 y === 'Hippocamposeptal' ? 20 :
+    //                                                                                     y === 'Cck Cxcl14+' ? 21 :
+    //                                                                                         y === 'Cck Vip Cxcl14-' ? 22 :
+    //                                                                                             y === 'Cck Cxcl14-' ? 23 :
+    //                                                                                                 y === 'Unidentified' ? 24 :
+    //                                                                                                     y === 'Cck Vip Cxcl14+' ? 25 :
+    //                                                                                                         y === 'Cck Calb1/Slc17a8*' ? 26 :
+    //                                                                                                             y === 'Backprojection' ? 27 :
+    //                                                                                                                 y === 'IS2' ? 28 :
+    //                                                                                                                     29;
+    // }
 
 
     var chartData = {};
@@ -253,10 +253,12 @@ function dataManager(sectionFeatures, data) {
 }
 
 function updateManagedData(md, arr){
-    // arr is an array of objects. Each object looks like a dict, its properties are key and value.
-    // The key the class name and value the total counts of the cells with cell class the same as the key
-    // Hence if you add up all the values the total should the same as the total number of cells. You can do this by typing
-    // arr.map(item => item.value).reduce((prev, next) => prev + next);
+    // Will stick a new property that controls the renderOrder of the circles shown in the section chart.
+    //
+    // Side note:   arr is an array of objects. Each object looks like a dict, its properties are key and value.
+    //              The key the class name and value the total counts of the cells with cell class the same as the key
+    //              Hence if you add up all the values the total should the same as the total number of cells. You can do this by typing
+    //              arr.map(item => item.value).reduce((prev, next) => prev + next);
 
     // First, sort array arr in decreasing order
     arr.sort(function (x, y) {
