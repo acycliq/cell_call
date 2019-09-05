@@ -77,6 +77,12 @@ function classColorsCodes()
         {className: 'Sst.Cryab',                    IdentifiedType: 'Unidentified',     color: '#A6A6A6'},
         {className: 'Zero',                         IdentifiedType: 'Zero',             color: '#000000'},
 
+
+        // I added this
+        {className: 'Other', IdentifiedType: 'Other', colorGroup: 'Other', color: '#C0C0C0'},
+
+
+
     ];
 
     return out
