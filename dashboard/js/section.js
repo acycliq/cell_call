@@ -201,6 +201,26 @@ function aggregator(data) {
     return out
 }
 
+function setIdentifiedType(d){
+    if (d.IdentifiedType) {
+        it = d.IdentifiedType
+    } else {
+        it = 'Other'
+        console.log('IdentifiedType for ' + d.ClassName + ' was set to "Other" ')
+    }
+    return it
+}
+
+function setColor(d){
+    if (d.color) {
+        c = d.color
+    } else {
+        c = '#C0C0C0'
+        console.log('color  for ' + d.ClassName + ' was set to "#C0C0C0" ')
+    }
+    return c
+}
+
 function dataManager(sectionFeatures, data) {
     var chartData = [];
     for (var i = 0; i < data.length; ++i) {
@@ -208,8 +228,10 @@ function dataManager(sectionFeatures, data) {
         for (var j = 0; j < data[i].ClassName.length; ++j) {
             // console.log(data[i].ClassName[j])
             temp.push({
-                IdentifiedType: sectionFeatures.colorMap.get(data[i].ClassName[j]).IdentifiedType,
-                color: sectionFeatures.colorMap.get(data[i].ClassName[j]).color,
+                // IdentifiedType: sectionFeatures.colorMap.get(data[i].ClassName[j]).IdentifiedType,
+                IdentifiedType: setIdentifiedType(sectionFeatures.colorMap.get(data[i].ClassName[j])),
+                // color: sectionFeatures.colorMap.get(data[i].ClassName[j]).color,
+                color: setColor(sectionFeatures.colorMap.get(data[i].ClassName[j])),
                 Prob: data[i].Prob[j]? data[i].Prob[j]: [data[i].Prob] //Maybe that one is better
             })
         }
