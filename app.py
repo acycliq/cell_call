@@ -39,9 +39,12 @@ def get_browser(port_num):
 
     if chrome_path and os.path.isfile(chrome_path):
         webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chrome_path), 1)
-        webbrowser.get('chrome').open_new_tab(url)
+        wb = webbrowser.get('chrome').open_new_tab(url)
     else:
-        webbrowser.open_new(url)
+        wb = webbrowser.open_new(url)
+
+    if ~wb:
+        logger.info('Could not open browser')
 
 
 def open_browser():
