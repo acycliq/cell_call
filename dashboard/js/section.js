@@ -506,7 +506,6 @@ function sectionChart(data) {
         // Hence despite zooming-in or out the circles will keep the same size on the screen
         // The same workaround has to be applied for the highlighting circle and the rect (the rect is raised by the dapi.js)
         var zoomLevel = d3.event.transform.k;
-        //collect the coordinates of the circles and push the to the data object
         var nodes = d3.selectAll('circle').nodes();
         for (var i = 0; i < nodes.length; i++) {
             if (nodes[i].getAttribute('class') === 'dotOnScatter') {
