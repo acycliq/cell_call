@@ -171,6 +171,7 @@ function section() {
     chartData.xGrid = xGrid;
     chartData.yGrid = yGrid;
     chartData.voronoi = voronoi;
+    chartData.zoomLevel = 1.0; // Thats ok. It is going to be updated later on, when the zoom function comes alive
 
     return chartData
 }
@@ -499,6 +500,22 @@ function sectionChart(data) {
         dotsGroup.attr("transform", d3.event.transform);
         // xGrid.attr("transform", d3.event.transform);
         // yGrid.attr("transform", d3.event.transform);
+
+
+        // The loop below goes over all circles and set the radius to a new value that will negate the zoom effect.
+        // Hence despite zooming-in or out the circles will keep the same size on the screen
+        // The same workaround has to be applied for the highlighting circle and the rect (the rect is raised by the dapi.js)
+        var zoomLevel = d3.event.transform.k;
+        //collect the coordinates of the circles and push the to the data object
+        var nodes = d3.selectAll('circle').nodes();
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].getAttribute('class') === 'dotOnScatter') {
+                var rd = Math.sqrt(config.cellData[i].managedData.GeneCountTotal);
+                nodes[i].setAttribute('r', rd / d3.event.transform.k)
+            }
+        }
+        // finally update the zoomLevel property.
+        sectionFeatures.zoomLevel = zoomLevel
     }
 
 // callback for when the mouse moves across the overlay
@@ -613,10 +630,11 @@ function sectionChart(data) {
                 d3.select('.highlight-circle')
                     .style('display', '')
                     .style('stroke', 'tomato')
+                    .style('stroke-width', 1/sectionFeatures.zoomLevel)
                     .attr('fill', d.managedData.color)
                     .attr('cx', sectionFeatures.scale.x(d.x))
                     .attr('cy', sectionFeatures.scale.y(d.y))
-                    .attr("r", 1.2 * Math.sqrt(d.managedData.GeneCountTotal)); // increase circle by 20% when highlighted
+                    .attr("r", 1.2 * Math.sqrt(d.managedData.GeneCountTotal) / sectionFeatures.zoomLevel ); // increase circle by 20% when highlighted
 
                 // If event has been triggered from the scatter chart, do a tooltip
                 if (d3.event && d3.event.pageX) {

@@ -510,17 +510,17 @@ function dapiChart(cellData, geneData, config) {
         var width = 35*1.6;
         var height = 35;
         d3.select('.highlight-rect')
-            .attr("x", x-width/2)
-            .attr("y", y-height/2)
-            .attr("width", width)
-            .attr("height",height)
+            .attr("x", x-width/(2*sectionFeatures.zoomLevel))
+            .attr("y", y-height/(2*sectionFeatures.zoomLevel))
+            .attr("width", width/sectionFeatures.zoomLevel)
+            .attr("height",height/sectionFeatures.zoomLevel)
             .attr('fill', 'orange')
             .attr('fill-opacity', 0.5)
             .attr('opacity', 1)
             .attr('stroke', 'red')
             // .attr('stroke-dasharray', '10,5')
             // .attr('stroke-linecap', 'butt')
-            .attr('stroke-width', '3')
+            .attr('stroke-width', 3/sectionFeatures.zoomLevel)
     }
 
     function outsideMap(e){
