@@ -79,7 +79,7 @@ function section() {
 
     var dotsGroup = svg.append("g")
         .attr("clip-path", "url(#clip)")
-        .attr("transform", "translate(4, 0)") // no idea why!
+        //.attr("transform", "translate(0, 0)")
         .append("g")
         .attr('id', 'dotsGroup');
 
@@ -339,9 +339,8 @@ function sectionChart(data) {
 
     function updateScales() {
         var extent = getExtent();
-
-        sectionFeatures.scale.x.domain([extent.x[0] * 0.99, extent.x[1] * 1.01]).nice()
-        sectionFeatures.scale.y.domain([extent.y[0] * 0.99, extent.y[1] * 1.01]).nice()
+        sectionFeatures.scale.x.domain([extent.x[0], extent.x[1]]).nice();
+        sectionFeatures.scale.y.domain([extent.y[0], extent.y[1]]).nice();
     }
 
     var gridlines = {
@@ -415,28 +414,13 @@ function sectionChart(data) {
     updateGridlines();
 
     svg.select('.y.axis')
-        .attr("transform", "translate(" + sectionFeatures.pointRadius + " 0)")
+        //.attr("transform", "translate(" + sectionFeatures.pointRadius + " 0)")
         .call(sectionFeatures.axis.y);
 
-    var h = sectionFeatures.height + sectionFeatures.pointRadius;
+    var h = sectionFeatures.height;
     svg.select('.x.axis')
         .attr("transform", "translate(0, " + h + ")")
         .call(sectionFeatures.axis.x);
-
-    // var xGrid = svg.append("g")
-    //     .attr("class", "grid")
-    //     .call(sectionFeatures.gridlines.x);
-    //
-    // var yGrid = svg.append("g")
-    //     .attr("class", "grid")
-    //     .call(sectionFeatures.gridlines.y);
-
-    // var dotsGroup = svg.append("g")
-    //     .attr("clip-path", "url(#clip)")
-    //     .attr("transform", "translate(4, 0)") // no idea why!
-    //     .append("g");
-
-    var dotsGroup = sectionFeatures.dotsGroup;
 
 
     // Do the chart
@@ -445,6 +429,7 @@ function sectionChart(data) {
     // because it will carry the styling from the highlight-circle
     // That styling is set to:
     // style="stroke: tomato; display: none;"
+    var dotsGroup = sectionFeatures.dotsGroup;
     var update = dotsGroup.selectAll(".dotOnScatter").data(data);
 
     // Note: Setting the transition here messes up the landing cell
