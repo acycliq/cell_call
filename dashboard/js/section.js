@@ -115,37 +115,37 @@ function section() {
     // voronoi
     var voronoi = d3.voronoi();
 
-    // function renderOrder(y) {
-    //     return y === 'Zero' ? 1 :
-    //         y === 'PC' ? 2 :
-    //             y === 'Non Neuron' ? 3 :
-    //                 y === 'PC Other2' ? 4 :
-    //                     y === 'PC Other1' ? 5 :
-    //                         y === 'Bistratified' ? 6 :
-    //                             y === 'Sst/Reln/NPY' ? 7 :
-    //                                 y === 'IS1' ? 8 :
-    //                                     y === 'CGE NGF' ? 9 :
-    //                                         y === 'Basket' ? 10 :
-    //                                             y === 'IS3' ? 11 :
-    //                                                 y === 'Radiatum retrohip' ? 12 :
-    //                                                     y === 'MGE NGF' ? 13 :
-    //                                                         y === 'O/LM' ? 14 :
-    //                                                             y === 'NGF/I-S transition' ? 15 :
-    //                                                                 y === 'Trilaminar' ? 16 :
-    //                                                                     y === 'Axo-axonic' ? 17 :
-    //                                                                         y === 'O-Bi' ? 18 :
-    //                                                                             y === 'Ivy' ? 19 :
-    //                                                                                 y === 'Hippocamposeptal' ? 20 :
-    //                                                                                     y === 'Cck Cxcl14+' ? 21 :
-    //                                                                                         y === 'Cck Vip Cxcl14-' ? 22 :
-    //                                                                                             y === 'Cck Cxcl14-' ? 23 :
-    //                                                                                                 y === 'Unidentified' ? 24 :
-    //                                                                                                     y === 'Cck Vip Cxcl14+' ? 25 :
-    //                                                                                                         y === 'Cck Calb1/Slc17a8*' ? 26 :
-    //                                                                                                             y === 'Backprojection' ? 27 :
-    //                                                                                                                 y === 'IS2' ? 28 :
-    //                                                                                                                     29;
-    // }
+    function renderOrder(y) {
+        return y === 'Zero' ? 1 :
+            y === 'PC' ? 2:
+                y === 'Non Neuron' ? 3 :
+                    y === 'PC Other2' ? 4 :
+                        y === 'PC Other1' ? 5 :
+                            y === 'Bistratified' ? 6 :
+                                y === 'Sst/Reln/NPY' ? 7 :
+                                    y === 'IS1' ? 8 :
+                                        y === 'CGE NGF' ? 9 :
+                                            y === 'Basket' ? 10 :
+                                                y === 'IS3' ? 11 :
+                                                    y === 'Radiatum retrohip' ? 12 :
+                                                        y === 'MGE NGF' ? 13 :
+                                                            y === 'O/LM' ? 14 :
+                                                                y === 'NGF/I-S transition' ? 15 :
+                                                                    y === 'Trilaminar' ? 16 :
+                                                                        y === 'Axo-axonic' ? 17 :
+                                                                            y === 'O-Bi' ? 18 :
+                                                                                y === 'Ivy' ? 19 :
+                                                                                    y === 'Hippocamposeptal' ? 20 :
+                                                                                        y === 'Cck Cxcl14+' ? 21 :
+                                                                                            y === 'Cck Vip Cxcl14-' ? 22 :
+                                                                                                y === 'Cck Cxcl14-' ? 23 :
+                                                                                                    y === 'Unidentified' ? 24 :
+                                                                                                        y === 'Cck Vip Cxcl14+' ? 25 :
+                                                                                                            y === 'Cck Calb1/Slc17a8*' ? 26 :
+                                                                                                                y === 'Backprojection' ? 27 :
+                                                                                                                    y === 'IS2' ? 28 :
+                                                                                                                        29;
+    }
 
 
     var chartData = {};
@@ -157,6 +157,7 @@ function section() {
     chartData.renderYAxis = renderYAxis;
     chartData.renderXGridline = renderXGridline;
     chartData.renderYGridline = renderYGridline;
+    chartData.renderOrder = renderOrder;
     chartData.tsn = tsn;
     chartData.pointRadius = pointRadius;
     chartData.scale = scale;
@@ -244,7 +245,8 @@ function dataManager(sectionFeatures, data) {
             IdentifiedType: agg[0].IdentifiedType,
             color: agg[0].color,
             Prob: agg[0].Prob,
-            renderOrder: null, // This will be set/updated later on
+            renderOrder: sectionFeatures.renderOrder(agg[0].IdentifiedType),
+            // renderOrder: null, // This will be set/updated later on
             // renderOrder2: sectionFeatures.renderOrder2(countData, agg[0].IdentifiedType),
 
         })
@@ -297,7 +299,7 @@ function sectionChart(data) {
             return leaves.length
         })
         .entries(managedData);
-    updateManagedData(managedData, countsPerIdentifiedType);
+    // updateManagedData(managedData, countsPerIdentifiedType);
 
     //update now data with a managedData property
     for (var i = 0; i < data.length; ++i) {
