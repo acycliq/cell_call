@@ -146,7 +146,25 @@ class Spots(object):
         nN = cfg['nNeighbors'] + 1
 
         idx = np.array(yxCoords) - np.array([y0, x0]) # First move the origin at (0, 0)
+        logger.info('Starting SpotInCell')
         SpotInCell = utils.label_spot(label_image, idx.T)
+        logger.info('Ended SpotInCell')
+        SpotInCell[np.isnan(SpotInCell)] = 0
+
+        logger.info('Starting SpotInCell2')
+        SpotInCell2 = utils.label_spot2(label_image,  idx)
+        SpotInCell2 = SpotInCell2.parent_cell
+        SpotInCell2[np.isnan(SpotInCell2)] = 0
+        SpotInCell2 = SpotInCell2.values
+        logger.info('Ended SpotInCell2')
+
+        # logger.info('Starting SpotInCell3')
+        # SpotInCell3 = utils.label_spot3(label_image, idx, roi)
+        # SpotInCell3 = SpotInCell3.parent_cell
+        # SpotInCell3[np.isnan(SpotInCell3)] = 0
+        # SpotInCell3 = SpotInCell3.values
+        # logger.info('Ended SpotInCell3')
+
         # sanity check
         mask = np.greater(SpotInCell, 0, where=~np.isnan(SpotInCell))
         sanity_check = neighbors[mask, 0] + 1 == SpotInCell[mask]

@@ -1,7 +1,9 @@
 import numpy as np
+import pandas as pd
 import numexpr as ne
 import numba as nb
 import scipy
+from scipy.sparse import coo_matrix
 import xarray as xr
 import scipy.io as spio
 import os
@@ -100,6 +102,45 @@ def label_spot(a, idx):
     print('in label_spot')
 
     return out
+
+def label_spot2(label_image, yx_coords):
+    spots_df = pd.DataFrame(yx_coords, columns=['y', 'x'])
+
+    logger.info('flattening the label_image')
+    label_image_flat = pd.DataFrame(label_image).unstack()
+    label_image_flat = label_image_flat[label_image_flat > 0]
+    label_image_flat = label_image_flat.reset_index().rename(columns={'level_0': 'x', 'level_1': 'y', 0: 'parent_cell'})
+    label_image_flat.head()
+    logger.info('flattening done!')
+
+    merged = pd.merge(spots_df, label_image_flat, on=['x', 'y'], how='left')
+
+    merged[np.isfinite(merged.parent_cell)]
+
+    print(np.isfinite(merged.parent_cell).sum())
+
+    return merged
+
+
+def label_spot3(label_image, yx_coords, roi):
+    within_bounds = [np.all(x>=0) for x in yx_coords]
+    yx_coords = yx_coords[within_bounds]
+    spots_df = pd.DataFrame(yx_coords, columns=['y', 'x'])
+
+    row = yx_coords[:, 0]
+    col = yx_coords[:, 1]
+    coo_spots = coo_matrix((np.zeros(col.shape), (row, col)), shape=label_image.shape)
+
+    cm = coo_matrix(label_image, dtype=np.int)
+    cm_df = pd.DataFrame({'x': cm.col, 'y': cm.row, 'parent_cell': cm.data})
+    merged = pd.merge(spots_df, cm_df, on=['x', 'y'], how='left')
+
+    merged[np.isfinite(merged.parent_cell)]
+
+    print(np.isfinite(merged.parent_cell).sum())
+
+    return merged
+
 
 
 def gammaExpectation(rho, beta):
