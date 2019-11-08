@@ -147,6 +147,7 @@ class Spots(object):
 
         idx = np.array(yxCoords) - np.array([y0, x0]) # First move the origin at (0, 0)
         SpotInCell = utils.label_spot(label_image, idx.T)
+        SpotInCell[np.isnan(SpotInCell)] = 0
         # sanity check
         mask = np.greater(SpotInCell, 0, where=~np.isnan(SpotInCell))
         sanity_check = neighbors[mask, 0] + 1 == SpotInCell[mask]
