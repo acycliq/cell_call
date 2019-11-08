@@ -115,7 +115,8 @@ def label_spot2(label_image, yx_coords):
 
     merged = pd.merge(spots_df, label_image_flat, on=['x', 'y'], how='left')
 
-    merged[np.isfinite(merged.parent_cell)]
+    # merged[np.isfinite(merged.parent_cell)]
+    merged['parent_cell'] = merged.parent_cell.fillna(0).astype(int).values
 
     print(np.isfinite(merged.parent_cell).sum())
 
